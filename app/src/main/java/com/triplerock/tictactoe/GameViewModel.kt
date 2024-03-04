@@ -27,7 +27,7 @@ val crossingList = listOf(
 
 sealed class GameUiState {
     data class Ready(
-        val statusText: String,
+        val statusText: String = "Player 1 starts",
     ) : GameUiState()
 
     data class NextTurn(
@@ -36,10 +36,10 @@ sealed class GameUiState {
         val statusText: String,
     ) : GameUiState()
 
-    data class GameOver(
+    data class Draw(
         val player1Moves: List<Int>,
         val player2Moves: List<Int>,
-        val statusText: String,
+        val statusText: String = "Its a draw!",
     ) : GameUiState()
 
     data class Winner(
@@ -58,7 +58,7 @@ class GameViewModel : ViewModel() {
     private val player2Moves: ArrayList<Int> = ArrayList()
 
     private val _uiState: MutableStateFlow<GameUiState> =
-        MutableStateFlow(GameUiState.Ready(statusTurnPlayer1))
+        MutableStateFlow(GameUiState.Ready())
     val uiState: StateFlow<GameUiState> = _uiState
 
     fun onCellClick(cell: Int) {
@@ -85,10 +85,18 @@ class GameViewModel : ViewModel() {
                 return
             }
         }
+        val nextPlayer = if (isTurnOfPlayer1) 2 else 1
         _uiState.value = GameUiState.NextTurn(
             player1Moves = player1Moves,
             player2Moves = player2Moves,
-            statusText = "Turn: Player $player",
+            statusText = "Turn: Player $nextPlayer",
         )
+    }
+
+    fun onRestartClick() {
+        player1Moves.clear()
+        player2Moves.clear()
+        isTurnOfPlayer1 = true
+        _uiState.value = GameUiState.Ready()
     }
 }

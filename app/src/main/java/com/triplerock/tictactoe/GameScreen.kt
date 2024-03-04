@@ -2,12 +2,10 @@ package com.triplerock.tictactoe
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,9 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -26,9 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +43,7 @@ fun GameScreenContainer(gameViewModel: GameViewModel) {
             val ready = gameUiState.value as GameUiState.Ready
             GameScreen(
                 onCellClicked = { gameViewModel.onCellClick(it) },
-                statusText = ready.statusText
+                statusText = ready.statusText,
             )
         }
 
@@ -56,7 +53,7 @@ fun GameScreenContainer(gameViewModel: GameViewModel) {
                 onCellClicked = { gameViewModel.onCellClick(it) },
                 player1Moves = nextTurn.player1Moves,
                 player2Moves = nextTurn.player2Moves,
-                statusText = nextTurn.statusText
+                statusText = nextTurn.statusText,
             )
         }
 
@@ -66,16 +63,20 @@ fun GameScreenContainer(gameViewModel: GameViewModel) {
                 player1Moves = winner.player1Moves,
                 player2Moves = winner.player2Moves,
                 statusText = winner.statusText,
-                crossing = winner.crossing
+                crossing = winner.crossing,
+                isShowRestartButton = true,
+                onRestartButtonClick = { gameViewModel.onRestartClick() }
             )
         }
 
-        is GameUiState.GameOver -> {
-            val gameOver = gameUiState.value as GameUiState.GameOver
+        is GameUiState.Draw -> {
+            val gameOver = gameUiState.value as GameUiState.Draw
             GameScreen(
                 player1Moves = gameOver.player1Moves,
                 player2Moves = gameOver.player2Moves,
-                statusText = gameOver.statusText
+                statusText = gameOver.statusText,
+                isShowRestartButton = true,
+                onRestartButtonClick = { gameViewModel.onRestartClick() }
             )
         }
     }
@@ -86,7 +87,7 @@ fun GameScreenContainer(gameViewModel: GameViewModel) {
 @Composable
 private fun PreviewGameScreen() {
     TicTacToeTheme {
-        GameScreen()
+        GameScreen(isShowRestartButton = true)
     }
 }
 
@@ -156,31 +157,29 @@ private fun GameScreen(
     player2Moves: List<Int> = emptyList(),
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
+    isShowRestartButton: Boolean = false,
+    onRestartButtonClick: () -> Unit = {},
 ) {
     ConstraintLayout {
-        val (status, grid, crossingContainer) = createRefs()
-        StatusBox(
-            message = statusText,
-            modifier = Modifier.constrainAs(status) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                top.linkTo(parent.top)
-            })
-        LazyVerticalGrid(
-            columns = GridCells.FixedSize(100.dp),
+        val (status, grid, crossingContainer, restart) = createRefs()
+        StatusBox(message = statusText, modifier = Modifier.constrainAs(status) {
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+            top.linkTo(parent.top, 20.dp)
+        })
+        LazyVerticalGrid(columns = GridCells.FixedSize(100.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
                 .constrainAs(grid) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     top.linkTo(status.bottom, 30.dp)
-                }.size(300.dp)
-        ) {
+                }
+                .size(300.dp)) {
             items(count = 9) {
-                val cellState =
-                    if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
-                    else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
-                    else Mark(isEmpty = true)
+                val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
+                else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
+                else Mark(isEmpty = true)
                 Cell(cellState, onCellClick = { onCellClicked(it) })
             }
         }
@@ -191,10 +190,31 @@ private fun GameScreen(
                     end.linkTo(grid.end)
                     top.linkTo(grid.top)
                     bottom.linkTo(grid.bottom)
-                },
-                crossing = crossing
+                }, crossing = crossing
             )
         }
+        AnimatedVisibility(
+            visible = isShowRestartButton,
+            modifier = Modifier.constrainAs(restart) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(grid.bottom, 50.dp)
+            }) {
+            RestartButton { onRestartButtonClick() }
+        }
+    }
+}
+
+@Composable
+fun RestartButton(onRestartClick: () -> Unit = {}) {
+    Button(
+        onClick = { onRestartClick() },
+    ) {
+        Icon(
+            imageVector = Icons.Default.Autorenew, contentDescription = null
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(text = "New game")
     }
 }
 
@@ -204,8 +224,7 @@ fun Line(
     crossing: Crossing,
 ) {
     Canvas(
-        modifier = modifier
-            .size(210.dp)
+        modifier = modifier.size(210.dp)
     ) {
         drawLine(
             color = Color.Yellow.copy(alpha = 0.5f),
