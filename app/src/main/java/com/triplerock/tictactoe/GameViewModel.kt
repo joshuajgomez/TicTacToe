@@ -4,7 +4,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.ViewModel
-import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -73,7 +72,6 @@ class GameViewModel : ViewModel() {
     }
 
     private fun checkState(player: Int, moves: List<Int>) {
-        Logger.debug("player = [${player}], moves = [${moves}]")
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
                 _uiState.value = GameUiState.Winner(
@@ -85,12 +83,20 @@ class GameViewModel : ViewModel() {
                 return
             }
         }
-        val nextPlayer = if (isTurnOfPlayer1) 2 else 1
-        _uiState.value = GameUiState.NextTurn(
-            player1Moves = player1Moves,
-            player2Moves = player2Moves,
-            statusText = "Turn: Player $nextPlayer",
-        )
+        if (player1Moves.size + player2Moves.size == 9) {
+            // game is draw
+            _uiState.value = GameUiState.Draw(
+                player1Moves = player1Moves,
+                player2Moves = player2Moves,
+            )
+        } else {
+            val nextPlayer = if (isTurnOfPlayer1) 2 else 1
+            _uiState.value = GameUiState.NextTurn(
+                player1Moves = player1Moves,
+                player2Moves = player2Moves,
+                statusText = "Turn: Player $nextPlayer",
+            )
+        }
     }
 
     fun onRestartClick() {
