@@ -1,12 +1,12 @@
 package com.triplerock.tictactoe
 
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.ViewModel
+import com.triplerock.tictactoe.utils.Logger
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 data class Crossing(val start: Offset, val end: Offset, val positions: List<Int>)
 
@@ -25,36 +25,70 @@ val crossingList = listOf(
     Crossing(positions = listOf(2, 4, 6), start = rect.topRight, end = rect.bottomLeft),
 )
 
-data class Winner(
-    val player: Int,
-    val crossing: Crossing,
-    val message: String = "Player$player won!! Congrats",
-)
+sealed class GameUiState {
+    data class Ready(
+        val statusText: String,
+    ) : GameUiState()
+
+    data class NextTurn(
+        val player1Moves: List<Int>,
+        val player2Moves: List<Int>,
+        val statusText: String,
+    ) : GameUiState()
+
+    data class GameOver(
+        val player1Moves: List<Int>,
+        val player2Moves: List<Int>,
+        val statusText: String,
+    ) : GameUiState()
+
+    data class Winner(
+        val player1Moves: List<Int>,
+        val player2Moves: List<Int>,
+        val statusText: String,
+        val crossing: Crossing,
+    ) : GameUiState()
+}
 
 class GameViewModel : ViewModel() {
 
-    private val player1Moves: MutableList<Int> = mutableListOf()
-    private val player2Moves: MutableList<Int> = mutableListOf()
+    private var isTurnOfPlayer1 = true
 
-    var playerWon: MutableIntState = mutableIntStateOf(0)
-    lateinit var winner: Winner
+    private val player1Moves: ArrayList<Int> = ArrayList()
+    private val player2Moves: ArrayList<Int> = ArrayList()
 
-    fun onPlayer1Moved(cell: Int) {
-        player1Moves.add(cell)
-        checkStatus(1, player1Moves.toList())
+    private val _uiState: MutableStateFlow<GameUiState> =
+        MutableStateFlow(GameUiState.Ready(statusTurnPlayer1))
+    val uiState: StateFlow<GameUiState> = _uiState
+
+    fun onCellClick(cell: Int) {
+        if (isTurnOfPlayer1) {
+            player1Moves.add(cell)
+            checkState(1, player1Moves)
+        } else {
+            player2Moves.add(cell)
+            checkState(2, player2Moves)
+        }
+        isTurnOfPlayer1 = !isTurnOfPlayer1
     }
 
-    fun onPlayer2Moved(cell: Int) {
-        player2Moves.add(cell)
-        checkStatus(2, player2Moves.toList())
-    }
-
-    private fun checkStatus(player: Int, moves: List<Int>) {
+    private fun checkState(player: Int, moves: List<Int>) {
+        Logger.debug("player = [${player}], moves = [${moves}]")
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
-                winner = Winner(player = player, crossing = crossing)
-                playerWon.value = player
+                _uiState.value = GameUiState.Winner(
+                    player1Moves = player1Moves,
+                    player2Moves = player2Moves,
+                    statusText = "Player $player wins!!",
+                    crossing = crossing
+                )
+                return
             }
         }
+        _uiState.value = GameUiState.NextTurn(
+            player1Moves = player1Moves,
+            player2Moves = player2Moves,
+            statusText = "Turn: Player $player",
+        )
     }
 }
