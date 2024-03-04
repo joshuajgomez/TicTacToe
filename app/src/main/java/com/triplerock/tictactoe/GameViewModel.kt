@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 data class Crossing(val start: Offset, val end: Offset, val positions: List<Int>)
 
-const val rectOffset = 650f
+const val rectOffset = 600f
 val rect = Rect(Offset.Zero, Size(width = rectOffset, height = rectOffset))
 val crossingList = listOf(
     Crossing(positions = listOf(0, 1, 2), start = rect.topLeft, end = rect.topRight),

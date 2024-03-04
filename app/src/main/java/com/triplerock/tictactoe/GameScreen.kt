@@ -2,8 +2,10 @@ package com.triplerock.tictactoe
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -24,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -77,18 +82,34 @@ fun GameScreenContainer(gameViewModel: GameViewModel) {
 
 }
 
-@Preview()
+@Preview
 @Composable
 private fun PreviewGameScreen() {
     TicTacToeTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            StatusBox()
-            GameScreen()
+        GameScreen()
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewGame() {
+    TicTacToeTheme {
+        Box(contentAlignment = Alignment.Center) {
+            LazyVerticalGrid(
+                columns = GridCells.FixedSize(100.dp),
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(300.dp)
+            ) {
+                items(count = 9) {
+                    Cell(stateList.random())
+                }
+            }
+            crossingList.forEach {
+                Line(
+                    crossing = it,
+                )
+            }
         }
     }
 }
@@ -149,12 +170,11 @@ private fun GameScreen(
             columns = GridCells.FixedSize(100.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
-                .width(400.dp)
                 .constrainAs(grid) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     top.linkTo(status.bottom, 30.dp)
-                }
+                }.size(300.dp)
         ) {
             items(count = 9) {
                 val cellState =
@@ -185,8 +205,7 @@ fun Line(
 ) {
     Canvas(
         modifier = modifier
-            .width(240.dp)
-            .height(240.dp)
+            .size(210.dp)
     ) {
         drawLine(
             color = Color.Yellow.copy(alpha = 0.5f),
