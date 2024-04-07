@@ -44,7 +44,7 @@ class Firebase {
 
             if (snapshot != null && snapshot.exists()) {
                 Logger.debug("snapshot = ${snapshot.data}")
-                if (snapshot.contains(keyPlayer2Name)) {
+                if (snapshot[keyPlayer2Name].toString().isNotEmpty()) {
                     // Player 2 available. Start game
                     Logger.debug("Player 2 available. Starting game")
                     room.player2Name = snapshot[keyPlayer2Name].toString()
