@@ -1,4 +1,4 @@
-package com.triplerock.tictactoe
+package com.triplerock.tictactoe.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
@@ -34,9 +34,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
+import com.triplerock.tictactoe.viewmodels.Crossing
+import com.triplerock.tictactoe.viewmodels.GameUiState
+import com.triplerock.tictactoe.viewmodels.GameViewModel
+import com.triplerock.tictactoe.viewmodels.crossingList
 
 @Composable
-fun GameScreenContainer(gameViewModel: GameViewModel) {
+fun GameScreenContainer(
+    gameViewModel: GameViewModel,
+    onBackClick: () -> Unit,
+) {
     val gameUiState = gameViewModel.uiState.collectAsState()
     when (gameUiState.value) {
         is GameUiState.Ready -> {

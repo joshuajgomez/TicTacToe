@@ -1,4 +1,4 @@
-package com.triplerock.tictactoe
+package com.triplerock.tictactoe.viewmodels
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -56,8 +56,7 @@ class GameViewModel : ViewModel() {
     private val player1Moves: ArrayList<Int> = ArrayList()
     private val player2Moves: ArrayList<Int> = ArrayList()
 
-    private val _uiState: MutableStateFlow<GameUiState> =
-        MutableStateFlow(GameUiState.Ready())
+    private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Ready())
     val uiState: StateFlow<GameUiState> = _uiState
 
     fun onCellClick(cell: Int) {
