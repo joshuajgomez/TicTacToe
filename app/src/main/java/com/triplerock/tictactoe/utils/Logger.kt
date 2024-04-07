@@ -4,7 +4,7 @@ import android.util.Log
 
 class Logger {
     companion object {
-        private const val TAG = "TicTacToe_Logger"
+        private const val TAG = "Tic_Logger"
 
         /**
          * Set to high log levels to avoid printing low priority logs
