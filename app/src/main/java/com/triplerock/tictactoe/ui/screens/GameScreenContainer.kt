@@ -5,7 +5,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
@@ -44,47 +47,53 @@ fun GameScreenContainer(
     gameViewModel: GameViewModel,
     onBackClick: () -> Unit,
 ) {
-    val gameUiState = gameViewModel.uiState.collectAsState()
-    when (gameUiState.value) {
-        is GameUiState.Ready -> {
-            val ready = gameUiState.value as GameUiState.Ready
-            GameScreen(
-                onCellClicked = { gameViewModel.onCellClick(it) },
-                statusText = ready.statusText,
-            )
-        }
+    Column(
+        Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        TitleBar(title = "Tic Tac Toe") { onBackClick() }
+        val gameUiState = gameViewModel.uiState.collectAsState()
+        when (gameUiState.value) {
+            is GameUiState.Ready -> {
+                val ready = gameUiState.value as GameUiState.Ready
+                GameScreen(
+                    onCellClicked = { gameViewModel.onCellClick(it) },
+                    statusText = ready.statusText,
+                )
+            }
 
-        is GameUiState.NextTurn -> {
-            val nextTurn = gameUiState.value as GameUiState.NextTurn
-            GameScreen(
-                onCellClicked = { gameViewModel.onCellClick(it) },
-                player1Moves = nextTurn.player1Moves,
-                player2Moves = nextTurn.player2Moves,
-                statusText = nextTurn.statusText,
-            )
-        }
+            is GameUiState.NextTurn -> {
+                val nextTurn = gameUiState.value as GameUiState.NextTurn
+                GameScreen(
+                    onCellClicked = { gameViewModel.onCellClick(it) },
+                    player1Moves = nextTurn.player1Moves,
+                    player2Moves = nextTurn.player2Moves,
+                    statusText = nextTurn.statusText,
+                )
+            }
 
-        is GameUiState.Winner -> {
-            val winner = gameUiState.value as GameUiState.Winner
-            GameScreen(
-                player1Moves = winner.player1Moves,
-                player2Moves = winner.player2Moves,
-                statusText = winner.statusText,
-                crossing = winner.crossing,
-                isShowRestartButton = true,
-                onRestartButtonClick = { gameViewModel.onRestartClick() }
-            )
-        }
+            is GameUiState.Winner -> {
+                val winner = gameUiState.value as GameUiState.Winner
+                GameScreen(
+                    player1Moves = winner.player1Moves,
+                    player2Moves = winner.player2Moves,
+                    statusText = winner.statusText,
+                    crossing = winner.crossing,
+                    isShowRestartButton = true,
+                    onRestartButtonClick = { gameViewModel.onRestartClick() }
+                )
+            }
 
-        is GameUiState.Draw -> {
-            val gameOver = gameUiState.value as GameUiState.Draw
-            GameScreen(
-                player1Moves = gameOver.player1Moves,
-                player2Moves = gameOver.player2Moves,
-                statusText = gameOver.statusText,
-                isShowRestartButton = true,
-                onRestartButtonClick = { gameViewModel.onRestartClick() }
-            )
+            is GameUiState.Draw -> {
+                val gameOver = gameUiState.value as GameUiState.Draw
+                GameScreen(
+                    player1Moves = gameOver.player1Moves,
+                    player2Moves = gameOver.player2Moves,
+                    statusText = gameOver.statusText,
+                    isShowRestartButton = true,
+                    onRestartButtonClick = { gameViewModel.onRestartClick() }
+                )
+            }
         }
     }
 
@@ -94,7 +103,23 @@ fun GameScreenContainer(
 @Composable
 private fun PreviewGameScreen() {
     TicTacToeTheme {
-        GameScreen(isShowRestartButton = true)
+        Column {
+            GameScreen(isShowRestartButton = true)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewGameScreenFull() {
+    TicTacToeTheme {
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            TitleBar()
+            GameScreen(isShowRestartButton = true)
+        }
     }
 }
 

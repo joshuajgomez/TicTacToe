@@ -63,6 +63,9 @@ fun GameAppContainer(
 
         composable(navGame) {
             Logger.debug("navigate=$navGame")
+            gameViewModel.startGame()
+//            LaunchedEffect(Unit) {
+//            }
             GameScreenContainer(
                 gameViewModel = gameViewModel,
                 onBackClick = {

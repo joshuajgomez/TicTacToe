@@ -2,6 +2,7 @@ package com.triplerock.tictactoe.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ fun CreateRoomContainer(
     onPlayerJoined: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    Column {
+    Column(Modifier.fillMaxSize()) {
         TitleBar(title = "Host a room") { onBackClick() }
         val uiState = createRoomViewModel.uiState.collectAsState()
         when (uiState.value) {

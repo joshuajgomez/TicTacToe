@@ -1,12 +1,14 @@
 package com.triplerock.tictactoe.model
 
+import com.triplerock.tictactoe.data.Move
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.utils.Logger
 
 class GameRepository(private val firebase: Firebase) {
 
-    private var playingRoom: Room? = null
+    var playingRoom: Room? = null
     private var myName: String = ""
+    private var isHost: Boolean = false
 
     fun createRoom(
         roomName: String,
@@ -21,6 +23,7 @@ class GameRepository(private val firebase: Firebase) {
             firebase.waitForPlayers(it) {
                 // on players joining
                 playingRoom = it
+                isHost = true
                 onPlayerJoined(it.player2Name)
             }
         }
@@ -53,5 +56,51 @@ class GameRepository(private val firebase: Firebase) {
 
     fun setName(name: String) {
         myName = name
+    }
+
+    fun onMove(cell: Int) {
+        if (playingRoom == null) {
+            Logger.error("playing room not set")
+            return
+        }
+        if (myName.isEmpty()) {
+            Logger.error("my name not set")
+            return
+        }
+        val move = Move(
+            roomId = playingRoom!!.id,
+            playerName = myName,
+            cell = cell,
+            isHost = isHost,
+        )
+        firebase.submitMove(move, playingRoom!!)
+    }
+
+    fun listenForMoves(
+        onMovesUpdate: (
+            player1Moves: List<Int>,
+            player2Moves: List<Int>,
+        ) -> Unit,
+    ) {
+        if (playingRoom == null) {
+            Logger.error("playing room is null")
+            return
+        }
+        firebase.listenForTurns(playingRoom!!) { room ->
+            playingRoom = room
+        }
+        firebase.listenForMoves(playingRoom!!.id) {
+            val player1Moves = ArrayList<Int>()
+            val player2Moves = ArrayList<Int>()
+            for (move in it) {
+                if (move.isHost) player1Moves.add(move.cell)
+                else player2Moves.add(move.cell)
+            }
+            onMovesUpdate(player1Moves, player2Moves)
+        }
+    }
+
+    fun clearMoves() {
+        firebase.clearMoves(playingRoom!!)
     }
 }

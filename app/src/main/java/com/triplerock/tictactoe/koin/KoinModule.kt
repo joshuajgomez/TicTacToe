@@ -17,7 +17,7 @@ val koinModule = module {
         GameRepository(get())
     }
     viewModel {
-        GameViewModel()
+        GameViewModel(get())
     }
     viewModel {
         CreateRoomViewModel(get())

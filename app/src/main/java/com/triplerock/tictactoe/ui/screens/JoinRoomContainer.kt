@@ -1,9 +1,11 @@
 package com.triplerock.tictactoe.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
@@ -34,7 +37,7 @@ fun JoinRoomContainer(
     onBackClick: () -> Unit,
     onPlayerJoined: () -> Unit,
 ) {
-    Column {
+    Column(Modifier.fillMaxSize()) {
         TitleBar(title = "Join a room") { onBackClick() }
         val uiState = roomViewModel.uiState.collectAsState()
         when (uiState.value) {
@@ -55,11 +58,33 @@ fun JoinRoomContainer(
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewJoinRoomDarkTheme() {
+    TicTacToeTheme {
+        Column(Modifier.fillMaxWidth()) {
+            TitleBar(title = "Join a room") { }
+            Rooms(rooms = getRooms()) {}
+        }
+    }
+}
+
+@Preview()
+@Composable
+fun PreviewJoinRoomLightTheme() {
+    TicTacToeTheme {
+        Column(Modifier.fillMaxWidth()) {
+            TitleBar(title = "Join a room") { }
+            Rooms(rooms = getRooms()) {}
+        }
+    }
+}
+
 fun getRooms(): List<Room> = listOf(
-    Room("Jocha"),
-    Room("Manvila"),
-    Room("Visteon"),
-    Room("Tharavadu"),
+    Room(name = "Jocha"),
+    Room(name = "Manvila"),
+    Room(name = "Visteon"),
+    Room(name = "Tharavadu"),
 )
 
 @Composable
@@ -70,8 +95,8 @@ private fun Rooms(
     if (rooms.isNotEmpty()) {
         LazyColumn(
             modifier = Modifier
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(horizontal = 50.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(25.dp)
         ) {
             items(rooms) {
                 RoomItem(it) {
@@ -118,7 +143,8 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
     ) {
         Text(
             text = room.name,
-            color = colorScheme.onPrimary
+            color = colorScheme.primary,
+            fontSize = 25.sp
         )
         TextButton(
             onClick = { onJoinClick() },

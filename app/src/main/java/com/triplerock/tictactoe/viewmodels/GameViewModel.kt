@@ -4,6 +4,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.ViewModel
+import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -49,28 +51,43 @@ sealed class GameUiState {
     ) : GameUiState()
 }
 
-class GameViewModel : ViewModel() {
+class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     private var isTurnOfPlayer1 = true
 
-    private val player1Moves: ArrayList<Int> = ArrayList()
-    private val player2Moves: ArrayList<Int> = ArrayList()
+    private var player1Moves: List<Int> = ArrayList()
+    private var player2Moves: List<Int> = ArrayList()
 
     private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Ready())
     val uiState: StateFlow<GameUiState> = _uiState
 
-    fun onCellClick(cell: Int) {
-        if (isTurnOfPlayer1) {
-            player1Moves.add(cell)
-            checkState(1, player1Moves)
-        } else {
-            player2Moves.add(cell)
-            checkState(2, player2Moves)
-        }
-        isTurnOfPlayer1 = !isTurnOfPlayer1
+    fun startGame() {
+        gameRepository.listenForMoves(
+            onMovesUpdate = { moves1, moves2 ->
+                Logger.entry()
+                player1Moves = moves1
+                player2Moves = moves2
+                checkGameState()
+            },
+        )
     }
 
-    private fun checkState(player: Int, moves: List<Int>) {
+    private fun checkGameState() {
+        val turnOfPlayer1 = gameRepository.playingRoom!!.isTurnOfPlayer1
+        Logger.debug("turnOfPlayer1 = $turnOfPlayer1")
+        if (turnOfPlayer1) {
+            checkState(1, player1Moves)
+        } else {
+            checkState(2, player2Moves)
+        }
+    }
+
+    fun onCellClick(cell: Int) {
+        Logger.debug("cell=$cell")
+        gameRepository.onMove(cell)
+    }
+
+    private fun checkState(player: Int, moves: List<Int>): Boolean {
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
                 _uiState.value = GameUiState.Winner(
@@ -79,7 +96,7 @@ class GameViewModel : ViewModel() {
                     statusText = "Player $player wins!!",
                     crossing = crossing
                 )
-                return
+                return true
             }
         }
         if (player1Moves.size + player2Moves.size == 9) {
@@ -88,6 +105,7 @@ class GameViewModel : ViewModel() {
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
             )
+            return true
         } else {
             val nextPlayer = if (isTurnOfPlayer1) 2 else 1
             _uiState.value = GameUiState.NextTurn(
@@ -96,11 +114,11 @@ class GameViewModel : ViewModel() {
                 statusText = "Turn: Player $nextPlayer",
             )
         }
+        return false
     }
 
     fun onRestartClick() {
-        player1Moves.clear()
-        player2Moves.clear()
+        gameRepository.clearMoves()
         isTurnOfPlayer1 = true
         _uiState.value = GameUiState.Ready()
     }
