@@ -18,9 +18,7 @@ private const val COLLECTION_MOVES = "moves"
 private const val keyPlayer2Name = "player2Name"
 private const val keyNextTurn = "nextTurn"
 
-private const val keyPlayerName = "player_name"
-private const val keyCell = "cell"
-private const val keyRoomId = "room_id"
+private const val keyRoomId = "roomId"
 
 class Firebase {
 
