@@ -64,7 +64,6 @@ fun CreateRoomContainer(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
         TitleBar(title = "Host a room") { navController.navigate(navMenu) }
         val uiState = createRoomViewModel.uiState.collectAsState()
@@ -135,7 +134,10 @@ private fun EmptyPlayers(roomName: String = "pac-room") {
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(text = "Waiting for players")
+            Text(
+                text = "Waiting for players",
+                fontSize = 25.sp
+            )
         }
     }
 }

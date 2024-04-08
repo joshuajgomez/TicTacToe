@@ -1,13 +1,18 @@
 package com.triplerock.tictactoe.ui.screens.common
 
+import android.content.res.Configuration
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -26,6 +31,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -38,6 +44,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,11 +61,12 @@ fun CustomButton(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier.padding(all = 5.dp)
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier.size(30.dp)
         )
     }
 }
@@ -87,17 +95,24 @@ fun CustomTextButton(
     }
 }
 
+
 @Preview
 @Composable
-fun Loading(message: String = "Loading") {
+fun PreviewLoading() {
     TicTacToeTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
-            Text(text = message)
-        }
+        Loading()
+    }
+}
+
+@Composable
+fun Loading(message: String = "Loading") {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
+    ) {
+        CircularProgressIndicator()
+        Text(text = message, fontSize = 25.sp)
     }
 }
 
@@ -111,16 +126,20 @@ fun PreviewTitleBar() {
 
 @Composable
 fun TitleBar(
-    title: String = "TicTacToe title",
+    title: String = "TicTacToe",
     onBackClick: () -> Unit = {},
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.width(20.dp))
         CustomButton(
-            onClick = onBackClick
+            onClick = onBackClick,
         )
+        Spacer(modifier = Modifier.width(20.dp))
         Text(
             text = title,
             fontSize = 25.sp,
@@ -188,53 +207,46 @@ private fun NameTag(name: String, onClick: () -> Unit) {
     )
 }
 
-@Preview
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewCustomTextFieldDark() {
+    TicTacToeTheme {
+        CustomTextField()
+    }
+}
+
+@Preview()
+@Composable
+fun PreviewCustomTextFieldLight() {
+    TicTacToeTheme {
+        CustomTextField()
+    }
+}
+
 @Composable
 fun CustomTextField(
     modifier: Modifier = Modifier,
-    hintText: String = "Type something",
-    text: String = "",
+    text: String = "Heyy",
     onTextChanged: (text: String) -> Unit = {},
 ) {
-    val focusRequester = remember { FocusRequester() }
-    BasicTextField(modifier = modifier
-        .background(
-            color = colorScheme.onBackground,
-            shape = MaterialTheme.shapes.extraLarge,
-        )
-        .fillMaxWidth()
-        .height(50.dp)
-        .padding(horizontal = 10.dp)
-        .focusRequester(focusRequester),
+    BasicTextField(
+        modifier = modifier
+            .background(
+                color = colorScheme.onBackground,
+                shape = MaterialTheme.shapes.extraLarge,
+            )
+            .padding(horizontal = 10.dp, vertical = 10.dp)
+            .fillMaxWidth(),
         value = text,
         onValueChange = {
             if ("\n" !in it) onTextChanged(it)
         },
         cursorBrush = SolidColor(colorScheme.primary),
         textStyle = LocalTextStyle.current.copy(
-            color = colorScheme.onSurface,
-            fontSize = 20.sp
+            color = colorScheme.background,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
         ),
-        decorationBox = { innerTextField ->
-            Row(
-                modifier,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .padding(start = 5.dp)
-                ) {
-                    if (text.isEmpty()) Text(
-                        hintText,
-                        style = LocalTextStyle.current.copy(
-                            color = colorScheme.onSurface.copy(alpha = 0.3f),
-                            fontSize = 20.sp
-                        )
-                    )
-                    innerTextField()
-                }
-            }
-        }
     )
 }
