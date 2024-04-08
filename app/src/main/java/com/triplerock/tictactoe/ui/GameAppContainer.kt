@@ -1,16 +1,19 @@
-package com.triplerock.tictactoe.ui.screens
+package com.triplerock.tictactoe.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.triplerock.tictactoe.data.Player1
+import com.triplerock.tictactoe.data.Player2
+import com.triplerock.tictactoe.ui.screens.CreateRoomContainer
+import com.triplerock.tictactoe.ui.screens.CreditsContainer
+import com.triplerock.tictactoe.ui.screens.GameScreenContainer
+import com.triplerock.tictactoe.ui.screens.JoinRoomContainer
+import com.triplerock.tictactoe.ui.screens.MenuContainer
 import com.triplerock.tictactoe.utils.Logger
-import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
-import com.triplerock.tictactoe.viewmodels.GameViewModel
-import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
-import com.triplerock.tictactoe.viewmodels.MenuViewModel
-import org.koin.androidx.compose.koinViewModel
+import com.triplerock.tictactoe.viewmodels.navKeyPlayer
+import com.triplerock.tictactoe.viewmodels.navKeyRoomId
 
 const val navMenu = "menu_screen"
 const val navCreateRoom = "create_room_screen"
@@ -37,7 +40,7 @@ fun GameAppContainer(
             Logger.debug("navigate=$navCreateRoom")
             CreateRoomContainer(
                 onPlayerJoined = {
-                    navController.navigate("$navGame/$it")
+                    navController.navigate("$navGame/$it/$Player1")
                 },
                 onBackClick = {
                     navController.navigate(navMenu)
@@ -48,7 +51,7 @@ fun GameAppContainer(
             Logger.debug("navigate=$navJoinRoom")
             JoinRoomContainer(
                 onPlayerJoined = {
-                    navController.navigate("$navGame/$it")
+                    navController.navigate("$navGame/$it/$Player2")
                 },
                 onBackClick = {
                     navController.navigate(navMenu)
@@ -56,7 +59,7 @@ fun GameAppContainer(
             )
         }
 
-        composable("$navGame/{roomId}") {
+        composable("$navGame/{$navKeyRoomId}/{$navKeyPlayer}") {
             Logger.debug("navigate=$navGame")
             GameScreenContainer(
                 onBackClick = {

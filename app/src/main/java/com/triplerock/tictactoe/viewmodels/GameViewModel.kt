@@ -6,6 +6,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.data.Player1
+import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
 import com.triplerock.tictactoe.utils.Logger
@@ -34,14 +35,11 @@ sealed class GameUiState {
         val statusText: String = "Setting up game",
     ) : GameUiState()
 
-    data class Ready(
-        val statusText: String = "Player 1 starts",
-    ) : GameUiState()
-
     data class NextTurn(
         val player1Moves: List<Int>,
         val player2Moves: List<Int>,
         val statusText: String,
+        val isMyTurn: Boolean,
     ) : GameUiState()
 
     data class Draw(
@@ -58,12 +56,16 @@ sealed class GameUiState {
     ) : GameUiState()
 }
 
+const val navKeyRoomId = "roomId"
+const val navKeyPlayer = "player"
+
 class GameViewModel(
     savedStateHandle: SavedStateHandle,
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
-    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
+    private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
+    private val player: String = checkNotNull(savedStateHandle[navKeyPlayer])
 
     private var player1Moves: List<Int> = ArrayList()
     private var player2Moves: List<Int> = ArrayList()
@@ -75,9 +77,14 @@ class GameViewModel(
 
     init {
         gameRepository.listenForTurnUpdates(roomId) {
-            if (playingRoom.value == null)
-                _uiState.value = GameUiState.Ready()
+            Logger.verbose("room set. starting game")
             playingRoom.value = it
+            _uiState.value = GameUiState.NextTurn(
+                player1Moves = player1Moves,
+                player2Moves = player2Moves,
+                statusText = "Turn: ${it.player1Name}",
+                isMyTurn = it.nextTurn == player
+            )
         }
         gameRepository.listenForMoves(
             roomId = roomId,
@@ -125,17 +132,25 @@ class GameViewModel(
             )
             return true
         } else {
-            val nextPlayer = gameRepository.updateTurn(playingRoom.value!!)
+            // change turn
+            val room = playingRoom.value
+            room!!.nextTurn = if (room.nextTurn == Player1) Player2 else Player1
+            if (player == Player1) {
+                // Only Player1/Host is allowed to update move to server
+                gameRepository.updateTurn(playingRoom.value!!)
+            }
+
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
-                statusText = "Turn: $nextPlayer",
+                statusText = "Turn: ${room.player2Name}",
+                isMyTurn = room.nextTurn == player
             )
         }
         return false
     }
 
     fun onRestartClick() {
-        _uiState.value = GameUiState.Ready()
+        _uiState.value = GameUiState.Waiting()
     }
 }

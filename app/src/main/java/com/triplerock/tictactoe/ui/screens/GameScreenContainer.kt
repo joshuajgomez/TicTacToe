@@ -2,6 +2,7 @@ package com.triplerock.tictactoe.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
@@ -24,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -38,6 +41,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
+import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
@@ -63,14 +67,6 @@ fun GameScreenContainer(
                 )
             }
 
-            is GameUiState.Ready -> {
-                val ready = gameUiState.value as GameUiState.Ready
-                GameScreen(
-                    onCellClicked = { gameViewModel.onCellClick(it) },
-                    statusText = ready.statusText,
-                )
-            }
-
             is GameUiState.NextTurn -> {
                 val nextTurn = gameUiState.value as GameUiState.NextTurn
                 GameScreen(
@@ -78,6 +74,7 @@ fun GameScreenContainer(
                     player1Moves = nextTurn.player1Moves,
                     player2Moves = nextTurn.player2Moves,
                     statusText = nextTurn.statusText,
+                    isPlayable = nextTurn.isMyTurn,
                 )
             }
 
@@ -193,6 +190,7 @@ val stateList = listOf(
 
 @Composable
 private fun GameScreen(
+    isPlayable: Boolean = true,
     onCellClicked: (cell: Int) -> Unit = {},
     player1Moves: List<Int> = emptyList(),
     player2Moves: List<Int> = emptyList(),
@@ -202,26 +200,42 @@ private fun GameScreen(
     onRestartButtonClick: () -> Unit = {},
 ) {
     ConstraintLayout {
-        val (status, grid, crossingContainer, restart) = createRefs()
+        val (status, turn, grid, crossingContainer, restart) = createRefs()
         StatusBox(message = statusText, modifier = Modifier.constrainAs(status) {
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             top.linkTo(parent.top, 20.dp)
         })
+        AnimatedVisibility(visible = isPlayable, modifier = Modifier.constrainAs(turn) {
+            end.linkTo(grid.end)
+            top.linkTo(status.bottom, 20.dp)
+        }) {
+            Text(
+                text = "Your turn",
+                modifier = Modifier
+                    .background(
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                        color = colorScheme.primary
+                    )
+                    .padding(horizontal = 10.dp, vertical = 2.dp)
+            )
+        }
         LazyVerticalGrid(columns = GridCells.FixedSize(100.dp),
             verticalArrangement = Arrangement.spacedBy(0.dp),
             modifier = Modifier
                 .constrainAs(grid) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(status.bottom, 30.dp)
+                    top.linkTo(turn.bottom)
                 }
                 .size(300.dp)) {
             items(count = 9) {
                 val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
                 else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
                 else Mark(isEmpty = true)
-                Cell(cellState, onCellClick = { onCellClicked(it) })
+                Cell(cellState, onCellClick = {
+                    if (isPlayable) onCellClicked(it) else Logger.warn("not your turn")
+                })
             }
         }
         if (crossing != null) {
