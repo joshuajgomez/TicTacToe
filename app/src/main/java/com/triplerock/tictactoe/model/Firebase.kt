@@ -78,8 +78,7 @@ class Firebase {
             }
             val rooms = getRooms(snapshot!!)
             if (rooms.isNotEmpty()) {
-                roomsListener.remove()
-                Logger.debug("rooms found = $rooms")
+                Logger.debug("rooms found = ${rooms.size}")
                 onRoomsFound(rooms)
             }
         }
@@ -90,6 +89,7 @@ class Firebase {
             .update(keyPlayer2Name, room.player2Name)
             .addOnSuccessListener {
                 Logger.entry()
+                roomsListener.remove()
                 onRoomJoined()
             }
             .addOnFailureListener {
