@@ -2,6 +2,8 @@ package com.triplerock.tictactoe.model
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -14,7 +16,7 @@ private const val COLLECTION_ROOMS = "rooms"
 private const val COLLECTION_MOVES = "moves"
 
 private const val keyPlayer2Name = "player2Name"
-private const val keyIsTurnOfPlayer1 = "isTurnOfPlayer1"
+private const val keyNextTurn = "nextTurn"
 
 private const val keyPlayerName = "player_name"
 private const val keyCell = "cell"
@@ -36,9 +38,11 @@ class Firebase {
             }
     }
 
+    private lateinit var playersListener: ListenerRegistration
+
     fun waitForPlayers(room: Room, onPlayerJoining: (room: Room) -> Unit) {
         val roomRef = firestore.collection(COLLECTION_ROOMS).document(room.id)
-        roomRef.addSnapshotListener { snapshot, e ->
+        playersListener = roomRef.addSnapshotListener() { snapshot, e ->
             Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
@@ -51,6 +55,7 @@ class Firebase {
                     // Player 2 available. Start game
                     Logger.debug("Player 2 available. Starting game")
                     room.player2Name = snapshot[keyPlayer2Name].toString()
+                    playersListener.remove()
                     onPlayerJoining(room)
                 } else {
                     // Player 2 not available
@@ -62,10 +67,12 @@ class Firebase {
         }
     }
 
+    private lateinit var roomsListener: ListenerRegistration
+
     fun findRooms(onRoomsFound: (rooms: List<Room>) -> Unit) {
         val roomRef = firestore.collection(COLLECTION_ROOMS)
             .whereEqualTo(keyPlayer2Name, "")
-        roomRef.addSnapshotListener { snapshot, e ->
+        roomsListener = roomRef.addSnapshotListener { snapshot, e ->
             Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
@@ -73,6 +80,7 @@ class Firebase {
             }
             val rooms = getRooms(snapshot!!)
             if (rooms.isNotEmpty()) {
+                roomsListener.remove()
                 onRoomsFound(rooms)
             }
         }
@@ -90,22 +98,23 @@ class Firebase {
             }
     }
 
-    fun submitMove(move: Move, room: Room) {
+    fun submitMove(move: Move, room: Room, onMoveUpdated: () -> Unit) {
+        Logger.debug("move = [${move}], room = [${room}]")
         firestore.collection(COLLECTION_MOVES)
             .add(move)
             .addOnSuccessListener {
                 Logger.entry()
-                updateTurn(room)
+                onMoveUpdated()
             }
             .addOnFailureListener {
                 Logger.error(it.message.toString())
             }
     }
 
-    private fun updateTurn(room: Room) {
+    fun updateTurn(room: Room) {
         Logger.debug("room = [${room}]")
         firestore.collection(COLLECTION_ROOMS).document(room.id)
-            .update(keyIsTurnOfPlayer1, !room.isTurnOfPlayer1)
+            .update(keyIsTurnOfPlayer1, room.isTurnOfPlayer1)
             .addOnSuccessListener {
                 Logger.entry()
             }
@@ -124,6 +133,7 @@ class Firebase {
                 return@addSnapshotListener
             }
             val moves = getMoves(snapshot!!)
+            Logger.debug("onMoveUpdate: $moves")
             if (moves.isNotEmpty()) {
                 onPlayerMoved(moves)
             }
@@ -131,6 +141,7 @@ class Firebase {
     }
 
     fun listenForTurns(room: Room, onTurnUpdate: (room: Room) -> Unit) {
+        Logger.debug("room = [${room}], onTurnUpdate = [${onTurnUpdate}]")
         val roomRef = firestore.collection(COLLECTION_ROOMS)
             .whereEqualTo(keyRoomId, room.id)
         roomRef.addSnapshotListener { snapshot, e ->
@@ -143,9 +154,9 @@ class Firebase {
                 Logger.error("snapshot is null / empty")
                 return@addSnapshotListener
             }
-            val isTurnOfPlayer1 = snapshot.first().getBoolean(keyIsTurnOfPlayer1)
-            room.isTurnOfPlayer1 = isTurnOfPlayer1!!
-            onTurnUpdate(room)
+            val roomUpdate = snapshot.first().toObject(Room::class.java)
+            Logger.debug("onTurnUpdate: $roomUpdate")
+            onTurnUpdate(roomUpdate)
         }
     }
 

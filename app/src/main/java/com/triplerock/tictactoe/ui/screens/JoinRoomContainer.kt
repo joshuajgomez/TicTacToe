@@ -54,6 +54,8 @@ fun JoinRoomContainer(
             is JoinRoomUiState.Joined -> {
                 onPlayerJoined()
             }
+
+            else -> {}
         }
     }
 }

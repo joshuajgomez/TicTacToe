@@ -1,12 +1,15 @@
 package com.triplerock.tictactoe.model
 
 import com.triplerock.tictactoe.data.Move
+import com.triplerock.tictactoe.data.Player1
+import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.utils.Logger
 
 class GameRepository(private val firebase: Firebase) {
 
     var playingRoom: Room? = null
+    private var currentPlayer = ""
     private var myName: String = ""
     private var isHost: Boolean = false
 
@@ -24,6 +27,7 @@ class GameRepository(private val firebase: Firebase) {
                 // on players joining
                 playingRoom = it
                 isHost = true
+                currentPlayer = Player1
                 onPlayerJoined(it.player2Name)
             }
         }
@@ -50,6 +54,8 @@ class GameRepository(private val firebase: Firebase) {
         room.player2Name = myName
         firebase.joinRoom(room) {
             // room joined
+            playingRoom = room
+            currentPlayer = Player2
             onRoomJoined()
         }
     }
@@ -70,10 +76,19 @@ class GameRepository(private val firebase: Firebase) {
         val move = Move(
             roomId = playingRoom!!.id,
             playerName = myName,
+            player = currentPlayer,
             cell = cell,
-            isHost = isHost,
         )
-        firebase.submitMove(move, playingRoom!!)
+        firebase.submitMove(move, playingRoom!!) {
+            // on move updated
+        }
+    }
+
+    fun changeTurn(): String {
+        val nextTurn = if (currentPlayer == Player1) Player2 else Player1
+        playingRoom!!.nextTurn = nextTurn
+        firebase.updateTurn(playingRoom!!)
+        return nextTurn
     }
 
     fun listenForMoves(
@@ -93,7 +108,7 @@ class GameRepository(private val firebase: Firebase) {
             val player1Moves = ArrayList<Int>()
             val player2Moves = ArrayList<Int>()
             for (move in it) {
-                if (move.isHost) player1Moves.add(move.cell)
+                if (move.player == Player1) player1Moves.add(move.cell)
                 else player2Moves.add(move.cell)
             }
             onMovesUpdate(player1Moves, player2Moves)
@@ -102,5 +117,11 @@ class GameRepository(private val firebase: Firebase) {
 
     fun clearMoves() {
         firebase.clearMoves(playingRoom!!)
+    }
+
+    fun resetGame() {
+        clearMoves()
+        playingRoom!!.nextTurn = Player1
+        firebase.updateTurn(playingRoom!!)
     }
 }

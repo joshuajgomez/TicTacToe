@@ -1,6 +1,7 @@
 package com.triplerock.tictactoe.ui.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -63,9 +64,9 @@ fun GameAppContainer(
 
         composable(navGame) {
             Logger.debug("navigate=$navGame")
-            gameViewModel.startGame()
-//            LaunchedEffect(Unit) {
-//            }
+            LaunchedEffect(Unit) {
+                gameViewModel.startGame()
+            }
             GameScreenContainer(
                 gameViewModel = gameViewModel,
                 onBackClick = {
