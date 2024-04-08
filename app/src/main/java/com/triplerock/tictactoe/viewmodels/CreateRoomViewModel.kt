@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 sealed class CreateRoomUiState {
     data class CreateRoom(val message: String) : CreateRoomUiState()
     data class EmptyRoom(val message: String) : CreateRoomUiState()
-    data class Starting(val message: String) : CreateRoomUiState()
+    data class Starting(val roomId: String) : CreateRoomUiState()
 }
 
 class CreateRoomViewModel(private val gameRepository: GameRepository) : ViewModel() {

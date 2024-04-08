@@ -24,10 +24,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     GameAppContainer(
-                        createRoomViewModel = get(),
-                        joinRoomViewModel = get(),
-                        gameViewModel = get(),
-                        menuViewModel = get(),
                         navController = navController
                     )
                 }

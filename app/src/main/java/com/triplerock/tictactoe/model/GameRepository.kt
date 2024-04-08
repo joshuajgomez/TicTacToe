@@ -8,7 +8,6 @@ import com.triplerock.tictactoe.utils.Logger
 
 class GameRepository(private val firebase: Firebase) {
 
-    var playingRoom: Room? = null
     private var currentPlayer = ""
     private var myName: String = ""
     private var isHost: Boolean = false
@@ -16,7 +15,7 @@ class GameRepository(private val firebase: Firebase) {
     fun createRoom(
         roomName: String,
         onRoomCreated: (room: Room) -> Unit,
-        onPlayerJoined: (player2Name: String) -> Unit,
+        onPlayerJoined: (roomId: String) -> Unit,
     ) {
         Logger.entry()
         val room = Room(name = roomName, player1Name = myName, player2Name = "")
@@ -25,10 +24,9 @@ class GameRepository(private val firebase: Firebase) {
             onRoomCreated(it)
             firebase.waitForPlayers(it) {
                 // on players joining
-                playingRoom = it
                 isHost = true
                 currentPlayer = Player1
-                onPlayerJoined(it.player2Name)
+                onPlayerJoined(it.id)
             }
         }
     }
@@ -54,7 +52,6 @@ class GameRepository(private val firebase: Firebase) {
         room.player2Name = myName
         firebase.joinRoom(room) {
             // room joined
-            playingRoom = room
             currentPlayer = Player2
             onRoomJoined()
         }
@@ -64,47 +61,26 @@ class GameRepository(private val firebase: Firebase) {
         myName = name
     }
 
-    fun onMove(cell: Int) {
-        if (playingRoom == null) {
-            Logger.error("playing room not set")
-            return
-        }
-        if (myName.isEmpty()) {
-            Logger.error("my name not set")
-            return
-        }
+    fun onMove(cell: Int, roomId: String) {
         val move = Move(
-            roomId = playingRoom!!.id,
+            roomId = roomId,
             playerName = myName,
             player = currentPlayer,
             cell = cell,
         )
-        firebase.submitMove(move, playingRoom!!) {
+        firebase.submitMove(move) {
             // on move updated
         }
     }
 
-    fun changeTurn(): String {
-        val nextTurn = if (currentPlayer == Player1) Player2 else Player1
-        playingRoom!!.nextTurn = nextTurn
-        firebase.updateTurn(playingRoom!!)
-        return nextTurn
-    }
-
     fun listenForMoves(
+        roomId: String,
         onMovesUpdate: (
             player1Moves: List<Int>,
             player2Moves: List<Int>,
         ) -> Unit,
     ) {
-        if (playingRoom == null) {
-            Logger.error("playing room is null")
-            return
-        }
-        firebase.listenForTurns(playingRoom!!) { room ->
-            playingRoom = room
-        }
-        firebase.listenForMoves(playingRoom!!.id) {
+        firebase.listenForMoves(roomId) {
             val player1Moves = ArrayList<Int>()
             val player2Moves = ArrayList<Int>()
             for (move in it) {
@@ -115,13 +91,13 @@ class GameRepository(private val firebase: Firebase) {
         }
     }
 
-    fun clearMoves() {
-        firebase.clearMoves(playingRoom!!)
+    fun listenForTurnUpdates(roomId: String, onTurnChange: (room: Room) -> Unit) {
+        firebase.listenForTurns(roomId) { room ->
+            onTurnChange(room)
+        }
     }
 
-    fun resetGame() {
-        clearMoves()
-        playingRoom!!.nextTurn = Player1
-        firebase.updateTurn(playingRoom!!)
+    fun updateTurn(room: Room) {
+
     }
 }

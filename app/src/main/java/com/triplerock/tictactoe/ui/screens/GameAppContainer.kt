@@ -10,6 +10,7 @@ import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
 import com.triplerock.tictactoe.viewmodels.MenuViewModel
+import org.koin.androidx.compose.koinViewModel
 
 const val navMenu = "menu_screen"
 const val navCreateRoom = "create_room_screen"
@@ -20,10 +21,6 @@ const val navCredits = "credits_screen"
 @Composable
 fun GameAppContainer(
     navController: NavHostController,
-    menuViewModel: MenuViewModel,
-    createRoomViewModel: CreateRoomViewModel,
-    joinRoomViewModel: JoinRoomViewModel,
-    gameViewModel: GameViewModel,
 ) {
     NavHost(
         navController = navController,
@@ -32,7 +29,6 @@ fun GameAppContainer(
         composable(navMenu) {
             Logger.debug("navigate=$navMenu")
             MenuContainer(
-                menuViewModel = menuViewModel,
                 onMenuClick = { navController.navigate(it) },
             )
         }
@@ -40,9 +36,8 @@ fun GameAppContainer(
         composable(navCreateRoom) {
             Logger.debug("navigate=$navCreateRoom")
             CreateRoomContainer(
-                createRoomViewModel = createRoomViewModel,
                 onPlayerJoined = {
-                    navController.navigate(navGame)
+                    navController.navigate("$navGame/$it")
                 },
                 onBackClick = {
                     navController.navigate(navMenu)
@@ -52,9 +47,8 @@ fun GameAppContainer(
         composable(navJoinRoom) {
             Logger.debug("navigate=$navJoinRoom")
             JoinRoomContainer(
-                roomViewModel = joinRoomViewModel,
                 onPlayerJoined = {
-                    navController.navigate(navGame)
+                    navController.navigate("$navGame/$it")
                 },
                 onBackClick = {
                     navController.navigate(navMenu)
@@ -62,13 +56,9 @@ fun GameAppContainer(
             )
         }
 
-        composable(navGame) {
+        composable("$navGame/{roomId}") {
             Logger.debug("navigate=$navGame")
-            LaunchedEffect(Unit) {
-                gameViewModel.startGame()
-            }
             GameScreenContainer(
-                gameViewModel = gameViewModel,
                 onBackClick = {
                     navController.navigate(navMenu)
                 }

@@ -81,6 +81,7 @@ class Firebase {
             val rooms = getRooms(snapshot!!)
             if (rooms.isNotEmpty()) {
                 roomsListener.remove()
+                Logger.debug("rooms found = $rooms")
                 onRoomsFound(rooms)
             }
         }
@@ -98,8 +99,8 @@ class Firebase {
             }
     }
 
-    fun submitMove(move: Move, room: Room, onMoveUpdated: () -> Unit) {
-        Logger.debug("move = [${move}], room = [${room}]")
+    fun submitMove(move: Move, onMoveUpdated: () -> Unit) {
+        Logger.debug("move = [${move}]")
         firestore.collection(COLLECTION_MOVES)
             .add(move)
             .addOnSuccessListener {
@@ -114,7 +115,7 @@ class Firebase {
     fun updateTurn(room: Room) {
         Logger.debug("room = [${room}]")
         firestore.collection(COLLECTION_ROOMS).document(room.id)
-            .update(keyIsTurnOfPlayer1, room.isTurnOfPlayer1)
+            .update(keyNextTurn, room.nextTurn)
             .addOnSuccessListener {
                 Logger.entry()
             }
@@ -140,10 +141,10 @@ class Firebase {
         }
     }
 
-    fun listenForTurns(room: Room, onTurnUpdate: (room: Room) -> Unit) {
-        Logger.debug("room = [${room}], onTurnUpdate = [${onTurnUpdate}]")
+    fun listenForTurns(roomId: String, onTurnUpdate: (room: Room) -> Unit) {
+        Logger.debug("roomId = [${roomId}], onTurnUpdate = [${onTurnUpdate}]")
         val roomRef = firestore.collection(COLLECTION_ROOMS)
-            .whereEqualTo(keyRoomId, room.id)
+            .whereEqualTo(keyRoomId, roomId)
         roomRef.addSnapshotListener { snapshot, e ->
             Logger.entry()
             if (e != null) {
@@ -155,7 +156,7 @@ class Firebase {
                 return@addSnapshotListener
             }
             val roomUpdate = snapshot.first().toObject(Room::class.java)
-            Logger.debug("onTurnUpdate: $roomUpdate")
+            Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
             onTurnUpdate(roomUpdate)
         }
     }

@@ -23,6 +23,7 @@ import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.viewmodels.CreateRoomUiState
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Preview
 @Composable
@@ -35,8 +36,8 @@ fun PreviewCreateRoom() {
 
 @Composable
 fun CreateRoomContainer(
-    createRoomViewModel: CreateRoomViewModel,
-    onPlayerJoined: () -> Unit,
+    createRoomViewModel: CreateRoomViewModel = koinViewModel(),
+    onPlayerJoined: (roomId: String) -> Unit,
     onBackClick: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
@@ -55,8 +56,8 @@ fun CreateRoomContainer(
             }
 
             is CreateRoomUiState.Starting -> {
-                Loading(message = (uiState.value as CreateRoomUiState.Starting).message)
-                onPlayerJoined()
+                Loading(message = "Starting")
+                onPlayerJoined((uiState.value as CreateRoomUiState.Starting).roomId)
             }
         }
     }

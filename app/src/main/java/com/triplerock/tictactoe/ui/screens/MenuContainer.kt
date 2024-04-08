@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.triplerock.tictactoe.R
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.viewmodels.MenuViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Preview
 @Composable
@@ -51,7 +52,7 @@ fun PreviewMenu() {
 
 @Composable
 fun MenuContainer(
-    menuViewModel: MenuViewModel,
+    menuViewModel: MenuViewModel = koinViewModel(),
     onMenuClick: (destination: String) -> Unit = {},
 ) {
     Column(

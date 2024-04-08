@@ -73,8 +73,11 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:1.6.5")
 
-    implementation("io.insert-koin:koin-core:3.5.3")
-    implementation("io.insert-koin:koin-android-compat:3.5.3")
+    val koinVersion = "3.5.3"
+    implementation("io.insert-koin:koin-core:$koinVersion")
+    implementation("io.insert-koin:koin-android-compat:$koinVersion")
+    implementation ("io.insert-koin:koin-androidx-compose:$koinVersion")
+
     implementation("androidx.compose.runtime:runtime-livedata:1.6.5")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")

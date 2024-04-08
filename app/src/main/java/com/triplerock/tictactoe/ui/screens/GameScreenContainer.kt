@@ -35,17 +35,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import com.triplerock.tictactoe.viewmodels.crossingList
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun GameScreenContainer(
-    gameViewModel: GameViewModel,
-    onBackClick: () -> Unit,
+    gameViewModel: GameViewModel = koinViewModel(),
+    onBackClick: () -> Unit = {},
 ) {
     Column(
         Modifier.fillMaxSize(),
@@ -54,6 +56,13 @@ fun GameScreenContainer(
         TitleBar(title = "Tic Tac Toe") { onBackClick() }
         val gameUiState = gameViewModel.uiState.collectAsState()
         when (gameUiState.value) {
+            is GameUiState.Waiting -> {
+                val waiting = gameUiState.value as GameUiState.Waiting
+                Loading(
+                    message = waiting.statusText,
+                )
+            }
+
             is GameUiState.Ready -> {
                 val ready = gameUiState.value as GameUiState.Ready
                 GameScreen(

@@ -30,12 +30,13 @@ import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.viewmodels.JoinRoomUiState
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun JoinRoomContainer(
-    roomViewModel: JoinRoomViewModel,
-    onBackClick: () -> Unit,
-    onPlayerJoined: () -> Unit,
+    roomViewModel: JoinRoomViewModel = koinViewModel(),
+    onBackClick: () -> Unit = {},
+    onPlayerJoined: (roomId: String) -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize()) {
         TitleBar(title = "Join a room") { onBackClick() }
@@ -52,10 +53,8 @@ fun JoinRoomContainer(
             )
 
             is JoinRoomUiState.Joined -> {
-                onPlayerJoined()
+                onPlayerJoined((uiState.value as JoinRoomUiState.Joined).roomId)
             }
-
-            else -> {}
         }
     }
 }

@@ -3,8 +3,10 @@ package com.triplerock.tictactoe.viewmodels
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.data.Player1
+import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,10 @@ val crossingList = listOf(
 )
 
 sealed class GameUiState {
+    data class Waiting(
+        val statusText: String = "Setting up game",
+    ) : GameUiState()
+
     data class Ready(
         val statusText: String = "Player 1 starts",
     ) : GameUiState()
@@ -52,16 +58,29 @@ sealed class GameUiState {
     ) : GameUiState()
 }
 
-class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
+class GameViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val gameRepository: GameRepository
+) : ViewModel() {
+
+    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private var player1Moves: List<Int> = ArrayList()
     private var player2Moves: List<Int> = ArrayList()
 
-    private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Ready())
+    private var playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
+
+    private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Waiting())
     val uiState: StateFlow<GameUiState> = _uiState
 
-    fun startGame() {
+    init {
+        gameRepository.listenForTurnUpdates(roomId) {
+            if (playingRoom.value == null)
+                _uiState.value = GameUiState.Ready()
+            playingRoom.value = it
+        }
         gameRepository.listenForMoves(
+            roomId = roomId,
             onMovesUpdate = { moves1, moves2 ->
                 Logger.entry()
                 player1Moves = moves1
@@ -72,7 +91,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
 
     private fun checkGameState() {
-        val nextTurn = gameRepository.playingRoom!!.nextTurn
+        val nextTurn = playingRoom.value!!.nextTurn
         Logger.debug("turnOfPlayer1 = $nextTurn")
         if (nextTurn == Player1) {
             checkState(nextTurn, player1Moves)
@@ -83,7 +102,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     fun onCellClick(cell: Int) {
         Logger.debug("cell=$cell")
-        gameRepository.onMove(cell)
+        gameRepository.onMove(cell, roomId)
     }
 
     private fun checkState(player: String, moves: List<Int>): Boolean {
@@ -106,7 +125,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
             )
             return true
         } else {
-            val nextPlayer = gameRepository.changeTurn()
+            val nextPlayer = gameRepository.updateTurn(playingRoom.value!!)
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
@@ -117,7 +136,6 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
 
     fun onRestartClick() {
-        gameRepository.resetGame()
         _uiState.value = GameUiState.Ready()
     }
 }
