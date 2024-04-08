@@ -3,6 +3,7 @@ package com.triplerock.tictactoe.koin
 import androidx.lifecycle.SavedStateHandle
 import com.triplerock.tictactoe.model.Firebase
 import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.utils.SharedPrefUtil
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
@@ -15,7 +16,13 @@ val koinModule = module {
         Firebase()
     }
     single {
-        GameRepository(get())
+        SharedPrefUtil(get())
+    }
+    single {
+        SharedPrefUtil(get())
+    }
+    single {
+        GameRepository(get(), get())
     }
     viewModel { (handle: SavedStateHandle) ->
         GameViewModel(handle, get())
@@ -27,6 +34,6 @@ val koinModule = module {
         JoinRoomViewModel(get())
     }
     viewModel {
-        MenuViewModel(get())
+        MenuViewModel(get(), get())
     }
 }

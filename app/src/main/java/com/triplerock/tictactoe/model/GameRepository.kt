@@ -4,9 +4,10 @@ import com.triplerock.tictactoe.data.Move
 import com.triplerock.tictactoe.data.Player1
 import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.utils.SharedPrefUtil
 import com.triplerock.tictactoe.utils.Logger
 
-class GameRepository(private val firebase: Firebase) {
+class GameRepository(private val firebase: Firebase, private val sharedPrefUtil: SharedPrefUtil) {
 
     private var currentPlayer = ""
     private var myName: String = ""
@@ -59,6 +60,7 @@ class GameRepository(private val firebase: Firebase) {
 
     fun setName(name: String) {
         myName = name
+        sharedPrefUtil.setName(name)
     }
 
     fun onMove(cell: Int, roomId: String) {
@@ -99,5 +101,9 @@ class GameRepository(private val firebase: Firebase) {
 
     fun updateTurn(room: Room) {
 
+    }
+
+    fun getName(): String {
+        return sharedPrefUtil.getName()
     }
 }
