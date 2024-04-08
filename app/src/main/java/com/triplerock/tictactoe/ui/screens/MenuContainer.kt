@@ -16,10 +16,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.ArrowCircleRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.SuggestionChip
@@ -96,14 +99,14 @@ fun Menu(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "TicTacToe",
-            fontSize = 50.sp,
+            fontSize = 60.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Serif,
-            color = colorScheme.onPrimary
+            fontFamily = FontFamily.Cursive,
+            color = colorScheme.primary
         )
-        Spacer(modifier = Modifier.height(20.dp))
 
         NameBox(name)
 
@@ -112,13 +115,13 @@ fun Menu(
         Spacer(modifier = Modifier.height(20.dp))
 
         MenuItem(
-            text = "Host new game",
-            icon = Icons.Default.Add,
+            text = "Host game",
+            icon = Icons.Rounded.AddCircle,
             onClick = { onMenuClick(navCreateRoom) }
         )
         MenuItem(
-            text = "Join a game",
-            icon = Icons.Default.ArrowRightAlt,
+            text = "Join game",
+            icon = Icons.Rounded.ArrowCircleRight,
             onClick = { onMenuClick(navJoinRoom) }
         )
         MenuItem(
@@ -169,15 +172,15 @@ fun MenuItem(
                 shape = RoundedCornerShape(10.dp), color = colorScheme.primary
             )
             .height(60.dp)
-            .width(250.dp)
+            .width(250.dp),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = colorScheme.onPrimary,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(30.dp)
         )
-        Spacer(modifier = Modifier.width(2.dp))
+        Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = text,
             color = colorScheme.onPrimary,

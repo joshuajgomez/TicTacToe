@@ -26,6 +26,7 @@ import com.triplerock.tictactoe.data.Player1
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
+import com.triplerock.tictactoe.ui.screens.common.CustomTextField
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
@@ -60,7 +61,11 @@ fun CreateRoomContainer(
     createRoomViewModel: CreateRoomViewModel = koinViewModel(),
     navController: NavController,
 ) {
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         TitleBar(title = "Host a room") { navController.navigate(navMenu) }
         val uiState = createRoomViewModel.uiState.collectAsState()
         when (uiState.value) {
@@ -87,6 +92,7 @@ fun CreateRoomContainer(
 @Composable
 fun RoomName(
     modifier: Modifier = Modifier,
+    defaultName: String = sampleRoomNames.random(),
     onCreateRoomClick: (roomName: String) -> Unit = {},
 ) {
     Column(
@@ -96,19 +102,11 @@ fun RoomName(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        var name by remember { mutableStateOf("") }
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            textStyle = LocalTextStyle.current.copy(
-                textAlign = TextAlign.Center
-            ),
-            placeholder = {
-                Text(
-                    text = "Enter room name",
-                    textAlign = TextAlign.Center
-                )
-            }
+        var name by remember { mutableStateOf(defaultName) }
+        CustomTextField(
+            text = name,
+            onTextChanged = { name = it },
+            modifier = Modifier.padding(horizontal = 50.dp)
         )
         RoomNameTags(names = sampleRoomNames) {
             name = it
