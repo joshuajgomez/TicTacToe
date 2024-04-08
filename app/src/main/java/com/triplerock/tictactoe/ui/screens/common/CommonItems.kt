@@ -29,6 +29,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -109,7 +110,9 @@ fun Loading(message: String = "Loading") {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 30.dp)
     ) {
         CircularProgressIndicator()
         Text(text = message, fontSize = 25.sp)
@@ -212,7 +215,12 @@ private fun NameTag(name: String, onClick: () -> Unit) {
 @Composable
 fun PreviewCustomTextFieldDark() {
     TicTacToeTheme {
-        CustomTextField()
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = colorScheme.background
+        ) {
+            CustomTextField(Modifier.padding(all = 20.dp))
+        }
     }
 }
 
@@ -220,7 +228,9 @@ fun PreviewCustomTextFieldDark() {
 @Composable
 fun PreviewCustomTextFieldLight() {
     TicTacToeTheme {
-        CustomTextField()
+        Surface(color = colorScheme.background) {
+            CustomTextField(modifier = Modifier.padding(all = 20.dp))
+        }
     }
 }
 
@@ -233,7 +243,7 @@ fun CustomTextField(
     BasicTextField(
         modifier = modifier
             .background(
-                color = colorScheme.onBackground,
+                color = colorScheme.tertiary.copy(alpha = 0.3f),
                 shape = MaterialTheme.shapes.extraLarge,
             )
             .padding(horizontal = 10.dp, vertical = 10.dp)
@@ -244,8 +254,9 @@ fun CustomTextField(
         },
         cursorBrush = SolidColor(colorScheme.primary),
         textStyle = LocalTextStyle.current.copy(
-            color = colorScheme.background,
-            fontSize = 20.sp,
+            color = colorScheme.primary,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         ),
     )
