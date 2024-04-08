@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -13,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
+import com.triplerock.tictactoe.viewmodels.sampleNames
+import com.triplerock.tictactoe.viewmodels.sampleRoomNames
 
 @Preview
 @Composable
@@ -104,4 +111,62 @@ fun TitleBar(
             color = colorScheme.primary,
         )
     }
+}
+
+@Preview
+@Composable
+fun PreviewNameTags(onNameSelect: (name: String) -> Unit = {}) {
+    TicTacToeTheme {
+        NameTags()
+    }
+}
+
+@Preview
+@Composable
+fun PreviewRoomNameTags(onNameSelect: (name: String) -> Unit = {}) {
+    TicTacToeTheme {
+        RoomNameTags()
+    }
+}
+
+@Composable
+fun NameTags(
+    names: List<String> = sampleNames,
+    onNameSelect: (name: String) -> Unit = {},
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 20.dp)
+    ) {
+        Text(text = "choose another name")
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(items = names) {
+                NameTag(name = it) {
+                    onNameSelect(it)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RoomNameTags(
+    names: List<String> = sampleRoomNames,
+    onNameSelect: (name: String) -> Unit = {},
+) {
+    LazyColumn {
+        items(items = names) {
+            NameTag(name = it) {
+                onNameSelect(it)
+            }
+        }
+    }
+}
+
+@Composable
+private fun NameTag(name: String, onClick: () -> Unit) {
+    SuggestionChip(
+        onClick = onClick,
+        label = { Text(text = name, fontSize = 20.sp) }
+    )
 }

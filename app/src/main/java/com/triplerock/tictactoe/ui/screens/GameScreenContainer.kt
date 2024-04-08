@@ -38,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
+import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
@@ -51,13 +53,13 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun GameScreenContainer(
     gameViewModel: GameViewModel = koinViewModel(),
-    onBackClick: () -> Unit = {},
+    navController: NavController,
 ) {
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TitleBar(title = "Tic Tac Toe") { onBackClick() }
+        TitleBar(title = "Tic Tac Toe") { navController.navigate(navMenu) }
         val gameUiState = gameViewModel.uiState.collectAsState()
         when (gameUiState.value) {
             is GameUiState.Waiting -> {

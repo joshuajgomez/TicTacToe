@@ -24,7 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.navGame
+import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
@@ -35,11 +39,10 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun JoinRoomContainer(
     roomViewModel: JoinRoomViewModel = koinViewModel(),
-    onBackClick: () -> Unit = {},
-    onPlayerJoined: (roomId: String) -> Unit = {},
+    navController: NavController,
 ) {
     Column(Modifier.fillMaxSize()) {
-        TitleBar(title = "Join a room") { onBackClick() }
+        TitleBar(title = "Join a room") { navController.navigate(navMenu) }
         val uiState = roomViewModel.uiState.collectAsState()
         when (uiState.value) {
             is JoinRoomUiState.EmptyRoom -> EmptyRoom()
@@ -53,7 +56,8 @@ fun JoinRoomContainer(
             )
 
             is JoinRoomUiState.Joined -> {
-                onPlayerJoined((uiState.value as JoinRoomUiState.Joined).roomId)
+                val roomId = (uiState.value as JoinRoomUiState.Joined).roomId
+                navController.navigate("$navGame/$roomId/$Player2")
             }
         }
     }
@@ -115,6 +119,9 @@ private fun Rooms(
 private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
     TicTacToeTheme {
         Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp),
             verticalArrangement = Arrangement.spacedBy(30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

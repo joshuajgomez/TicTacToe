@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.triplerock.tictactoe.data.Player1
-import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.ui.screens.CreateRoomContainer
 import com.triplerock.tictactoe.ui.screens.CreditsContainer
 import com.triplerock.tictactoe.ui.screens.GameScreenContainer
@@ -31,50 +29,27 @@ fun GameAppContainer(
     ) {
         composable(navMenu) {
             Logger.debug("navigate=$navMenu")
-            MenuContainer(
-                onMenuClick = { navController.navigate(it) },
-            )
+            MenuContainer(navController = navController)
         }
 
         composable(navCreateRoom) {
             Logger.debug("navigate=$navCreateRoom")
-            CreateRoomContainer(
-                onPlayerJoined = {
-                    navController.navigate("$navGame/$it/$Player1")
-                },
-                onBackClick = {
-                    navController.navigate(navMenu)
-                })
+            CreateRoomContainer(navController = navController)
         }
 
         composable(navJoinRoom) {
             Logger.debug("navigate=$navJoinRoom")
-            JoinRoomContainer(
-                onPlayerJoined = {
-                    navController.navigate("$navGame/$it/$Player2")
-                },
-                onBackClick = {
-                    navController.navigate(navMenu)
-                }
-            )
+            JoinRoomContainer(navController = navController)
         }
 
         composable("$navGame/{$navKeyRoomId}/{$navKeyPlayer}") {
             Logger.debug("navigate=$navGame")
-            GameScreenContainer(
-                onBackClick = {
-                    navController.navigate(navMenu)
-                }
-            )
+            GameScreenContainer(navController = navController)
         }
 
         composable(navCredits) {
             Logger.debug("navigate=$navCredits")
-            CreditsContainer(
-                onBackClick = {
-                    navController.navigate(navMenu)
-                }
-            )
+            CreditsContainer(navController = navController)
         }
     }
 }
