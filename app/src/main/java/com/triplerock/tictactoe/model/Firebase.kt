@@ -1,14 +1,10 @@
 package com.triplerock.tictactoe.model
 
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 import com.triplerock.tictactoe.data.Move
-import com.triplerock.tictactoe.data.Player
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.utils.Logger
 
@@ -141,21 +137,20 @@ class Firebase {
 
     fun listenForTurns(roomId: String, onTurnUpdate: (room: Room) -> Unit) {
         Logger.debug("roomId = [${roomId}], onTurnUpdate = [${onTurnUpdate}]")
-        val roomRef = firestore.collection(COLLECTION_ROOMS)
-            .whereEqualTo(keyRoomId, roomId)
+        val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
         roomRef.addSnapshotListener { snapshot, e ->
             Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
                 return@addSnapshotListener
             }
-            if (snapshot == null || snapshot.isEmpty) {
-                Logger.error("snapshot is null / empty")
+            if (snapshot == null || snapshot.data == null) {
+                Logger.warn("snapshot is null")
                 return@addSnapshotListener
             }
-            val roomUpdate = snapshot.first().toObject(Room::class.java)
-            Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
-            onTurnUpdate(roomUpdate)
+            val roomUpdate = snapshot.toObject(Room::class.java)
+            Logger.debug("snapshot:onTurnUpdate: $roomUpdate, snapshot=${snapshot.data}")
+            onTurnUpdate(roomUpdate!!)
         }
     }
 

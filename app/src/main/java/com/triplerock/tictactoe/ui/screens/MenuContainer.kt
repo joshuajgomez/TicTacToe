@@ -76,6 +76,7 @@ fun MenuContainer(
             name = name,
             errorStatus = errorStatus,
             onMenuClick = {
+                menuViewModel.setName(name)
                 navController.navigate(it)
             },
             onNameSelect = {

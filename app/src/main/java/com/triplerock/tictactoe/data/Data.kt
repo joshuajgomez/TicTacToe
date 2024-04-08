@@ -12,11 +12,7 @@ data class Room(
     var player1Name: String = "",
     var player2Name: String = "",
     var nextTurn: String = Player1,
-)
-
-data class Player(
-    var id: String = "",
-    var name: String = "",
+    var timeCreated: Long = 1712598251041,
 )
 
 data class Move(

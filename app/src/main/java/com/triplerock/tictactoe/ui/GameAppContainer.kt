@@ -28,27 +28,22 @@ fun GameAppContainer(
         startDestination = navMenu,
     ) {
         composable(navMenu) {
-            Logger.debug("navigate=$navMenu")
             MenuContainer(navController = navController)
         }
 
         composable(navCreateRoom) {
-            Logger.debug("navigate=$navCreateRoom")
             CreateRoomContainer(navController = navController)
         }
 
         composable(navJoinRoom) {
-            Logger.debug("navigate=$navJoinRoom")
             JoinRoomContainer(navController = navController)
         }
 
         composable("$navGame/{$navKeyRoomId}/{$navKeyPlayer}") {
-            Logger.debug("navigate=$navGame")
             GameScreenContainer(navController = navController)
         }
 
         composable(navCredits) {
-            Logger.debug("navigate=$navCredits")
             CreditsContainer(navController = navController)
         }
     }

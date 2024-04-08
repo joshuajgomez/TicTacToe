@@ -2,6 +2,7 @@ package com.triplerock.tictactoe.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -22,8 +23,7 @@ class CreateRoomViewModel(private val gameRepository: GameRepository) : ViewMode
             roomName = roomName,
             onRoomCreated = { _uiState.value = CreateRoomUiState.EmptyRoom(it.name) },
             onPlayerJoined = {
-                val message = "Starting game with $it"
-                _uiState.value = CreateRoomUiState.Starting(message)
+                _uiState.value = CreateRoomUiState.Starting(it)
             })
     }
 

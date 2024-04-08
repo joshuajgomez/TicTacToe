@@ -6,11 +6,20 @@ import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.utils.SharedPrefUtil
 import com.triplerock.tictactoe.utils.Logger
+import com.triplerock.tictactoe.viewmodels.sampleNames
 
-class GameRepository(private val firebase: Firebase, private val sharedPrefUtil: SharedPrefUtil) {
+class GameRepository(
+    private val firebase: Firebase,
+    private val sharedPrefUtil: SharedPrefUtil,
+) {
+
+    private var myName: String
+
+    init {
+        myName = sharedPrefUtil.getName().ifEmpty { sampleNames.random() }
+    }
 
     private var currentPlayer = ""
-    private var myName: String = ""
     private var isHost: Boolean = false
 
     fun createRoom(
@@ -19,7 +28,11 @@ class GameRepository(private val firebase: Firebase, private val sharedPrefUtil:
         onPlayerJoined: (roomId: String) -> Unit,
     ) {
         Logger.entry()
-        val room = Room(name = roomName, player1Name = myName, player2Name = "")
+        val room = Room(
+            name = roomName,
+            player1Name = myName,
+            player2Name = "",
+        )
         firebase.createRoom(room) { it ->
             // room created
             onRoomCreated(it)

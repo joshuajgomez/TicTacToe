@@ -26,10 +26,9 @@ val sampleRoomNames = listOf(
 
 class MenuViewModel(
     private val gameRepository: GameRepository,
-    sharedPrefUtil: SharedPrefUtil,
 ) : ViewModel() {
 
-    var name = sharedPrefUtil.getName().ifEmpty { sampleNames.random() }
+    var name = gameRepository.getName()
 
     fun setName(name: String): Boolean {
         gameRepository.setName(name)

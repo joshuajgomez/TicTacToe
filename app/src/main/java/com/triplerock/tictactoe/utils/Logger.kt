@@ -1,6 +1,8 @@
 package com.triplerock.tictactoe.utils
 
 import android.util.Log
+import android.widget.Toast
+import com.triplerock.tictactoe.TicApp
 
 class Logger {
     companion object {
@@ -53,10 +55,16 @@ class Logger {
 
         fun warn(message: String) {
             logControl(Log.WARN, methodName + message)
+            showToast("$methodName: $message")
+        }
+
+        private fun showToast(message: String) {
+            Toast.makeText(TicApp.context, message, Toast.LENGTH_SHORT).show()
         }
 
         fun error(message: String) {
             logControl(Log.ERROR, methodName + message)
+            showToast("$methodName: $message")
         }
     }
 }

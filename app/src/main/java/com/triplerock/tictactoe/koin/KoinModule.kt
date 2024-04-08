@@ -34,6 +34,6 @@ val koinModule = module {
         JoinRoomViewModel(get())
     }
     viewModel {
-        MenuViewModel(get(), get())
+        MenuViewModel(get())
     }
 }

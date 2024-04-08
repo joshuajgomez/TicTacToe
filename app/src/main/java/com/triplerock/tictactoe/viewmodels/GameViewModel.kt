@@ -76,6 +76,7 @@ class GameViewModel(
     val uiState: StateFlow<GameUiState> = _uiState
 
     init {
+        Logger.debug("roomId = [${roomId}]")
         gameRepository.listenForTurnUpdates(roomId) {
             Logger.verbose("room set. starting game")
             playingRoom.value = it
