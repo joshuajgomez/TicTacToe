@@ -32,14 +32,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
+import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 
 @Preview
 @Composable
@@ -116,25 +119,33 @@ fun PreviewTitleBar() {
 
 @Composable
 fun TitleBar(
-    title: String = "TicTacToe",
+    title: String = "tic.tac.toe",
     onBackClick: () -> Unit = {},
 ) {
-    Row(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(20.dp))
+        val (iconRef, titleRef) = createRefs()
         CustomButton(
             onClick = onBackClick,
+            modifier = Modifier.constrainAs(iconRef) {
+                start.linkTo(parent.start, margin = 10.dp)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+            }
         )
-        Spacer(modifier = Modifier.width(20.dp))
         Text(
             text = title,
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 35.sp,
             color = colorScheme.primary,
+            modifier = Modifier.constrainAs(titleRef) {
+                start.linkTo(parent.start)
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                end.linkTo(parent.end)
+            }
         )
     }
 }

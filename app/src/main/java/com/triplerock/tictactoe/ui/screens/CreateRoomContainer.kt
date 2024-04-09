@@ -51,7 +51,7 @@ fun PreviewCreateRoom() {
 fun PreviewCreateRoomContainer() {
     TicTacToeTheme {
         Column(Modifier.fillMaxSize()) {
-            TitleBar(title = "Host a room") { }
+            TitleBar(title = "Host Game") { }
             RoomName()
         }
     }
@@ -66,7 +66,7 @@ fun CreateRoomContainer(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TitleBar(title = "Host a room") { navController.navigate(navMenu) }
+        TitleBar(title = "Host Game") { navController.navigate(navMenu) }
         val uiState = createRoomViewModel.uiState.collectAsState()
         when (uiState.value) {
             is CreateRoomUiState.CreateRoom ->
@@ -113,7 +113,7 @@ fun RoomName(
             name = it
         }
         CustomTextButton(
-            text = "Create",
+            text = "Host",
         ) {
             onCreateRoomClick(name)
         }

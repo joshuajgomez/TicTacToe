@@ -52,6 +52,7 @@ import com.triplerock.tictactoe.ui.navJoinRoom
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.Yellow10
+import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 import com.triplerock.tictactoe.viewmodels.MenuViewModel
 import org.koin.androidx.compose.koinViewModel
 
