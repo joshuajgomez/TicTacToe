@@ -1,5 +1,6 @@
 package com.triplerock.tictactoe.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -7,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -25,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
@@ -48,6 +52,8 @@ import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import com.triplerock.tictactoe.viewmodels.crossingList
+import com.triplerock.tictactoe.viewmodels.sampleNames
+import com.triplerock.tictactoe.viewmodels.sampleRoomNames
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -61,6 +67,8 @@ fun GameScreenContainer(
     ) {
         TitleBar(title = "Tic Tac Toe") { navController.navigate(navMenu) }
         val gameUiState = gameViewModel.uiState.collectAsState()
+        val roomName = gameViewModel.roomName
+        val playerName = gameViewModel.myName
         when (gameUiState.value) {
             is GameUiState.Waiting -> {
                 val waiting = gameUiState.value as GameUiState.Waiting
@@ -77,6 +85,8 @@ fun GameScreenContainer(
                     player2Moves = nextTurn.player2Moves,
                     statusText = nextTurn.statusText,
                     isPlayable = nextTurn.isMyTurn,
+                    roomName = roomName,
+                    playerName = playerName
                 )
             }
 
@@ -88,7 +98,9 @@ fun GameScreenContainer(
                     statusText = winner.statusText,
                     crossing = winner.crossing,
                     isShowRestartButton = true,
-                    onRestartButtonClick = { gameViewModel.onRestartClick() }
+                    onRestartButtonClick = { gameViewModel.onRestartClick() },
+                    roomName = roomName,
+                    playerName = playerName
                 )
             }
 
@@ -99,7 +111,9 @@ fun GameScreenContainer(
                     player2Moves = gameOver.player2Moves,
                     statusText = gameOver.statusText,
                     isShowRestartButton = true,
-                    onRestartButtonClick = { gameViewModel.onRestartClick() }
+                    onRestartButtonClick = { gameViewModel.onRestartClick() },
+                    roomName = roomName,
+                    playerName = playerName
                 )
             }
         }
@@ -109,9 +123,19 @@ fun GameScreenContainer(
 
 @Preview
 @Composable
-private fun PreviewGameScreen() {
+private fun PreviewGameScreenLight() {
     TicTacToeTheme {
-        Column {
+        Surface(color = colorScheme.background) {
+            GameScreen(isShowRestartButton = true, isPlayable = true)
+        }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewGameScreenDark() {
+    TicTacToeTheme {
+        Surface(color = colorScheme.background) {
             GameScreen(isShowRestartButton = true, isPlayable = true)
         }
     }
@@ -182,7 +206,7 @@ fun StatusBox(
 ) {
     Text(
         text = message,
-        fontSize = 30.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         color = colorScheme.primary,
         modifier = modifier
@@ -203,6 +227,8 @@ val stateList = listOf(
 @Composable
 private fun GameScreen(
     isPlayable: Boolean = false,
+    playerName: String = sampleNames.random(),
+    roomName: String = sampleRoomNames.random(),
     onCellClicked: (cell: Int) -> Unit = {},
     player1Moves: List<Int> = emptyList(),
     player2Moves: List<Int> = emptyList(),
@@ -212,11 +238,14 @@ private fun GameScreen(
     onRestartButtonClick: () -> Unit = {},
 ) {
     ConstraintLayout {
-        val (status, turn, grid, crossingContainer, restart) = createRefs()
-        StatusBox(message = statusText, modifier = Modifier.constrainAs(status) {
+        val (status, name, turn, grid, crossingContainer, restart) = createRefs()
+        IdBox(modifier = Modifier.constrainAs(name) {
             start.linkTo(parent.start)
+            top.linkTo(parent.top)
+        }, playerName = playerName, roomName = roomName)
+        StatusBox(message = statusText, modifier = Modifier.constrainAs(status) {
             end.linkTo(parent.end)
-            top.linkTo(parent.top, 20.dp)
+            top.linkTo(parent.top)
         })
         AnimatedVisibility(visible = isPlayable, modifier = Modifier.constrainAs(turn) {
             end.linkTo(grid.end)
@@ -230,7 +259,8 @@ private fun GameScreen(
                         shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
                         color = colorScheme.tertiary
                     )
-                    .padding(horizontal = 10.dp, vertical = 2.dp)
+                    .padding(horizontal = 10.dp, vertical = 2.dp),
+                color = colorScheme.background
             )
         }
         LazyVerticalGrid(columns = GridCells.FixedSize(100.dp),
@@ -239,7 +269,7 @@ private fun GameScreen(
                 .constrainAs(grid) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(status.bottom, margin = 35.dp)
+                    top.linkTo(name.bottom, margin = 35.dp)
                 }
                 .size(300.dp)) {
             items(count = 9) {
@@ -270,6 +300,37 @@ private fun GameScreen(
             }) {
             RestartButton { onRestartButtonClick() }
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewIdBox() {
+    TicTacToeTheme {
+        Surface(color = colorScheme.background) {
+            IdBox()
+        }
+    }
+}
+
+@Composable
+fun IdBox(
+    modifier: Modifier = Modifier, roomName: String = "big-mac",
+    playerName: String = "pico",
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Info("Room: ", roomName)
+        Info("Player: ", playerName)
+    }
+}
+
+@Composable
+fun Info(label: String, info: String) {
+    Row {
+        Text(text = label)
+        Text(text = info, fontWeight = FontWeight.Bold)
     }
 }
 

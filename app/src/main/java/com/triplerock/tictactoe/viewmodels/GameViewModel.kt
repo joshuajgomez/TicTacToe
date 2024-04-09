@@ -66,11 +66,13 @@ class GameViewModel(
 
     private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
     private val me: String = checkNotNull(savedStateHandle[navKeyPlayer])
+    val myName: String = gameRepository.getName()
 
     private var player1Moves: List<Int> = ArrayList()
     private var player2Moves: List<Int> = ArrayList()
 
-    private var playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
+    private val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
+    var roomName: String = ""
 
     private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Waiting())
     val uiState: StateFlow<GameUiState> = _uiState
@@ -78,13 +80,14 @@ class GameViewModel(
     init {
         Logger.debug("roomId = [${roomId}]")
         gameRepository.listenForTurnUpdates(roomId) {
+            roomName = it.name
             if (playingRoom.value == null) {
                 Logger.verbose("room set. starting game")
             }
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
-                statusText = "Turn: ${it.nextTurn}",
+                statusText = "Turn: ${if (it.nextTurn == Player1) it.player1Name else it.player2Name}",
                 isMyTurn = it.nextTurn == me
             )
             playingRoom.value = it
