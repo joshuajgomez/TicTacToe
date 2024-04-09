@@ -4,9 +4,9 @@ import com.triplerock.tictactoe.data.Move
 import com.triplerock.tictactoe.data.Player1
 import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.utils.SharedPrefUtil
 import com.triplerock.tictactoe.utils.Logger
-import com.triplerock.tictactoe.viewmodels.sampleNames
 
 class GameRepository(
     private val firebase: Firebase,
@@ -16,7 +16,10 @@ class GameRepository(
     private var myName: String
 
     init {
-        myName = sharedPrefUtil.getName().ifEmpty { sampleNames.random() }
+        if (!sharedPrefUtil.isNameSet()) {
+            sharedPrefUtil.setName(sampleNames.random())
+        }
+        myName = sharedPrefUtil.getName()
     }
 
     private var currentPlayer = ""
@@ -119,6 +122,13 @@ class GameRepository(
     }
 
     fun getName(): String {
-        return sharedPrefUtil.getName()
+        return myName
+    }
+
+    fun resetGame(room: Room, onResetComplete: () -> Unit) {
+        firebase.clearMoves(playingRoom = room) {
+            // on reset complete
+            onResetComplete()
+        }
     }
 }

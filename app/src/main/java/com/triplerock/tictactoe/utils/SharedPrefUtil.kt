@@ -4,10 +4,10 @@ import android.content.Context
 
 class SharedPrefUtil(context: Context) {
 
-    private val shared_pref_name = "tic_data_store"
+    private val sharedPrefName = "tic_data_store"
     private val keyName = "name"
 
-    private val sharedPref = context.getSharedPreferences(shared_pref_name, Context.MODE_PRIVATE)
+    private val sharedPref = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
 
     fun setName(name: String) {
         Logger.debug("user = [$name]")
@@ -21,4 +21,6 @@ class SharedPrefUtil(context: Context) {
         Logger.debug("name=$name")
         return name
     }
+
+    fun isNameSet() = sharedPref.contains(keyName)
 }

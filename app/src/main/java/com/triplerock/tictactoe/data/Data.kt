@@ -23,3 +23,23 @@ data class Move(
     var player: String = "",
     var cell: Int = 0,
 )
+
+val sampleNames = listOf(
+    "pico",
+    "mini",
+    "mike",
+    "tiny",
+    "mario",
+    "big",
+    "max",
+)
+
+val sampleRoomNames = listOf(
+    "pac-room",
+    "money-bag",
+    "middle-earth",
+    "tiny-home",
+    "max-people",
+    "big-mac",
+    "more-fun",
+)

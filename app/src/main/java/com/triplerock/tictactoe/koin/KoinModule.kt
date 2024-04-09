@@ -19,9 +19,6 @@ val koinModule = module {
         SharedPrefUtil(get())
     }
     single {
-        SharedPrefUtil(get())
-    }
-    single {
         GameRepository(get(), get())
     }
     viewModel { (handle: SavedStateHandle) ->

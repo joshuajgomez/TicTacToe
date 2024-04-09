@@ -154,16 +154,25 @@ class Firebase {
         }
     }
 
-    fun clearMoves(playingRoom: Room) {
+    fun clearMoves(playingRoom: Room, onResetComplete: () -> Unit) {
         firestore.collection(COLLECTION_MOVES)
             .whereEqualTo(keyRoomId, playingRoom.id)
             .addSnapshotListener { value, error ->
-                if (value != null) {
-                    val batch = firestore.batch()
-                    for (document in value) {
-                        batch.delete(document.reference)
-                    }
-                    batch.commit()
+                if (error != null) {
+                    Logger.error(error.message.toString())
+                    return@addSnapshotListener
+                }
+                if (value == null) {
+                    Logger.error("value is null")
+                    return@addSnapshotListener
+                }
+                val batch = firestore.batch()
+                for (document in value) {
+                    batch.delete(document.reference)
+                }
+                batch.commit().addOnSuccessListener {
+                    Logger.entry()
+                    onResetComplete()
                 }
             }
     }

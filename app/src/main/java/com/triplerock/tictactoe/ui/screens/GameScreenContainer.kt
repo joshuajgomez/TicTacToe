@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.data.sampleNames
+import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
@@ -52,8 +54,6 @@ import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import com.triplerock.tictactoe.viewmodels.crossingList
-import com.triplerock.tictactoe.viewmodels.sampleNames
-import com.triplerock.tictactoe.viewmodels.sampleRoomNames
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

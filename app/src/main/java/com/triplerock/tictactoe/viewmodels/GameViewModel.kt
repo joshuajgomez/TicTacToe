@@ -36,9 +36,9 @@ sealed class GameUiState {
     ) : GameUiState()
 
     data class NextTurn(
-        val player1Moves: List<Int>,
-        val player2Moves: List<Int>,
-        val statusText: String,
+        val player1Moves: List<Int> = listOf(),
+        val player2Moves: List<Int> = listOf(),
+        val statusText: String = "Ready",
         val isMyTurn: Boolean,
     ) : GameUiState()
 
@@ -108,7 +108,7 @@ class GameViewModel(
         Logger.debug("nextTurn = $nextTurn")
         if (isFinished(nextTurn, player1Moves)) {
             // game won or draw by player1
-        } else if (isFinished(nextTurn, player1Moves)) {
+        } else if (isFinished(nextTurn, player2Moves)) {
             // game won or draw by player2
         } else {
             // change turn
@@ -151,6 +151,12 @@ class GameViewModel(
     }
 
     fun onRestartClick() {
-        _uiState.value = GameUiState.Waiting()
+        if (me == Player1) {
+            _uiState.value = GameUiState.Waiting()
+            gameRepository.resetGame(playingRoom.value!!) {
+                // on reset complete
+
+            }
+        }
     }
 }

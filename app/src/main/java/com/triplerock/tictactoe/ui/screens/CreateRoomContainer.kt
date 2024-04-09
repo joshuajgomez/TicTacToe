@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.Player1
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
@@ -35,7 +36,6 @@ import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.utils.getPrettyTime
 import com.triplerock.tictactoe.viewmodels.CreateRoomUiState
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
-import com.triplerock.tictactoe.viewmodels.sampleRoomNames
 import org.koin.androidx.compose.koinViewModel
 
 @Preview
