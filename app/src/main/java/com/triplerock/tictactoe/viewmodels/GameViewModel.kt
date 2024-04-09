@@ -61,11 +61,11 @@ const val navKeyPlayer = "player"
 
 class GameViewModel(
     savedStateHandle: SavedStateHandle,
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
 ) : ViewModel() {
 
     private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
-    private val player: String = checkNotNull(savedStateHandle[navKeyPlayer])
+    private val me: String = checkNotNull(savedStateHandle[navKeyPlayer])
 
     private var player1Moves: List<Int> = ArrayList()
     private var player2Moves: List<Int> = ArrayList()
@@ -78,19 +78,21 @@ class GameViewModel(
     init {
         Logger.debug("roomId = [${roomId}]")
         gameRepository.listenForTurnUpdates(roomId) {
-            Logger.verbose("room set. starting game")
-            playingRoom.value = it
+            if (playingRoom.value == null) {
+                Logger.verbose("room set. starting game")
+            }
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
-                statusText = "Turn: ${it.player1Name}",
-                isMyTurn = it.nextTurn == player
+                statusText = "Turn: ${it.nextTurn}",
+                isMyTurn = it.nextTurn == me
             )
+            playingRoom.value = it
         }
         gameRepository.listenForMoves(
             roomId = roomId,
             onMovesUpdate = { moves1, moves2 ->
-                Logger.entry()
+                Logger.debug("moves1 = [${moves1}], moves2 = [${moves2}]")
                 player1Moves = moves1
                 player2Moves = moves2
                 checkGameState()
@@ -100,11 +102,20 @@ class GameViewModel(
 
     private fun checkGameState() {
         val nextTurn = playingRoom.value!!.nextTurn
-        Logger.debug("turnOfPlayer1 = $nextTurn")
-        if (nextTurn == Player1) {
-            checkState(nextTurn, player1Moves)
+        Logger.debug("nextTurn = $nextTurn")
+        if (isFinished(nextTurn, player1Moves)) {
+            // game won or draw by player1
+        } else if (isFinished(nextTurn, player1Moves)) {
+            // game won or draw by player2
         } else {
-            checkState(nextTurn, player2Moves)
+            // change turn
+            val room = playingRoom.value
+            room!!.nextTurn = if (room.nextTurn == Player1) Player2 else Player1
+            if (me == Player1) {
+                // Only Player1/Host is allowed to update move to server
+                Logger.info("changing turn")
+                gameRepository.updateTurn(playingRoom.value!!)
+            }
         }
     }
 
@@ -113,7 +124,7 @@ class GameViewModel(
         gameRepository.onMove(cell, roomId)
     }
 
-    private fun checkState(player: String, moves: List<Int>): Boolean {
+    private fun isFinished(player: String, moves: List<Int>): Boolean {
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
                 _uiState.value = GameUiState.Winner(
@@ -132,21 +143,6 @@ class GameViewModel(
                 player2Moves = player2Moves,
             )
             return true
-        } else {
-            // change turn
-            val room = playingRoom.value
-            room!!.nextTurn = if (room.nextTurn == Player1) Player2 else Player1
-            if (player == Player1) {
-                // Only Player1/Host is allowed to update move to server
-                gameRepository.updateTurn(playingRoom.value!!)
-            }
-
-            _uiState.value = GameUiState.NextTurn(
-                player1Moves = player1Moves,
-                player2Moves = player2Moves,
-                statusText = "Turn: ${room.player2Name}",
-                isMyTurn = room.nextTurn == player
-            )
         }
         return false
     }

@@ -149,7 +149,7 @@ class Firebase {
                 return@addSnapshotListener
             }
             val roomUpdate = snapshot.toObject(Room::class.java)
-            Logger.debug("snapshot:onTurnUpdate: $roomUpdate, snapshot=${snapshot.data}")
+            Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
             onTurnUpdate(roomUpdate!!)
         }
     }

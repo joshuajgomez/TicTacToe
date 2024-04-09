@@ -32,6 +32,7 @@ class GameRepository(
             name = roomName,
             player1Name = myName,
             player2Name = "",
+            timeCreated = System.currentTimeMillis()
         )
         firebase.createRoom(room) { it ->
             // room created
@@ -96,6 +97,7 @@ class GameRepository(
         ) -> Unit,
     ) {
         firebase.listenForMoves(roomId) {
+            // on player moved
             val player1Moves = ArrayList<Int>()
             val player2Moves = ArrayList<Int>()
             for (move in it) {
@@ -113,7 +115,7 @@ class GameRepository(
     }
 
     fun updateTurn(room: Room) {
-
+        firebase.updateTurn(room)
     }
 
     fun getName(): String {

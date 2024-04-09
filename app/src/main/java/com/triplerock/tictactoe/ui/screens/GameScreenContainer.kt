@@ -112,7 +112,17 @@ fun GameScreenContainer(
 private fun PreviewGameScreen() {
     TicTacToeTheme {
         Column {
-            GameScreen(isShowRestartButton = true)
+            GameScreen(isShowRestartButton = true, isPlayable = true)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewGameScreenNotMyTurn() {
+    TicTacToeTheme {
+        Column {
+            GameScreen()
         }
     }
 }
@@ -192,7 +202,7 @@ val stateList = listOf(
 
 @Composable
 private fun GameScreen(
-    isPlayable: Boolean = true,
+    isPlayable: Boolean = false,
     onCellClicked: (cell: Int) -> Unit = {},
     player1Moves: List<Int> = emptyList(),
     player2Moves: List<Int> = emptyList(),
@@ -210,14 +220,15 @@ private fun GameScreen(
         })
         AnimatedVisibility(visible = isPlayable, modifier = Modifier.constrainAs(turn) {
             end.linkTo(grid.end)
-            top.linkTo(status.bottom, 20.dp)
+            bottom.linkTo(grid.top)
         }) {
             Text(
-                text = "Your turn",
+                text = "your turn",
+                fontSize = 14.sp,
                 modifier = Modifier
                     .background(
-                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                        color = colorScheme.primary
+                        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+                        color = colorScheme.tertiary
                     )
                     .padding(horizontal = 10.dp, vertical = 2.dp)
             )
@@ -228,7 +239,7 @@ private fun GameScreen(
                 .constrainAs(grid) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(turn.bottom)
+                    top.linkTo(status.bottom, margin = 35.dp)
                 }
                 .size(300.dp)) {
             items(count = 9) {

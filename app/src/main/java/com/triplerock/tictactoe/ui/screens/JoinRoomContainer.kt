@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -73,9 +74,11 @@ fun JoinRoomContainer(
 @Composable
 fun PreviewJoinRoomDarkTheme() {
     TicTacToeTheme {
-        Column(Modifier.fillMaxWidth()) {
-            TitleBar(title = "Join a room") { }
-            Rooms(rooms = getRooms()) {}
+        Surface(color = colorScheme.background) {
+            Column(Modifier.fillMaxWidth()) {
+                TitleBar(title = "Join a room") { }
+                Rooms(rooms = getRooms()) {}
+            }
         }
     }
 }
@@ -84,9 +87,11 @@ fun PreviewJoinRoomDarkTheme() {
 @Composable
 fun PreviewJoinRoomLightTheme() {
     TicTacToeTheme {
-        Column(Modifier.fillMaxWidth()) {
-            TitleBar(title = "Join a room") { }
-            Rooms(rooms = getRooms()) {}
+        Surface(color = colorScheme.background) {
+            Column(Modifier.fillMaxWidth()) {
+                TitleBar(title = "Join a room") { }
+                Rooms(rooms = getRooms()) {}
+            }
         }
     }
 }
@@ -106,7 +111,7 @@ private fun Rooms(
     if (rooms.isNotEmpty()) {
         LazyColumn(
             modifier = Modifier
-                .padding(horizontal = 50.dp, vertical = 20.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(rooms) {
@@ -165,7 +170,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         )
         Text(
             text = getPrettyTime(room.timeCreated),
-            color = colorScheme.primary.copy(alpha = 0.4f),
+            color = colorScheme.secondary.copy(alpha = 0.6f),
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             overflow = TextOverflow.Ellipsis,
@@ -178,7 +183,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         )
         Text(
             text = " | ${room.id}",
-            color = colorScheme.primary.copy(alpha = 0.4f),
+            color = colorScheme.secondary.copy(alpha = 0.6f),
             fontSize = 15.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -187,7 +192,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
                     start.linkTo(timeCreated.end)
                     top.linkTo(roomName.bottom)
                 }
-                .width(130.dp)
+                .width(170.dp)
         )
         TextButton(
             onClick = { onJoinClick() },
