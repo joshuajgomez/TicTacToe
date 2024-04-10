@@ -54,6 +54,7 @@ import com.triplerock.tictactoe.ui.navCreateRoom
 import com.triplerock.tictactoe.ui.navCredits
 import com.triplerock.tictactoe.ui.navJoinRoom
 import com.triplerock.tictactoe.ui.screens.common.NameTags
+import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.Yellow10
 import com.triplerock.tictactoe.ui.theme.coolveticaFamily
@@ -63,13 +64,8 @@ import org.koin.androidx.compose.koinViewModel
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewMenuDark() {
-    TicTacToeTheme {
-        Surface(
-            modifier = Modifier.background(brush = gradientBrush()),
-            color = Color.Transparent
-        ) {
-            Menu()
-        }
+    TicSurface {
+        Menu()
     }
 }
 
@@ -86,13 +82,8 @@ fun gradientBrush(): Brush {
 @Preview
 @Composable
 fun PreviewMenuLight() {
-    TicTacToeTheme {
-        Surface(
-            modifier = Modifier.background(brush = gradientBrush()),
-            color = Color.Transparent
-        ) {
-            Menu()
-        }
+    TicSurface {
+        Menu()
     }
 }
 
@@ -145,8 +136,6 @@ fun Menu(
         Text(
             text = "TicTacToe",
             fontSize = 60.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Cursive,
             color = Yellow10
         )
 

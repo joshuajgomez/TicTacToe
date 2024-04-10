@@ -40,6 +40,7 @@ import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.utils.getPrettyTime
+import com.triplerock.tictactoe.utils.getRelativeTime
 import com.triplerock.tictactoe.viewmodels.JoinRoomUiState
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -122,30 +123,43 @@ private fun Rooms(
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewEmptyRoomDark() {
+    TicSurface {
+        EmptyRoom()
+    }
+}
+
 @Preview
 @Composable
+private fun PreviewEmptyRoomDarkLight() {
+    TicSurface {
+        EmptyRoom()
+    }
+}
+
+@Composable
 private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
-    TicTacToeTheme {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp),
-            verticalArrangement = Arrangement.spacedBy(30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 30.dp),
+        verticalArrangement = Arrangement.spacedBy(30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Waiting for rooms", color = colorScheme.tertiary)
+        TextButton(
+            onClick = onCreateRoomClick,
+            modifier = Modifier.background(
+                shape = RoundedCornerShape(30.dp),
+                color = colorScheme.primary
+            )
         ) {
-            Text(text = "Waiting for rooms")
-            TextButton(
-                onClick = onCreateRoomClick,
-                modifier = Modifier.background(
-                    shape = RoundedCornerShape(30.dp),
-                    color = colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = "Create a room",
-                    color = colorScheme.onPrimary
-                )
-            }
+            Text(
+                text = "Create a room",
+                color = colorScheme.onPrimary
+            )
         }
     }
 }
@@ -166,11 +180,10 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
             }
         )
         Text(
-            text = getPrettyTime(room.timeCreated),
+            text = getRelativeTime(room.timeCreated),
             color = colorScheme.secondary.copy(alpha = 0.6f),
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             modifier = Modifier
                 .constrainAs(timeCreated) {
@@ -180,7 +193,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         )
         Text(
             text = " | ${room.id}",
-            color = colorScheme.secondary.copy(alpha = 0.6f),
+            color = colorScheme.primary.copy(alpha = 0.6f),
             fontSize = 15.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -196,7 +209,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
             modifier = Modifier
                 .background(
                     shape = RoundedCornerShape(30.dp),
-                    color = colorScheme.secondary
+                    color = colorScheme.primary
                 )
                 .constrainAs(button) {
                     end.linkTo(parent.end)

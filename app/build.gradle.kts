@@ -84,4 +84,6 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-firestore")
+
+    implementation("joda-time:joda-time:2.12.7")
 }

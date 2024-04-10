@@ -50,7 +50,7 @@ import com.triplerock.tictactoe.ui.screens.gradientBrush
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 
-@Preview
+
 @Composable
 fun CustomButton(
     modifier: Modifier = Modifier,
@@ -63,7 +63,8 @@ fun CustomButton(
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = null,
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(30.dp),
+            tint = colorScheme.primary
         )
     }
 }
@@ -93,16 +94,27 @@ fun CustomTextButton(
 }
 
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewLoadingDark() {
+    TicBackground {
+        Loading()
+    }
+}
+
 @Preview
 @Composable
-fun PreviewLoading() {
-    TicTacToeTheme {
+fun PreviewLoadingLight() {
+    TicBackground {
         Loading()
     }
 }
 
 @Composable
-fun Loading(message: String = "Loading") {
+fun Loading(
+    message: String = "Loading",
+    color: Color = colorScheme.secondary
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,15 +122,23 @@ fun Loading(message: String = "Loading") {
             .fillMaxWidth()
             .padding(top = 30.dp)
     ) {
-        CircularProgressIndicator()
-        Text(text = message, fontSize = 25.sp)
+        CircularProgressIndicator(color = color)
+        Text(text = message, fontSize = 25.sp, color = color)
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewTitleBarDark() {
+    TicSurface {
+        TitleBar()
     }
 }
 
 @Preview
 @Composable
-fun PreviewTitleBar() {
-    TicTacToeTheme {
+fun PreviewTitleBarLight() {
+    TicSurface {
         TitleBar()
     }
 }
@@ -156,10 +176,18 @@ fun TitleBar(
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewNameTagsDark(onNameSelect: (name: String) -> Unit = {}) {
+    TicSurface {
+        NameTags()
+    }
+}
+
 @Preview
 @Composable
-fun PreviewNameTags(onNameSelect: (name: String) -> Unit = {}) {
-    TicTacToeTheme {
+fun PreviewNameTagsLight(onNameSelect: (name: String) -> Unit = {}) {
+    TicSurface {
         NameTags()
     }
 }
@@ -167,7 +195,7 @@ fun PreviewNameTags(onNameSelect: (name: String) -> Unit = {}) {
 @Preview
 @Composable
 fun PreviewRoomNameTags(onNameSelect: (name: String) -> Unit = {}) {
-    TicTacToeTheme {
+    TicSurface {
         RoomNameTags()
     }
 }
@@ -211,9 +239,10 @@ fun RoomNameTags(
 private fun NameTag(name: String, onClick: () -> Unit) {
     SuggestionChip(
         onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
         colors = SuggestionChipDefaults.suggestionChipColors(
             containerColor = colorScheme.primary.copy(alpha = 0.3f),
-            labelColor = colorScheme.onPrimary,
+            labelColor = colorScheme.onSurface,
         ),
         label = {
             Text(
@@ -281,7 +310,19 @@ fun TicSurface(content: @Composable () -> Unit) {
     TicTacToeTheme {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .background(brush = gradientBrush()),
+            color = Color.Transparent,
+            content = content
+        )
+    }
+}
+
+@Composable
+fun TicBackground(content: @Composable () -> Unit) {
+    TicTacToeTheme {
+        Surface(
+            modifier = Modifier
                 .background(brush = gradientBrush()),
             color = Color.Transparent,
             content = content

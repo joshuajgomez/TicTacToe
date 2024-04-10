@@ -4,7 +4,7 @@ import android.content.Context
 
 class SharedPrefUtil(context: Context) {
 
-    private val sharedPrefName = "tic_data_store"
+    private val sharedPrefName = "tic_shared_pref"
     private val keyName = "name"
 
     private val sharedPref = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
