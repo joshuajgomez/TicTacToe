@@ -35,6 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontFamily
@@ -46,9 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
-import com.triplerock.tictactoe.ui.screens.gradientBrush
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
-import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 
 
 @Composable
@@ -69,7 +68,22 @@ fun CustomButton(
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewCustomTextButtonDark() {
+    TicBackground {
+        CustomTextButton(modifier = Modifier.padding(20.dp))
+    }
+}
+
 @Preview
+@Composable
+fun PreviewCustomTextButtonLight() {
+    TicBackground {
+        CustomTextButton(modifier = Modifier.padding(20.dp))
+    }
+}
+
 @Composable
 fun CustomTextButton(
     modifier: Modifier = Modifier,
@@ -84,6 +98,7 @@ fun CustomTextButton(
                 color = colorScheme.primary
             )
             .padding(horizontal = 20.dp)
+            .height(50.dp)
     ) {
         Text(
             text = text,
@@ -113,7 +128,7 @@ fun PreviewLoadingLight() {
 @Composable
 fun Loading(
     message: String = "Loading",
-    color: Color = colorScheme.secondary
+    color: Color = colorScheme.secondary,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
@@ -209,7 +224,7 @@ fun NameTags(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(horizontal = 20.dp)
     ) {
-        Text(text = "choose another name", color = colorScheme.primary)
+        Text(text = "choose another name", color = colorScheme.secondary)
         Spacer(modifier = Modifier.height(10.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(items = names) {
@@ -328,4 +343,14 @@ fun TicBackground(content: @Composable () -> Unit) {
             content = content
         )
     }
+}
+
+@Composable
+fun gradientBrush(): Brush {
+    return Brush.verticalGradient(
+        listOf(
+            colorScheme.primaryContainer,
+            colorScheme.background,
+        )
+    )
 }

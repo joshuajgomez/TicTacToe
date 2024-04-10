@@ -1,5 +1,6 @@
 package com.triplerock.tictactoe.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.RamenDining
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +36,7 @@ import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
 import com.triplerock.tictactoe.ui.screens.common.CustomTextField
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
+import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.utils.getPrettyTime
@@ -38,18 +44,21 @@ import com.triplerock.tictactoe.viewmodels.CreateRoomUiState
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewCreateRoom() {
-    TicTacToeTheme {
-        RoomName()
+fun PreviewCreateRoomContainerDark() {
+    TicSurface {
+        Column(Modifier.fillMaxSize()) {
+            TitleBar(title = "Host Game") { }
+            RoomName()
+        }
     }
 }
 
 @Preview
 @Composable
-fun PreviewCreateRoomContainer() {
-    TicTacToeTheme {
+fun PreviewCreateRoomContainerLight() {
+    TicSurface {
         Column(Modifier.fillMaxSize()) {
             TitleBar(title = "Host Game") { }
             RoomName()
@@ -104,6 +113,10 @@ fun RoomName(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         var name by remember { mutableStateOf(defaultName) }
+        Text(
+            text = "Choose a name for the room",
+            color = colorScheme.secondary
+        )
         CustomTextField(
             text = name,
             onTextChanged = { name = it },
@@ -113,14 +126,29 @@ fun RoomName(
             name = it
         }
         CustomTextButton(
-            text = "Host",
+            text = "Create Room",
         ) {
             onCreateRoomClick(name)
         }
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewEmptyRoomDark() {
+    TicSurface {
+        EmptyRoom()
+    }
+}
+
 @Preview
+@Composable
+private fun PreviewEmptyRoomLight() {
+    TicSurface {
+        EmptyRoom()
+    }
+}
+
 @Composable
 private fun EmptyRoom(room: Room = getRooms().random()) {
     TicTacToeTheme {
@@ -128,30 +156,34 @@ private fun EmptyRoom(room: Room = getRooms().random()) {
             Modifier
                 .fillMaxWidth()
                 .padding(top = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
                 text = room.name,
-                fontSize = 25.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.primary
             )
             Text(
                 text = room.id,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.primary.copy(alpha = 0.4f)
+                color = colorScheme.primary.copy(alpha = 0.8f)
             )
             Text(
                 text = "created at ${getPrettyTime(room.timeCreated)}",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.secondary.copy(alpha = 0.4f)
+                color = colorScheme.secondary.copy(alpha = 0.8f)
             )
             Spacer(modifier = Modifier.height(30.dp))
+            Icon(
+                imageVector = Icons.Outlined.RamenDining,
+                contentDescription = null,
+                modifier = Modifier.size(200.dp),
+                tint = colorScheme.onBackground.copy(alpha = 0.8f)
+            )
             Text(
                 text = "Waiting for players",
-                fontSize = 25.sp
+                fontSize = 30.sp,
+                color = colorScheme.secondary
             )
         }
     }

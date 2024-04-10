@@ -1,19 +1,27 @@
 package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiPeople
+import androidx.compose.material.icons.filled.NoAdultContent
+import androidx.compose.material.icons.outlined.Attractions
+import androidx.compose.material.icons.outlined.Radar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -24,8 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,6 +46,7 @@ import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
+import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
@@ -95,10 +107,10 @@ fun PreviewJoinRoomLightTheme() {
 }
 
 fun getRooms(): List<Room> = listOf(
-    Room(name = "Jocha", id = "skdfhgweyigbcajkndfbks"),
-    Room(name = "Manvila", id = "skdfhgweyigbcajkndfbks"),
-    Room(name = "Visteon", id = "skdfhgweyigbcajkndfbks"),
-    Room(name = "Tharavadu", id = "skdfhgweyigbcajkndfbks"),
+    Room(name = "Jocha", id = "skdfhgweyigbcajkndfbks", player1Name = "pico"),
+    Room(name = "Manvila", id = "skdfhgweyigbcajkndfbks", player1Name = "max"),
+    Room(name = "Visteon", id = "skdfhgweyigbcajkndfbks", player1Name = "biggie"),
+    Room(name = "Tharavadu", id = "skdfhgweyigbcajkndfbks", player1Name = "mini"),
 )
 
 @Composable
@@ -145,22 +157,27 @@ private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
         Modifier
             .fillMaxWidth()
             .padding(top = 30.dp),
-        verticalArrangement = Arrangement.spacedBy(30.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Waiting for rooms", color = colorScheme.tertiary)
-        TextButton(
-            onClick = onCreateRoomClick,
-            modifier = Modifier.background(
-                shape = RoundedCornerShape(30.dp),
-                color = colorScheme.primary
-            )
-        ) {
-            Text(
-                text = "Create a room",
-                color = colorScheme.onPrimary
-            )
-        }
+        Icon(
+            imageVector = Icons.Outlined.Attractions,
+            contentDescription = null,
+            modifier = Modifier.size(200.dp),
+            tint = colorScheme.onBackground
+        )
+        Text(
+            text = "No games yet",
+            color = colorScheme.secondary,
+            fontSize = 30.sp
+        )
+
+        Text(
+            text = "Would you like to host a game?",
+            color = colorScheme.secondary.copy(alpha = 0.6f),
+            fontSize = 22.sp
+        )
+        CustomTextButton(text = "Host Game")
     }
 }
 
@@ -169,7 +186,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
     ConstraintLayout(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        val (roomName, roomId, timeCreated, button, line) = createRefs()
+        val (roomName, roomId, timeCreated, button, line, player) = createRefs()
         Text(
             text = room.name,
             color = colorScheme.primary,
@@ -180,6 +197,23 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
             }
         )
         Text(
+            buildAnnotatedString {
+                append("Created by ")
+                withStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(room.player1Name)
+                }
+            },
+            modifier = Modifier.constrainAs(player) {
+                start.linkTo(roomName.start)
+                top.linkTo(roomName.bottom, margin = 3.dp)
+            },
+            color = colorScheme.secondary
+        )
+        Text(
             text = getRelativeTime(room.timeCreated),
             color = colorScheme.secondary.copy(alpha = 0.6f),
             fontSize = 15.sp,
@@ -188,7 +222,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
             modifier = Modifier
                 .constrainAs(timeCreated) {
                     start.linkTo(parent.start)
-                    top.linkTo(roomName.bottom)
+                    top.linkTo(player.bottom, margin = 3.dp)
                 }
         )
         Text(
@@ -200,37 +234,47 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
             modifier = Modifier
                 .constrainAs(roomId) {
                     start.linkTo(timeCreated.end)
-                    top.linkTo(roomName.bottom)
+                    top.linkTo(timeCreated.top)
                 }
                 .width(170.dp)
         )
-        TextButton(
-            onClick = { onJoinClick() },
-            modifier = Modifier
-                .background(
-                    shape = RoundedCornerShape(30.dp),
-                    color = colorScheme.primary
-                )
-                .constrainAs(button) {
-                    end.linkTo(parent.end)
-                    top.linkTo(parent.top)
-                }
-        ) {
-            Text(
-                text = "Join",
-                color = colorScheme.onPrimary
-            )
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = colorScheme.onPrimary
-            )
+        JoinButton(modifier = Modifier.constrainAs(button) {
+            end.linkTo(parent.end)
+            top.linkTo(parent.top)
+            bottom.linkTo(parent.bottom)
+        }) {
+            onJoinClick()
         }
         Divider(modifier = Modifier.constrainAs(line) {
             start.linkTo(parent.start)
             bottom.linkTo(parent.bottom)
             top.linkTo(roomId.bottom, margin = 10.dp)
         })
+    }
+}
+
+@Composable
+fun JoinButton(
+    modifier: Modifier = Modifier,
+    onJoinClick: () -> Unit,
+) {
+    TextButton(
+        onClick = { onJoinClick() },
+        modifier = modifier
+            .background(
+                shape = RoundedCornerShape(30.dp),
+                color = colorScheme.primary
+            )
+    ) {
+        Text(
+            text = "Join",
+            color = colorScheme.onPrimary
+        )
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = colorScheme.onPrimary
+        )
     }
 }
 

@@ -2,6 +2,7 @@ package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -76,11 +80,7 @@ private fun Credits() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_icon),
-            contentDescription = null,
-            modifier = Modifier.size(150.dp)
-        )
+        LogoBelt()
         Spacer(modifier = Modifier.height(50.dp))
         Text(
             fontSize = 20.sp,
@@ -103,5 +103,20 @@ private fun Credits() {
                 localUriHandler.openUri("https://www.github.com/joshuajgomez")
             }
         )
+    }
+}
+
+@Composable
+fun LogoBelt() {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+    ) {
+        items(6) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_xoxo_round),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp)
+            )
+        }
     }
 }

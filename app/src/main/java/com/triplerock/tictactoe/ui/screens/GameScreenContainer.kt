@@ -47,6 +47,8 @@ import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
+import com.triplerock.tictactoe.ui.screens.common.TicBackground
+import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.coolveticaFamily
@@ -125,37 +127,31 @@ fun GameScreenContainer(
 @Preview
 @Composable
 private fun PreviewGameScreenLight() {
-    TicTacToeTheme {
-        Surface(color = colorScheme.background) {
-            GameScreen(isShowRestartButton = true, isPlayable = true)
-        }
+    TicSurface {
+        GameScreen(isShowRestartButton = true, isPlayable = true)
     }
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewGameScreenDark() {
-    TicTacToeTheme {
-        Surface(color = colorScheme.background) {
-            GameScreen(isShowRestartButton = true, isPlayable = true)
-        }
+    TicSurface {
+        GameScreen(isShowRestartButton = true, isPlayable = true)
     }
 }
 
 @Preview
 @Composable
 private fun PreviewGameScreenNotMyTurn() {
-    TicTacToeTheme {
-        Column {
-            GameScreen()
-        }
+    TicSurface {
+        GameScreen()
     }
 }
 
 @Preview
 @Composable
 private fun PreviewGameScreenFull() {
-    TicTacToeTheme {
+    TicSurface {
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -169,7 +165,7 @@ private fun PreviewGameScreenFull() {
 @Preview
 @Composable
 private fun PreviewGame() {
-    TicTacToeTheme {
+    TicSurface {
         Box(contentAlignment = Alignment.Center) {
             LazyVerticalGrid(
                 columns = GridCells.FixedSize(100.dp),
@@ -193,7 +189,7 @@ private fun PreviewGame() {
 @Preview
 @Composable
 private fun PreviewStatusBox() {
-    TicTacToeTheme {
+    TicBackground {
         StatusBox()
     }
 }
@@ -307,10 +303,8 @@ private fun GameScreen(
 @Preview
 @Composable
 fun PreviewIdBox() {
-    TicTacToeTheme {
-        Surface(color = colorScheme.background) {
-            IdBox()
-        }
+    TicBackground {
+        IdBox()
     }
 }
 
@@ -328,10 +322,14 @@ fun IdBox(
 }
 
 @Composable
-fun Info(label: String, info: String) {
+fun Info(
+    label: String,
+    info: String,
+    color: Color = colorScheme.onSurface,
+) {
     Row {
-        Text(text = label)
-        Text(text = info, fontWeight = FontWeight.Bold)
+        Text(text = label, color = color)
+        Text(text = info, fontWeight = FontWeight.Bold, color = color)
     }
 }
 
@@ -344,7 +342,7 @@ fun RestartButton(onRestartClick: () -> Unit = {}) {
             imageVector = Icons.Default.Autorenew, contentDescription = null
         )
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = "New game")
+        Text(text = "New game", fontSize = 20.sp)
     }
 }
 

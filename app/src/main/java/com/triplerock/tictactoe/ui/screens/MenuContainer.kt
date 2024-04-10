@@ -69,16 +69,6 @@ fun PreviewMenuDark() {
     }
 }
 
-@Composable
-fun gradientBrush(): Brush {
-    return Brush.verticalGradient(
-        listOf(
-            colorScheme.onPrimary,
-            colorScheme.surface,
-        )
-    )
-}
-
 @Preview
 @Composable
 fun PreviewMenuLight() {
@@ -129,7 +119,7 @@ fun Menu(
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         Image(
-            painterResource(id = R.drawable.logo_icon),
+            painterResource(id = R.drawable.ic_xoxo_round ),
             contentDescription = null,
             modifier = Modifier.size(100.dp)
         )
@@ -161,7 +151,7 @@ fun Menu(
             onClick = {
                 onMenuClick(navCredits)
             },
-            color = colorScheme.tertiary
+            color = colorScheme.secondary
         )
 
         AnimatedVisibility(visible = errorStatus.isNotEmpty()) {
@@ -183,7 +173,7 @@ fun NameBox(name: String) {
         Text(
             text = name,
             fontSize = 40.sp,
-            color = colorScheme.onSurface
+            color = colorScheme.primary
         )
         Icon(
             imageVector = Icons.Default.Edit,
