@@ -36,6 +36,7 @@ import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
+import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.utils.getPrettyTime
@@ -73,12 +74,10 @@ fun JoinRoomContainer(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewJoinRoomDarkTheme() {
-    TicTacToeTheme {
-        Surface(color = colorScheme.background) {
-            Column(Modifier.fillMaxWidth()) {
-                TitleBar(title = "Join a room") { }
-                Rooms(rooms = getRooms()) {}
-            }
+    TicSurface {
+        Column(Modifier.fillMaxWidth()) {
+            TitleBar(title = "Join a room") { }
+            Rooms(rooms = getRooms()) {}
         }
     }
 }
@@ -86,12 +85,10 @@ fun PreviewJoinRoomDarkTheme() {
 @Preview()
 @Composable
 fun PreviewJoinRoomLightTheme() {
-    TicTacToeTheme {
-        Surface(color = colorScheme.background) {
-            Column(Modifier.fillMaxWidth()) {
-                TitleBar(title = "Join a room") { }
-                Rooms(rooms = getRooms()) {}
-            }
+    TicSurface {
+        Column(Modifier.fillMaxWidth()) {
+            TitleBar(title = "Join a room") { }
+            Rooms(rooms = getRooms()) {}
         }
     }
 }

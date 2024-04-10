@@ -81,11 +81,11 @@ class Firebase {
     }
 
     fun joinRoom(room: Room, onRoomJoined: () -> Unit) {
+        roomsListener.remove()
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(keyPlayer2Name, room.player2Name)
             .addOnSuccessListener {
                 Logger.entry()
-                roomsListener.remove()
                 onRoomJoined()
             }
             .addOnFailureListener {

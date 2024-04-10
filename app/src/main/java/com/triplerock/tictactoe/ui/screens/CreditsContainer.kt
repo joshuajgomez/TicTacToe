@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.R
 import com.triplerock.tictactoe.ui.navMenu
+import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.Blue10
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
@@ -40,7 +41,7 @@ import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewCreditsContainerDark() {
-    TicTacToeTheme {
+    TicSurface {
         CreditsContainer(navController = NavController(LocalContext.current))
     }
 }
@@ -48,7 +49,7 @@ fun PreviewCreditsContainerDark() {
 @Preview
 @Composable
 fun PreviewCreditsContainerLight() {
-    TicTacToeTheme {
+    TicSurface {
         CreditsContainer(navController = NavController(LocalContext.current))
     }
 }
@@ -83,8 +84,9 @@ private fun Credits() {
         Spacer(modifier = Modifier.height(50.dp))
         Text(
             fontSize = 20.sp,
+            color = colorScheme.onSurface,
             text = buildAnnotatedString {
-                append("Created with $emojiHeart by ")
+                append("Created with $emojiHeart by  ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                     append("joshuajgomez")
                 }

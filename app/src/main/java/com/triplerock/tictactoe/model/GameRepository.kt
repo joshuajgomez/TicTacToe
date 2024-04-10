@@ -54,7 +54,10 @@ class GameRepository(
     ) {
         Logger.entry()
         firebase.findRooms {
-            onRoomFound(it)
+            onRoomFound(
+                it.sortedByDescending { room ->
+                    room.timeCreated
+                })
         }
     }
 

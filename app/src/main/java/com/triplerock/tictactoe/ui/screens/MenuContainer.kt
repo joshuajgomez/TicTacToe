@@ -1,5 +1,6 @@
 package com.triplerock.tictactoe.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,10 +36,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,11 +60,39 @@ import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 import com.triplerock.tictactoe.viewmodels.MenuViewModel
 import org.koin.androidx.compose.koinViewModel
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewMenuDark() {
+    TicTacToeTheme {
+        Surface(
+            modifier = Modifier.background(brush = gradientBrush()),
+            color = Color.Transparent
+        ) {
+            Menu()
+        }
+    }
+}
+
+@Composable
+fun gradientBrush(): Brush {
+    return Brush.verticalGradient(
+        listOf(
+            colorScheme.onPrimary,
+            colorScheme.surface,
+        )
+    )
+}
+
 @Preview
 @Composable
-fun PreviewMenu() {
+fun PreviewMenuLight() {
     TicTacToeTheme {
-        Menu()
+        Surface(
+            modifier = Modifier.background(brush = gradientBrush()),
+            color = Color.Transparent
+        ) {
+            Menu()
+        }
     }
 }
 
@@ -157,12 +189,12 @@ fun Menu(
 fun NameBox(name: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
             text = name,
             fontSize = 40.sp,
-            fontWeight = FontWeight.Bold
+            color = colorScheme.onSurface
         )
         Icon(
             imageVector = Icons.Default.Edit,

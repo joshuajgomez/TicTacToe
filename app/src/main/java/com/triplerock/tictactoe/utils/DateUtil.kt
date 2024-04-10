@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 fun getPrettyTime(instance: Long): String {
-    val dateFormat = SimpleDateFormat("h.mm a")
+    val dateFormat = SimpleDateFormat("h.mm a MMM dd")
     val date = Date(instance)
     return dateFormat.format(date).toLowerCase(Locale.current)
 }
