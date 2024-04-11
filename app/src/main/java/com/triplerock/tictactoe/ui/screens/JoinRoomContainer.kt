@@ -166,7 +166,7 @@ private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
 
         Text(
             text = "Would you like to host a game?",
-            color = colorScheme.secondary.copy(alpha = 0.6f),
+            color = colorScheme.secondary.copy(alpha = 0.8f),
             fontSize = 22.sp
         )
         CustomTextButton(text = textHostGame)
@@ -207,9 +207,8 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         )
         Text(
             text = getRelativeTime(room.timeCreated),
-            color = colorScheme.secondary.copy(alpha = 0.6f),
+            color = colorScheme.secondary.copy(alpha = 0.8f),
             fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
             maxLines = 1,
             modifier = Modifier
                 .constrainAs(timeCreated) {
