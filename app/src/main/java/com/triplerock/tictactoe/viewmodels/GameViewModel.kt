@@ -84,13 +84,13 @@ class GameViewModel(
             if (playingRoom.value == null) {
                 Logger.verbose("room set. starting game")
             }
+            playingRoom.value = it
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
-                statusText = "Turn: ${if (it.nextTurn == Player1) it.player1Name else it.player2Name}",
-                isMyTurn = it.nextTurn == me
+                statusText = "Turn: ${if (xTurn) it.player1Name else it.player2Name}",
+                isMyTurn = it.nextTurn == me,
             )
-            playingRoom.value = it
         }
         gameRepository.listenForMoves(
             roomId = roomId,
@@ -102,6 +102,8 @@ class GameViewModel(
             },
         )
     }
+
+    val xTurn = playingRoom.value?.nextTurn == Player1
 
     private fun checkGameState() {
         val nextTurn = playingRoom.value!!.nextTurn

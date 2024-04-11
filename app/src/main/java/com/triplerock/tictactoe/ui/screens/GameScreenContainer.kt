@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,31 +22,37 @@ import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
-import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
-import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
@@ -60,10 +65,11 @@ fun GameScreenContainer(
     navController: NavController,
 ) {
     Column(
-        Modifier.fillMaxSize(),
+        Modifier
+            .fillMaxSize()
+            .padding(top = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TitleBar(title = "Tic Tac Toe") { navController.navigate(navMenu) }
         val gameUiState = gameViewModel.uiState.collectAsState()
         val roomName = gameViewModel.roomName
         val playerName = gameViewModel.myName
@@ -84,7 +90,8 @@ fun GameScreenContainer(
                     statusText = nextTurn.statusText,
                     isPlayable = nextTurn.isMyTurn,
                     roomName = roomName,
-                    playerName = playerName
+                    playerName = playerName,
+                    xTurn = gameViewModel.xTurn
                 )
             }
 
@@ -98,7 +105,8 @@ fun GameScreenContainer(
                     isShowRestartButton = true,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
-                    playerName = playerName
+                    playerName = playerName,
+                    xTurn = gameViewModel.xTurn
                 )
             }
 
@@ -111,7 +119,8 @@ fun GameScreenContainer(
                     isShowRestartButton = true,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
-                    playerName = playerName
+                    playerName = playerName,
+                    xTurn = gameViewModel.xTurn
                 )
             }
         }
@@ -119,57 +128,38 @@ fun GameScreenContainer(
 
 }
 
-@Preview
-@Composable
-private fun PreviewGameScreenLight() {
-    TicSurface {
-        GameScreen(isShowRestartButton = true, isPlayable = true)
-    }
-}
-
 @Preview(device = Devices.PIXEL_2)
 @Composable
 private fun PreviewGameScreenLightPixel2() {
-    TicSurface {
-        GameScreen(isShowRestartButton = true, isPlayable = true)
+    GameScreenForPreview()
+}
+
+@Composable
+fun GameScreenForPreview() {
+    TicBackground {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(top = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            GameScreen(isPlayable = true, isShowRestartButton = true)
+        }
     }
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewGameScreenDark() {
-    TicSurface {
-        GameScreen(isShowRestartButton = true, isPlayable = true)
-    }
+    GameScreenForPreview()
 }
 
 @Preview
 @Composable
-private fun PreviewGameScreenNotMyTurn() {
-    TicSurface {
-        GameScreen()
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewGameScreenFull() {
-    TicSurface {
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            TitleBar()
-            GameScreen(isShowRestartButton = true)
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewGame() {
+private fun PreviewGameBox() {
     TicSurface {
         Box(contentAlignment = Alignment.Center) {
+            LineBox()
             LazyVerticalGrid(
                 columns = GridCells.FixedSize(100.dp),
                 modifier = Modifier
@@ -181,7 +171,7 @@ private fun PreviewGame() {
                 }
             }
             crossingList.forEach {
-                Line(
+                CrossingLine(
                     crossing = it,
                 )
             }
@@ -206,7 +196,7 @@ fun StatusBox(
 ) {
     Text(
         text = message,
-        fontSize = 20.sp,
+        fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
         color = colorScheme.primary,
         modifier = modifier
@@ -227,6 +217,7 @@ val stateList = listOf(
 @Composable
 private fun GameScreen(
     isPlayable: Boolean = false,
+    xTurn: Boolean = false,
     playerName: String = sampleNames.random(),
     roomName: String = sampleRoomNames.random(),
     onCellClicked: (cell: Int) -> Unit = {},
@@ -239,35 +230,26 @@ private fun GameScreen(
 ) {
     ConstraintLayout {
         val (status, name, turn, grid, restart) = createRefs()
+        StatusBox(
+            message = statusText,
+            modifier = Modifier.constrainAs(status) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(parent.top)
+            })
         IdBox(modifier = Modifier.constrainAs(name) {
             start.linkTo(parent.start)
-            top.linkTo(parent.top)
+            top.linkTo(status.bottom, margin = 40.dp)
         }, playerName = playerName, roomName = roomName)
-        StatusBox(message = statusText, modifier = Modifier.constrainAs(status) {
+        TurnBox(modifier = Modifier.constrainAs(turn) {
+            top.linkTo(name.top)
             end.linkTo(parent.end)
-            top.linkTo(parent.top)
-        })
-        AnimatedVisibility(visible = isPlayable, modifier = Modifier.constrainAs(turn) {
-            end.linkTo(grid.end)
-            bottom.linkTo(grid.top)
-        }) {
-            Text(
-                text = "your turn",
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .background(
-                        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-                        color = colorScheme.tertiary
-                    )
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                color = colorScheme.background
-            )
-        }
+        }, isPlayable, xTurn)
         GameContainer(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(name.bottom, margin = 35.dp)
+                top.linkTo(name.bottom, margin = 80.dp)
             },
             player1Moves = player1Moves,
             player2Moves = player2Moves,
@@ -290,36 +272,93 @@ private fun GameScreen(
     }
 }
 
+@Preview
+@Composable
+fun PreviewTurnBox() {
+    TicBackground {
+        TurnBox(isPlayable = false)
+    }
+}
+
+@Preview
+@Composable
+fun PreviewTurnBox2() {
+    TicBackground {
+        TurnBox(xTurn = false)
+    }
+}
+
+@Composable
+fun TurnBox(
+    modifier: Modifier = Modifier,
+    isPlayable: Boolean = true,
+    xTurn: Boolean = true,
+) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.End) {
+        val isChecked by remember { mutableStateOf(xTurn) }
+        Switch(
+            checked = isChecked,
+            onCheckedChange = { },
+            colors = SwitchDefaults.colors(
+                uncheckedIconColor = colorScheme.onSurface,
+                uncheckedTrackColor = colorScheme.primary,
+                uncheckedBorderColor = colorScheme.primary,
+                uncheckedThumbColor = colorScheme.onPrimary,
+            ),
+            thumbContent = {
+                if (isChecked)
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                    )
+                else
+                    Icon(
+                        imageVector = Icons.Outlined.Circle,
+                        contentDescription = null,
+                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                    )
+            },
+        )
+        AnimatedVisibility(
+            visible = isPlayable,
+            modifier = modifier
+        ) {
+            Text(
+                text = "your turn",
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .background(
+                        shape = RoundedCornerShape(10.dp),
+                        color = colorScheme.tertiary
+                    )
+                    .padding(bottom = 5.dp, start = 10.dp, end = 10.dp),
+                color = colorScheme.background
+            )
+        }
+    }
+}
+
 @Composable
 fun GameContainer(
     modifier: Modifier = Modifier,
+    crossing: Crossing? = null,
     player1Moves: List<Int>,
     player2Moves: List<Int>,
-    crossing: Crossing? = null,
     onCellClicked: (cell: Int) -> Unit = {},
 ) {
     ConstraintLayout(modifier) {
         val (grid, crossingContainer) = createRefs()
-        LazyVerticalGrid(columns = GridCells.Fixed(3),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier
-                .size(300.dp)
-                .constrainAs(grid) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        ) {
-            items(count = 9) {
-                val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
-                else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
-                else Mark(isEmpty = true)
-                Cell(mark = cellState) {
-                    onCellClicked(it)
-                }
-            }
-        }
+        LineBox()
+        MarkBox(
+            modifier = Modifier.constrainAs(grid) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            player1Moves, player2Moves, onCellClicked
+        )
         if (crossing != null) {
-            Line(
+            CrossingLine(
                 modifier = Modifier.constrainAs(crossingContainer) {
                     start.linkTo(grid.start)
                     end.linkTo(grid.end)
@@ -328,6 +367,29 @@ fun GameContainer(
                 },
                 crossing = crossing
             )
+        }
+    }
+}
+
+@Composable
+fun MarkBox(
+    modifier: Modifier,
+    player1Moves: List<Int>,
+    player2Moves: List<Int>,
+    onCellClicked: (cell: Int) -> Unit = {},
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
+        modifier = modifier.size(300.dp)
+    ) {
+        items(count = 9) {
+            val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
+            else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
+            else Mark(isEmpty = true)
+            Cell(mark = cellState) {
+                onCellClicked(it)
+            }
         }
     }
 }
@@ -379,7 +441,7 @@ fun RestartButton(onRestartClick: () -> Unit = {}) {
 }
 
 @Composable
-fun Line(
+fun CrossingLine(
     modifier: Modifier = Modifier,
     crossing: Crossing,
 ) {
@@ -401,9 +463,6 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
         onClick = { onCellClick() },
         modifier = Modifier
             .size(100.dp)
-            .border(
-                width = 2.dp, color = colorScheme.primary
-            )
             .padding(all = 10.dp),
     ) {
         AnimatedVisibility(visible = !mark.isEmpty) {
@@ -417,4 +476,49 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
     }
 }
 
+@Composable
+fun LineBox(
+    color: Color = colorScheme.primary,
+    stroke: Dp = 2.dp,
+) {
+    Box(Modifier.size(300.dp)) {
+        Canvas(Modifier.fillMaxSize()) {
+            val line1hStart = Offset(0f, size.width / 3)
+            val line1hEnd = Offset(size.width, size.width / 3)
 
+            val line2hStart = Offset(0f, size.width / 3 * 2)
+            val line2hEnd = Offset(size.width, size.width / 3 * 2)
+
+            val line1vStart = Offset(size.width / 3, 0f)
+            val line1vEnd = Offset(size.width / 3, size.width)
+
+            val line2vStart = Offset(size.width / 3 * 2, 0f)
+            val line2vEnd = Offset(size.width / 3 * 2, size.width)
+
+            drawLine(
+                color = color,
+                start = line1hStart,
+                end = line1hEnd,
+                strokeWidth = stroke.toPx(),
+            )
+            drawLine(
+                color = color,
+                start = line2hStart,
+                end = line2hEnd,
+                strokeWidth = stroke.toPx(),
+            )
+            drawLine(
+                color = color,
+                start = line1vStart,
+                end = line1vEnd,
+                strokeWidth = stroke.toPx(),
+            )
+            drawLine(
+                color = color,
+                start = line2vStart,
+                end = line2vEnd,
+                strokeWidth = stroke.toPx(),
+            )
+        }
+    }
+}
