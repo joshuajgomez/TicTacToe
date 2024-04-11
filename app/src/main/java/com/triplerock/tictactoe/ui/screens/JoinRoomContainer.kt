@@ -1,15 +1,11 @@
 package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,14 +14,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.EmojiPeople
-import androidx.compose.material.icons.filled.NoAdultContent
 import androidx.compose.material.icons.outlined.Attractions
-import androidx.compose.material.icons.outlined.Radar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,8 +42,8 @@ import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
-import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
-import com.triplerock.tictactoe.utils.getPrettyTime
+import com.triplerock.tictactoe.ui.theme.textHostGame
+import com.triplerock.tictactoe.ui.theme.textJoinGame
 import com.triplerock.tictactoe.utils.getRelativeTime
 import com.triplerock.tictactoe.viewmodels.JoinRoomUiState
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
@@ -63,7 +55,7 @@ fun JoinRoomContainer(
     navController: NavController,
 ) {
     Column(Modifier.fillMaxSize()) {
-        TitleBar(title = "Join a room") { navController.navigate(navMenu) }
+        TitleBar(title = textJoinGame) { navController.navigate(navMenu) }
         val uiState = roomViewModel.uiState.collectAsState()
         when (uiState.value) {
             is JoinRoomUiState.EmptyRoom -> EmptyRoom()
@@ -89,7 +81,7 @@ fun JoinRoomContainer(
 fun PreviewJoinRoomDarkTheme() {
     TicSurface {
         Column(Modifier.fillMaxWidth()) {
-            TitleBar(title = "Join a room") { }
+            TitleBar(title = textJoinGame) { }
             Rooms(rooms = getRooms()) {}
         }
     }
@@ -100,7 +92,7 @@ fun PreviewJoinRoomDarkTheme() {
 fun PreviewJoinRoomLightTheme() {
     TicSurface {
         Column(Modifier.fillMaxWidth()) {
-            TitleBar(title = "Join a room") { }
+            TitleBar(title = textJoinGame) { }
             Rooms(rooms = getRooms()) {}
         }
     }
@@ -177,7 +169,7 @@ private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
             color = colorScheme.secondary.copy(alpha = 0.6f),
             fontSize = 22.sp
         )
-        CustomTextButton(text = "Host Game")
+        CustomTextButton(text = textHostGame)
     }
 }
 

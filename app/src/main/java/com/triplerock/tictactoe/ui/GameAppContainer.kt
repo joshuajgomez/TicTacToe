@@ -9,7 +9,6 @@ import com.triplerock.tictactoe.ui.screens.CreditsContainer
 import com.triplerock.tictactoe.ui.screens.GameScreenContainer
 import com.triplerock.tictactoe.ui.screens.JoinRoomContainer
 import com.triplerock.tictactoe.ui.screens.MenuContainer
-import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.navKeyPlayer
 import com.triplerock.tictactoe.viewmodels.navKeyRoomId
 

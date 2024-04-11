@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_tic_logo_background">#A2235E</color>
+    <color name="ic_tictactoe_blue_background">#203E69</color>
 </resources>

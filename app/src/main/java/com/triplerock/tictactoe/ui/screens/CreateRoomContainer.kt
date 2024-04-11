@@ -39,6 +39,7 @@ import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
+import com.triplerock.tictactoe.ui.theme.textHostGame
 import com.triplerock.tictactoe.utils.getPrettyTime
 import com.triplerock.tictactoe.viewmodels.CreateRoomUiState
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
@@ -49,7 +50,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PreviewCreateRoomContainerDark() {
     TicSurface {
         Column(Modifier.fillMaxSize()) {
-            TitleBar(title = "Host Game") { }
+            TitleBar(title = textHostGame) { }
             RoomName()
         }
     }
@@ -60,7 +61,7 @@ fun PreviewCreateRoomContainerDark() {
 fun PreviewCreateRoomContainerLight() {
     TicSurface {
         Column(Modifier.fillMaxSize()) {
-            TitleBar(title = "Host Game") { }
+            TitleBar(title = textHostGame) { }
             RoomName()
         }
     }
@@ -75,7 +76,7 @@ fun CreateRoomContainer(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        TitleBar(title = "Host Game") { navController.navigate(navMenu) }
+        TitleBar(title = textHostGame) { navController.navigate(navMenu) }
         val uiState = createRoomViewModel.uiState.collectAsState()
         when (uiState.value) {
             is CreateRoomUiState.CreateRoom ->
@@ -126,7 +127,7 @@ fun RoomName(
             name = it
         }
         CustomTextButton(
-            text = "Create Room",
+            text = textHostGame,
         ) {
             onCreateRoomClick(name)
         }

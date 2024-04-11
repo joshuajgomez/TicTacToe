@@ -27,9 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -42,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.navMenu
@@ -50,8 +47,6 @@ import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
-import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
-import com.triplerock.tictactoe.ui.theme.coolveticaFamily
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
