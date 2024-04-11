@@ -1,9 +1,13 @@
 package com.triplerock.tictactoe.ui.screens.common
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -346,5 +353,57 @@ fun gradientBrush(): Brush {
             colorScheme.primaryContainer,
             colorScheme.surface,
         )
+    )
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewAppLogoContainerDark() {
+    TicSurface {
+        XoMarqueeContainer()
+    }
+}
+
+@Preview
+@Composable
+fun PreviewAppLogoContainerLight() {
+    TicSurface {
+        XoMarqueeContainer()
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun XoMarqueeContainer() {
+    Column {
+        val count = 6
+        val spacing = MarqueeSpacing.fractionOfContainer(0f)
+        Row(modifier = Modifier.basicMarquee(spacing = spacing)) {
+            for (i in 1..count) {
+                XoIcon()
+                XoIcon(Icons.Outlined.Circle)
+            }
+        }
+        Row(modifier = Modifier.basicMarquee(spacing = spacing)) {
+            for (i in 1..count) {
+                XoIcon(Icons.Outlined.Circle)
+                XoIcon()
+            }
+        }
+        Row(modifier = Modifier.basicMarquee(spacing = spacing)) {
+            for (i in 1..count) {
+                XoIcon()
+                XoIcon(Icons.Outlined.Circle)
+            }
+        }
+    }
+}
+
+@Composable
+fun XoIcon(icon: ImageVector = Icons.Default.Close) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        modifier = Modifier.size(40.dp),
     )
 }

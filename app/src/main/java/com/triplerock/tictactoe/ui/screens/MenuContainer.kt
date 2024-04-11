@@ -2,7 +2,6 @@ package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,17 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.triplerock.tictactoe.R
 import com.triplerock.tictactoe.ui.navCreateRoom
 import com.triplerock.tictactoe.ui.navCredits
 import com.triplerock.tictactoe.ui.navJoinRoom
+import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.theme.textAppTitle
@@ -109,17 +107,14 @@ fun Menu(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        Image(
-            painterResource(id = R.drawable.ic_tictactoe_foreground),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
+        XoMarqueeContainer()
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = textAppTitle,
             fontSize = 60.sp,
-            color = colorScheme.primary
+            color = colorScheme.primary.copy(blue = 0.5f)
         )
+        Spacer(modifier = Modifier.height(10.dp))
 
         NameBox(name)
 
@@ -165,11 +160,12 @@ fun NameBox(name: String) {
         Text(
             text = name,
             fontSize = 40.sp,
-            color = colorScheme.primary
+            color = colorScheme.onSurface
         )
         Icon(
             imageVector = Icons.Default.Edit,
-            contentDescription = null
+            contentDescription = null,
+            tint = colorScheme.onSurface.copy(alpha = 0.5f)
         )
     }
 }
