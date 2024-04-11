@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +48,6 @@ import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
-import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
@@ -122,6 +122,14 @@ fun GameScreenContainer(
 @Preview
 @Composable
 private fun PreviewGameScreenLight() {
+    TicSurface {
+        GameScreen(isShowRestartButton = true, isPlayable = true)
+    }
+}
+
+@Preview(device = Devices.PIXEL_2)
+@Composable
+private fun PreviewGameScreenLightPixel2() {
     TicSurface {
         GameScreen(isShowRestartButton = true, isPlayable = true)
     }
@@ -230,7 +238,7 @@ private fun GameScreen(
     onRestartButtonClick: () -> Unit = {},
 ) {
     ConstraintLayout {
-        val (status, name, turn, grid, crossingContainer, restart) = createRefs()
+        val (status, name, turn, grid, restart) = createRefs()
         IdBox(modifier = Modifier.constrainAs(name) {
             start.linkTo(parent.start)
             top.linkTo(parent.top)
@@ -255,33 +263,20 @@ private fun GameScreen(
                 color = colorScheme.background
             )
         }
-        LazyVerticalGrid(columns = GridCells.FixedSize(100.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-            modifier = Modifier
-                .constrainAs(grid) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(name.bottom, margin = 35.dp)
-                }
-                .size(300.dp)) {
-            items(count = 9) {
-                val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
-                else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
-                else Mark(isEmpty = true)
-                Cell(cellState, onCellClick = {
-                    if (isPlayable) onCellClicked(it) else Logger.warn("not your turn")
-                })
+        GameContainer(
+            modifier = Modifier.constrainAs(grid) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(name.bottom, margin = 35.dp)
+            },
+            player1Moves = player1Moves,
+            player2Moves = player2Moves,
+            crossing = crossing
+        ) {
+            // on cell clicked
+            if (isPlayable) {
+                onCellClicked(it)
             }
-        }
-        if (crossing != null) {
-            Line(
-                modifier = Modifier.constrainAs(crossingContainer) {
-                    start.linkTo(grid.start)
-                    end.linkTo(grid.end)
-                    top.linkTo(grid.top)
-                    bottom.linkTo(grid.bottom)
-                }, crossing = crossing
-            )
         }
         AnimatedVisibility(
             visible = isShowRestartButton,
@@ -291,6 +286,48 @@ private fun GameScreen(
                 top.linkTo(grid.bottom, 50.dp)
             }) {
             RestartButton { onRestartButtonClick() }
+        }
+    }
+}
+
+@Composable
+fun GameContainer(
+    modifier: Modifier = Modifier,
+    player1Moves: List<Int>,
+    player2Moves: List<Int>,
+    crossing: Crossing? = null,
+    onCellClicked: (cell: Int) -> Unit = {},
+) {
+    ConstraintLayout(modifier) {
+        val (grid, crossingContainer) = createRefs()
+        LazyVerticalGrid(columns = GridCells.Fixed(3),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+            modifier = Modifier
+                .size(300.dp)
+                .constrainAs(grid) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+        ) {
+            items(count = 9) {
+                val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
+                else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
+                else Mark(isEmpty = true)
+                Cell(mark = cellState) {
+                    onCellClicked(it)
+                }
+            }
+        }
+        if (crossing != null) {
+            Line(
+                modifier = Modifier.constrainAs(crossingContainer) {
+                    start.linkTo(grid.start)
+                    end.linkTo(grid.end)
+                    top.linkTo(grid.top)
+                    bottom.linkTo(grid.bottom)
+                },
+                crossing = crossing
+            )
         }
     }
 }
@@ -365,7 +402,7 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
         modifier = Modifier
             .size(100.dp)
             .border(
-                width = 2.dp, color = colorScheme.outline
+                width = 2.dp, color = colorScheme.primary
             )
             .padding(all = 10.dp),
     ) {
