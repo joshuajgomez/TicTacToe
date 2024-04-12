@@ -1,8 +1,8 @@
 package com.triplerock.tictactoe.model
 
 import com.triplerock.tictactoe.data.Move
-import com.triplerock.tictactoe.data.Player1
-import com.triplerock.tictactoe.data.Player2
+import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.utils.SharedPrefUtil
@@ -13,17 +13,16 @@ class GameRepository(
     private val sharedPrefUtil: SharedPrefUtil,
 ) {
 
-    private var myName: String
+    private var playerName: String
 
     init {
         if (!sharedPrefUtil.isNameSet()) {
             sharedPrefUtil.setName(sampleNames.random())
         }
-        myName = sharedPrefUtil.getName()
+        playerName = sharedPrefUtil.getName()
     }
 
-    private var currentPlayer = ""
-    private var isHost: Boolean = false
+    private var player = ""
 
     fun createRoom(
         roomName: String,
@@ -33,17 +32,15 @@ class GameRepository(
         Logger.entry()
         val room = Room(
             name = roomName,
-            player1Name = myName,
-            player2Name = "",
-            timeCreated = System.currentTimeMillis()
+            player1Name = playerName,
+            timeCreated = System.currentTimeMillis(),
         )
         firebase.createRoom(room) { it ->
             // room created
             onRoomCreated(it)
             firebase.waitForPlayers(it) {
                 // on players joining
-                isHost = true
-                currentPlayer = Player1
+                player = PlayerX
                 onPlayerJoined(it)
             }
         }
@@ -66,55 +63,24 @@ class GameRepository(
         onRoomJoined: () -> Unit,
     ) {
         Logger.entry()
-        if (myName.isEmpty()) {
+        if (playerName.isEmpty()) {
             Logger.error("myName not set")
             return
         }
-        room.player2Name = myName
+        room.player2Name = playerName
         firebase.joinRoom(room) {
             // room joined
-            currentPlayer = Player2
+            player = PlayerO
             onRoomJoined()
         }
     }
 
     fun setName(name: String) {
-        myName = name
+        playerName = name
         sharedPrefUtil.setName(name)
     }
 
-    fun onMove(cell: Int, roomId: String) {
-        val move = Move(
-            roomId = roomId,
-            playerName = myName,
-            player = currentPlayer,
-            cell = cell,
-        )
-        firebase.submitMove(move) {
-            // on move updated
-        }
-    }
-
-    fun listenForMoves(
-        roomId: String,
-        onMovesUpdate: (
-            player1Moves: List<Int>,
-            player2Moves: List<Int>,
-        ) -> Unit,
-    ) {
-        firebase.listenForMoves(roomId) {
-            // on player moved
-            val player1Moves = ArrayList<Int>()
-            val player2Moves = ArrayList<Int>()
-            for (move in it) {
-                if (move.player == Player1) player1Moves.add(move.cell)
-                else player2Moves.add(move.cell)
-            }
-            onMovesUpdate(player1Moves, player2Moves)
-        }
-    }
-
-    fun listenForTurnUpdates(roomId: String, onTurnChange: (room: Room) -> Unit) {
+    fun listenForRoomUpdates(roomId: String, onTurnChange: (room: Room) -> Unit) {
         firebase.listenForTurns(roomId) { room ->
             onTurnChange(room)
         }
@@ -125,7 +91,7 @@ class GameRepository(
     }
 
     fun getName(): String {
-        return myName
+        return playerName
     }
 
     fun resetGame(room: Room, onResetComplete: () -> Unit) {

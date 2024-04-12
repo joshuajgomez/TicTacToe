@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.triplerock.tictactoe.data.Player2
+import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.navHostGame
 import com.triplerock.tictactoe.ui.navGame
@@ -75,7 +75,7 @@ fun JoinRoomContainer(
 
             is JoinRoomUiState.Joined -> {
                 val roomId = (uiState.value as JoinRoomUiState.Joined).roomId
-                navController.navigate("$navGame/$roomId/$Player2")
+                navController.navigate("$navGame/$roomId/$PlayerO")
             }
         }
     }

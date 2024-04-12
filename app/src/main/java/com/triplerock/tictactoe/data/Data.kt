@@ -2,21 +2,36 @@ package com.triplerock.tictactoe.data
 
 import com.google.firebase.firestore.DocumentId
 
-const val Player1 = "Player1"
-const val Player2 = "Player2"
+const val PlayerX = "X"
+const val PlayerO = "O"
 
 data class Room(
     @DocumentId
     var id: String = "",
     var name: String = "",
+    var timeCreated: Long = 1712598251041,
+    var status: String = "Setting up game",
+
+    var nextTurn: String = PlayerX,
+
     var player1Name: String = "",
     var player2Name: String = "",
-    var nextTurn: String = Player1,
-    var timeCreated: Long = 1712598251041,
+
+    val moves: HashMap<String, ArrayList<Int>> = hashMapOf(
+        Pair(PlayerX, ArrayList()),
+        Pair(PlayerO, ArrayList())
+    ),
+
+    var history: History = History(),
+)
+
+data class History(
+    var xWins: Int = 0,
+    var oWins: Int = 0,
+    var draws: Int = 0,
 )
 
 data class Move(
-    @DocumentId
     var id: String = "",
     var roomId: String = "",
     var playerName: String = "",

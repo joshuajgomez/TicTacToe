@@ -19,7 +19,7 @@ const val navGame = "game_screen"
 const val navCredits = "credits_screen"
 
 @Composable
-fun GameAppContainer(
+fun TicAppContainer(
     navController: NavHostController,
 ) {
     NavHost(

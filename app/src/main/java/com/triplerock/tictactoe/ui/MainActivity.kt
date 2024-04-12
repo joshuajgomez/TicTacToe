@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                     color = Color.Transparent,
                 ) {
                     val navController = rememberNavController()
-                    GameAppContainer(
+                    TicAppContainer(
                         navController = navController
                     )
                 }

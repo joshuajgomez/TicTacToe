@@ -27,14 +27,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.triplerock.tictactoe.data.Player1
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
 import com.triplerock.tictactoe.ui.screens.common.CustomTextField
-import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
@@ -93,7 +92,7 @@ fun CreateRoomContainer(
                 val starting = uiState.value as CreateRoomUiState.Starting
                 val room = starting.room
                 WaitingForPlayers(room = room, status = "Starting game")
-                navController.navigate("$navGame/${room.id}/$Player1")
+                navController.navigate("$navGame/${room.id}/$PlayerX")
             }
         }
     }

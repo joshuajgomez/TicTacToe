@@ -5,8 +5,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.triplerock.tictactoe.data.Player1
-import com.triplerock.tictactoe.data.Player2
+import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
 import com.triplerock.tictactoe.utils.Logger
@@ -36,22 +36,15 @@ sealed class GameUiState {
     ) : GameUiState()
 
     data class NextTurn(
-        val player1Moves: List<Int> = listOf(),
-        val player2Moves: List<Int> = listOf(),
-        val statusText: String = "Ready",
-        val isMyTurn: Boolean,
+        val room: Room
     ) : GameUiState()
 
     data class Draw(
-        val player1Moves: List<Int>,
-        val player2Moves: List<Int>,
-        val statusText: String = "Its a draw!",
+        val room: Room
     ) : GameUiState()
 
     data class Winner(
-        val player1Moves: List<Int>,
-        val player2Moves: List<Int>,
-        val statusText: String,
+        val room: Room,
         val crossing: Crossing,
     ) : GameUiState()
 }
@@ -65,102 +58,87 @@ class GameViewModel(
 ) : ViewModel() {
 
     private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
-    private val me: String = checkNotNull(savedStateHandle[navKeyPlayer])
-    val myName: String = gameRepository.getName()
+    val player: String = checkNotNull(savedStateHandle[navKeyPlayer])
 
-    private var player1Moves: List<Int> = ArrayList()
-    private var player2Moves: List<Int> = ArrayList()
+    val playerName: String = gameRepository.getName()
 
-    private val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
-    var roomName: String = ""
+    val room: MutableStateFlow<Room?> = MutableStateFlow(null)
 
     private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Waiting())
     val uiState: StateFlow<GameUiState> = _uiState
 
     init {
         Logger.debug("roomId = [${roomId}]")
-        gameRepository.listenForTurnUpdates(roomId) {
-            roomName = it.name
-            if (playingRoom.value == null) {
+        gameRepository.listenForRoomUpdates(roomId) {
+            room.value = it
+            if (room.value == null) {
                 Logger.verbose("room set. starting game")
             }
-            playingRoom.value = it
-            _uiState.value = GameUiState.NextTurn(
-                player1Moves = player1Moves,
-                player2Moves = player2Moves,
-                statusText = "Turn: ${if (xTurn()) it.player1Name else it.player2Name}",
-                isMyTurn = it.nextTurn == me,
-            )
-        }
-        gameRepository.listenForMoves(
-            roomId = roomId,
-            onMovesUpdate = { moves1, moves2 ->
-                Logger.debug("moves1 = [${moves1}], moves2 = [${moves2}]")
-                player1Moves = moves1
-                player2Moves = moves2
-                checkGameState()
-            },
-        )
-    }
-
-    fun xTurn() = playingRoom.value?.nextTurn == Player1
-
-    private fun checkGameState() {
-        val nextTurn = playingRoom.value!!.nextTurn
-        Logger.debug("nextTurn = $nextTurn")
-        if (isFinished(nextTurn, player1Moves)) {
-            // game won or draw by player1
-        } else if (isFinished(nextTurn, player2Moves)) {
-            // game won or draw by player2
-        } else {
-            // change turn
-            val room = playingRoom.value
-            room!!.nextTurn = if (room.nextTurn == Player1) Player2 else Player1
-            if (me == Player1) {
-                // Only Player1/Host is allowed to update move to server
-                Logger.info("changing turn")
-                gameRepository.updateTurn(playingRoom.value!!)
-            }
+            checkGameState()
         }
     }
 
     fun onCellClick(cell: Int) {
         Logger.debug("cell=$cell")
-        gameRepository.onMove(cell, roomId)
+        val room = room.value
+        room?.moves?.get(player)?.add(cell)
+        room?.nextTurn = if (room?.nextTurn == PlayerX) PlayerO else PlayerX
+        checkGameState(true)
     }
 
-    private fun isFinished(player: String, moves: List<Int>): Boolean {
+    private fun checkGameState(shouldUpdate: Boolean = false) {
+        val room = room.value!!
+        Logger.debug("nextTurn = $room")
+        if (isDraw()) {
+            // game draw
+            if (shouldUpdate) room.history.draws++
+        } else if (isWon(room.moves[PlayerX]!!)) {
+            // game won by playerX
+            if (shouldUpdate) room.history.xWins++
+        } else if (isWon(room.moves[PlayerO]!!)) {
+            // game won by playerO
+            if (shouldUpdate) room.history.oWins++
+        } else {
+            // change turn
+            Logger.info("changing turn")
+            room.status = "Turn: ${room.nextTurn}"
+            _uiState.value = GameUiState.NextTurn(room)
+        }
+        if (shouldUpdate) gameRepository.updateTurn(room)
+    }
+
+    private fun isWon(moves: List<Int>): Boolean {
+        val room = room.value!!
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
+                room.status = "$player wins!!"
                 _uiState.value = GameUiState.Winner(
-                    player1Moves = player1Moves,
-                    player2Moves = player2Moves,
-                    statusText = "$player wins!!",
+                    room = room,
                     crossing = crossing
                 )
                 return true
             }
         }
-        if (player1Moves.size + player2Moves.size == 9) {
+        return false
+    }
+
+    private fun isDraw(): Boolean {
+        val room = room.value!!
+        if (room.moves[PlayerX]!!.size + room.moves[PlayerO]!!.size == 9) {
             // game is draw
-            _uiState.value = GameUiState.Draw(
-                player1Moves = player1Moves,
-                player2Moves = player2Moves,
-            )
+            room.status = "Draw :|"
+            _uiState.value = GameUiState.Draw(room)
             return true
         }
         return false
     }
 
     fun onRestartClick() {
-        if (me == Player1) {
-            _uiState.value = GameUiState.Waiting()
-            gameRepository.resetGame(playingRoom.value!!) {
-                // on reset complete
-                gameRepository.updateTurn(playingRoom.value!!)
-            }
+        _uiState.value = GameUiState.Waiting()
+        gameRepository.resetGame(room.value!!) {
+            // on reset complete
+            gameRepository.updateTurn(room.value!!)
         }
     }
 
-    fun isPlayer1() = me == Player1
 }

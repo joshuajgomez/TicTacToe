@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,8 +20,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.outlined.Balance
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -32,9 +35,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
+import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.screens.common.Loading
@@ -72,9 +75,7 @@ fun GameScreenContainer(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val gameUiState = gameViewModel.uiState.collectAsState()
-        val roomName = gameViewModel.roomName
-        val playerName = gameViewModel.myName
-        val isPlayer1 = gameViewModel.isPlayer1()
+        val playerName = gameViewModel.playerName
         when (gameUiState.value) {
             is GameUiState.Waiting -> {
                 val waiting = gameUiState.value as GameUiState.Waiting
@@ -87,43 +88,33 @@ fun GameScreenContainer(
                 val nextTurn = gameUiState.value as GameUiState.NextTurn
                 Logger.debug("nextTurn = $nextTurn")
                 GameScreen(
+                    room = nextTurn.room,
                     onCellClicked = { gameViewModel.onCellClick(it) },
-                    player1Moves = nextTurn.player1Moves,
-                    player2Moves = nextTurn.player2Moves,
-                    statusText = nextTurn.statusText,
-                    isPlayable = nextTurn.isMyTurn,
-                    roomName = roomName,
+                    statusText = nextTurn.room.status,
+                    isPlayable = nextTurn.room.nextTurn == gameViewModel.player,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn()
                 )
             }
 
             is GameUiState.Winner -> {
                 val winner = gameUiState.value as GameUiState.Winner
                 GameScreen(
-                    player1Moves = winner.player1Moves,
-                    player2Moves = winner.player2Moves,
-                    statusText = winner.statusText,
+                    room = winner.room,
+                    statusText = winner.room.status,
                     crossing = winner.crossing,
-                    isShowRestartButton = isPlayer1,
+                    isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    roomName = roomName,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn()
                 )
             }
 
             is GameUiState.Draw -> {
                 val gameOver = gameUiState.value as GameUiState.Draw
                 GameScreen(
-                    player1Moves = gameOver.player1Moves,
-                    player2Moves = gameOver.player2Moves,
-                    statusText = gameOver.statusText,
-                    isShowRestartButton = isPlayer1,
+                    statusText = gameOver.room.status,
+                    isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    roomName = roomName,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn()
                 )
             }
         }
@@ -161,7 +152,7 @@ val moves = listOf(
     0, 1, 2, 3, 4, 5, 6
 )
 
-@Preview
+//@Preview
 @Composable
 private fun PreviewGameBox() {
     TicSurface {
@@ -177,7 +168,7 @@ private fun PreviewGameBox() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 private fun PreviewStatusBox() {
     TicBackground {
@@ -214,20 +205,17 @@ val stateList = listOf(
 
 @Composable
 private fun GameScreen(
-    isPlayable: Boolean = false,
-    xTurn: Boolean = false,
+    room: Room = getRooms().random(),
+    isPlayable: Boolean = true,
     playerName: String = sampleNames.random(),
-    roomName: String = sampleRoomNames.random(),
-    onCellClicked: (cell: Int) -> Unit = {},
-    player1Moves: List<Int> = emptyList(),
-    player2Moves: List<Int> = emptyList(),
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
     isShowRestartButton: Boolean = false,
+    onCellClicked: (cell: Int) -> Unit = {},
     onRestartButtonClick: () -> Unit = {},
 ) {
-    ConstraintLayout {
-        val (status, name, turn, grid, restart) = createRefs()
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (status, name, turn, grid, restart, stats) = createRefs()
         StatusBox(
             message = statusText,
             modifier = Modifier.constrainAs(status) {
@@ -238,19 +226,19 @@ private fun GameScreen(
         IdBox(modifier = Modifier.constrainAs(name) {
             start.linkTo(parent.start)
             top.linkTo(status.bottom, margin = 40.dp)
-        }, playerName = playerName, roomName = roomName)
+        }, playerName = playerName, roomName = room.name)
         TurnBox(modifier = Modifier.constrainAs(turn) {
             top.linkTo(name.top)
             end.linkTo(parent.end)
-        }, isPlayable = isPlayable, xTurn = xTurn)
+        }, isPlayable = isPlayable, xTurn = room.nextTurn == PlayerX)
         GameContainer(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(name.bottom, margin = 80.dp)
+                top.linkTo(name.bottom, margin = 60.dp)
+                bottom.linkTo(stats.top)
             },
-            player1Moves = player1Moves,
-            player2Moves = player2Moves,
+            room = room,
             crossing = crossing
         ) {
             // on cell clicked
@@ -258,19 +246,65 @@ private fun GameScreen(
                 onCellClicked(it)
             }
         }
+
+        Stats(
+            modifier = Modifier.constrainAs(stats) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(grid.bottom)
+                bottom.linkTo(restart.top)
+            },
+            room = room
+        )
+
         AnimatedVisibility(
             visible = isShowRestartButton,
             modifier = Modifier.constrainAs(restart) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(grid.bottom, 50.dp)
+                bottom.linkTo(parent.bottom, 20.dp)
             }) {
             RestartButton { onRestartButtonClick() }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
+@Composable
+fun Stats(modifier: Modifier = Modifier, room: Room = getRooms().random()) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(all = 10.dp)
+            .background(
+                shape = RoundedCornerShape(10.dp),
+                color = colorScheme.secondaryContainer
+            ).padding(10.dp)
+    ) {
+        Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
+        Stat("${room.history.xWins} wins", Icons.Outlined.Clear)
+        Stat("${room.history.draws} draws", Icons.Outlined.Balance)
+    }
+}
+
+@Composable
+fun Stat(label: String, icon: ImageVector = Icons.Default.Close) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(30.dp),
+            tint = colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+        )
+        Text(
+            text = label, fontSize = 18.sp,
+            color = colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+        )
+    }
+}
+
+//@Preview
 @Composable
 fun PreviewTurnBox() {
     TicBackground {
@@ -278,7 +312,7 @@ fun PreviewTurnBox() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewTurnBox2() {
     TicBackground {
@@ -338,8 +372,7 @@ fun TurnBox(
 fun GameContainer(
     modifier: Modifier = Modifier,
     crossing: Crossing? = null,
-    player1Moves: List<Int>,
-    player2Moves: List<Int>,
+    room: Room,
     onCellClicked: (cell: Int) -> Unit = {},
 ) {
     ConstraintLayout(modifier) {
@@ -350,7 +383,7 @@ fun GameContainer(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
-            player1Moves, player2Moves, onCellClicked
+            room.moves[PlayerX]!!, room.moves[PlayerX]!!, onCellClicked
         )
         if (crossing != null) {
             CrossingLine(
