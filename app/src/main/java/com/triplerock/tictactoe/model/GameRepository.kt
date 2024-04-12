@@ -28,7 +28,7 @@ class GameRepository(
     fun createRoom(
         roomName: String,
         onRoomCreated: (room: Room) -> Unit,
-        onPlayerJoined: (roomId: String) -> Unit,
+        onPlayerJoined: (room: Room) -> Unit,
     ) {
         Logger.entry()
         val room = Room(
@@ -44,7 +44,7 @@ class GameRepository(
                 // on players joining
                 isHost = true
                 currentPlayer = Player1
-                onPlayerJoined(it.id)
+                onPlayerJoined(it)
             }
         }
     }

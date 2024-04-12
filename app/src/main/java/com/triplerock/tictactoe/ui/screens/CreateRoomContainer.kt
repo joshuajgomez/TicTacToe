@@ -86,15 +86,14 @@ fun CreateRoomContainer(
 
             is CreateRoomUiState.RoomCreated -> {
                 val room = (uiState.value as CreateRoomUiState.RoomCreated).room
-                EmptyRoom(
-                    room = room
-                )
+                WaitingForPlayers(room = room)
             }
 
             is CreateRoomUiState.Starting -> {
-                Loading(message = "Starting")
-                val roomId = (uiState.value as CreateRoomUiState.Starting).roomId
-                navController.navigate("$navGame/$roomId/$Player1")
+                val starting = uiState.value as CreateRoomUiState.Starting
+                val room = starting.room
+                WaitingForPlayers(room = room, status = "Starting game")
+                navController.navigate("$navGame/${room.id}/$Player1")
             }
         }
     }
@@ -138,7 +137,7 @@ fun RoomName(
 @Composable
 private fun PreviewEmptyRoomDark() {
     TicSurface {
-        EmptyRoom()
+        WaitingForPlayers()
     }
 }
 
@@ -146,12 +145,15 @@ private fun PreviewEmptyRoomDark() {
 @Composable
 private fun PreviewEmptyRoomLight() {
     TicSurface {
-        EmptyRoom()
+        WaitingForPlayers()
     }
 }
 
 @Composable
-private fun EmptyRoom(room: Room = getRooms().random()) {
+private fun WaitingForPlayers(
+    room: Room = getRooms().random(),
+    status: String = "Waiting for players"
+) {
     TicTacToeTheme {
         Column(
             Modifier
@@ -182,7 +184,7 @@ private fun EmptyRoom(room: Room = getRooms().random()) {
                 tint = colorScheme.onBackground.copy(alpha = 0.8f)
             )
             Text(
-                text = "Waiting for players",
+                text = status,
                 fontSize = 30.sp,
                 color = colorScheme.secondary
             )

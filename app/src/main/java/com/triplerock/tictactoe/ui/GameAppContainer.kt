@@ -13,8 +13,8 @@ import com.triplerock.tictactoe.viewmodels.navKeyPlayer
 import com.triplerock.tictactoe.viewmodels.navKeyRoomId
 
 const val navMenu = "menu_screen"
-const val navCreateRoom = "create_room_screen"
-const val navJoinRoom = "join_room_screen"
+const val navHostGame = "create_room_screen"
+const val navJoinGame = "join_room_screen"
 const val navGame = "game_screen"
 const val navCredits = "credits_screen"
 
@@ -30,11 +30,11 @@ fun GameAppContainer(
             MenuContainer(navController = navController)
         }
 
-        composable(navCreateRoom) {
+        composable(navHostGame) {
             CreateRoomContainer(navController = navController)
         }
 
-        composable(navJoinRoom) {
+        composable(navJoinGame) {
             JoinRoomContainer(navController = navController)
         }
 

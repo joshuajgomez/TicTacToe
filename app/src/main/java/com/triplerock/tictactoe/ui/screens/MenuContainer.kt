@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.triplerock.tictactoe.ui.navCreateRoom
+import com.triplerock.tictactoe.ui.navHostGame
 import com.triplerock.tictactoe.ui.navCredits
-import com.triplerock.tictactoe.ui.navJoinRoom
+import com.triplerock.tictactoe.ui.navJoinGame
 import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
@@ -125,12 +125,12 @@ fun Menu(
         MenuItem(
             text = textHostGame,
             icon = Icons.Rounded.AddCircle,
-            onClick = { onMenuClick(navCreateRoom) }
+            onClick = { onMenuClick(navHostGame) }
         )
         MenuItem(
             text = textJoinGame,
             icon = Icons.Rounded.ArrowCircleRight,
-            onClick = { onMenuClick(navJoinRoom) }
+            onClick = { onMenuClick(navJoinGame) }
         )
         MenuItem(
             text = textCredits,

@@ -36,6 +36,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.Player2
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.navHostGame
 import com.triplerock.tictactoe.ui.navGame
 import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
@@ -58,7 +59,11 @@ fun JoinRoomContainer(
         TitleBar(title = textJoinGame) { navController.navigate(navMenu) }
         val uiState = roomViewModel.uiState.collectAsState()
         when (uiState.value) {
-            is JoinRoomUiState.EmptyRoom -> EmptyRoom()
+            is JoinRoomUiState.EmptyRoom -> WaitingForPlayers {
+                // on host game click
+                navController.navigate(navHostGame)
+            }
+
             is JoinRoomUiState.RoomFound -> Rooms(
                 rooms = (uiState.value as JoinRoomUiState.RoomFound).rooms,
                 onJoinClick = { roomViewModel.onJoinRoomClick(it) }
@@ -110,20 +115,16 @@ private fun Rooms(
     rooms: List<Room>,
     onJoinClick: (room: Room) -> Unit,
 ) {
-    if (rooms.isNotEmpty()) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(rooms) {
-                RoomItem(it) {
-                    onJoinClick(it)
-                }
+    LazyColumn(
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(rooms) {
+            RoomItem(it) {
+                onJoinClick(it)
             }
         }
-    } else {
-        EmptyRoom()
     }
 }
 
@@ -131,7 +132,7 @@ private fun Rooms(
 @Composable
 private fun PreviewEmptyRoomDark() {
     TicSurface {
-        EmptyRoom()
+        WaitingForPlayers()
     }
 }
 
@@ -139,12 +140,12 @@ private fun PreviewEmptyRoomDark() {
 @Composable
 private fun PreviewEmptyRoomDarkLight() {
     TicSurface {
-        EmptyRoom()
+        WaitingForPlayers()
     }
 }
 
 @Composable
-private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
+private fun WaitingForPlayers(onCreateRoomClick: () -> Unit = {}) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -169,7 +170,9 @@ private fun EmptyRoom(onCreateRoomClick: () -> Unit = {}) {
             color = colorScheme.secondary.copy(alpha = 0.8f),
             fontSize = 22.sp
         )
-        CustomTextButton(text = textHostGame)
+        CustomTextButton(text = textHostGame) {
+            onCreateRoomClick()
+        }
     }
 }
 
