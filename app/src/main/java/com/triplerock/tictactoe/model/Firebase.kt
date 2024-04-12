@@ -37,7 +37,6 @@ class Firebase {
     fun waitForPlayers(room: Room, onPlayerJoining: (room: Room) -> Unit) {
         val roomRef = firestore.collection(COLLECTION_ROOMS).document(room.id)
         playersListener = roomRef.addSnapshotListener() { snapshot, e ->
-            Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
                 return@addSnapshotListener
@@ -67,7 +66,6 @@ class Firebase {
         val roomRef = firestore.collection(COLLECTION_ROOMS)
             .whereEqualTo(keyPlayer2Name, "")
         roomsListener = roomRef.addSnapshotListener { snapshot, e ->
-            Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
                 return@addSnapshotListener
@@ -85,11 +83,11 @@ class Firebase {
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(keyPlayer2Name, room.player2Name)
             .addOnSuccessListener {
-                Logger.entry()
+                Logger.debug("success")
                 onRoomJoined()
             }
             .addOnFailureListener {
-                Logger.error(it.message.toString())
+                Logger.error("failure: ${it.message.toString()}")
             }
     }
 
@@ -98,7 +96,7 @@ class Firebase {
         firestore.collection(COLLECTION_MOVES)
             .add(move)
             .addOnSuccessListener {
-                Logger.entry()
+                Logger.debug("success")
                 onMoveUpdated()
             }
             .addOnFailureListener {
@@ -111,10 +109,10 @@ class Firebase {
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(keyNextTurn, room.nextTurn)
             .addOnSuccessListener {
-                Logger.entry()
+                Logger.debug("success")
             }
             .addOnFailureListener {
-                Logger.entry()
+                Logger.debug("fail")
             }
     }
 
@@ -122,16 +120,13 @@ class Firebase {
         val roomRef = firestore.collection(COLLECTION_MOVES)
             .whereEqualTo(keyRoomId, roomId)
         roomRef.addSnapshotListener { snapshot, e ->
-            Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
                 return@addSnapshotListener
             }
             val moves = getMoves(snapshot!!)
             Logger.debug("onMoveUpdate: $moves")
-            if (moves.isNotEmpty()) {
-                onPlayerMoved(moves)
-            }
+            onPlayerMoved(moves)
         }
     }
 
@@ -139,7 +134,6 @@ class Firebase {
         Logger.debug("roomId = [${roomId}], onTurnUpdate = [${onTurnUpdate}]")
         val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
         roomRef.addSnapshotListener { snapshot, e ->
-            Logger.entry()
             if (e != null) {
                 Logger.error(e.message.toString())
                 return@addSnapshotListener
@@ -171,7 +165,7 @@ class Firebase {
                     batch.delete(document.reference)
                 }
                 batch.commit().addOnSuccessListener {
-                    Logger.entry()
+                    Logger.debug("success")
                     onResetComplete()
                 }
             }

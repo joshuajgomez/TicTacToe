@@ -157,8 +157,10 @@ class GameViewModel(
             _uiState.value = GameUiState.Waiting()
             gameRepository.resetGame(playingRoom.value!!) {
                 // on reset complete
-
+                gameRepository.updateTurn(playingRoom.value!!)
             }
         }
     }
+
+    fun isPlayer1() = me == Player1
 }

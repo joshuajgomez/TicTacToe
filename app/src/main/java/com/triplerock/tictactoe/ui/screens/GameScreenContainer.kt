@@ -74,6 +74,7 @@ fun GameScreenContainer(
         val gameUiState = gameViewModel.uiState.collectAsState()
         val roomName = gameViewModel.roomName
         val playerName = gameViewModel.myName
+        val isPlayer1 = gameViewModel.isPlayer1()
         when (gameUiState.value) {
             is GameUiState.Waiting -> {
                 val waiting = gameUiState.value as GameUiState.Waiting
@@ -104,7 +105,7 @@ fun GameScreenContainer(
                     player2Moves = winner.player2Moves,
                     statusText = winner.statusText,
                     crossing = winner.crossing,
-                    isShowRestartButton = true,
+                    isShowRestartButton = isPlayer1,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
                     playerName = playerName,
@@ -118,7 +119,7 @@ fun GameScreenContainer(
                     player1Moves = gameOver.player1Moves,
                     player2Moves = gameOver.player2Moves,
                     statusText = gameOver.statusText,
-                    isShowRestartButton = true,
+                    isShowRestartButton = isPlayer1,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
                     playerName = playerName,
