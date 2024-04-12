@@ -53,6 +53,7 @@ import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
+import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
@@ -83,6 +84,7 @@ fun GameScreenContainer(
 
             is GameUiState.NextTurn -> {
                 val nextTurn = gameUiState.value as GameUiState.NextTurn
+                Logger.debug("nextTurn = $nextTurn")
                 GameScreen(
                     onCellClicked = { gameViewModel.onCellClick(it) },
                     player1Moves = nextTurn.player1Moves,
@@ -91,7 +93,7 @@ fun GameScreenContainer(
                     isPlayable = nextTurn.isMyTurn,
                     roomName = roomName,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn
+                    xTurn = gameViewModel.xTurn()
                 )
             }
 
@@ -106,7 +108,7 @@ fun GameScreenContainer(
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn
+                    xTurn = gameViewModel.xTurn()
                 )
             }
 
@@ -120,7 +122,7 @@ fun GameScreenContainer(
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     roomName = roomName,
                     playerName = playerName,
-                    xTurn = gameViewModel.xTurn
+                    xTurn = gameViewModel.xTurn()
                 )
             }
         }
@@ -154,22 +156,17 @@ private fun PreviewGameScreenDark() {
     GameScreenForPreview()
 }
 
+val moves = listOf(
+    0, 1, 2, 3, 4, 5, 6
+)
+
 @Preview
 @Composable
 private fun PreviewGameBox() {
     TicSurface {
         Box(contentAlignment = Alignment.Center) {
             LineBox()
-            LazyVerticalGrid(
-                columns = GridCells.FixedSize(100.dp),
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(300.dp)
-            ) {
-                items(count = 9) {
-                    Cell(stateList.random())
-                }
-            }
+            MarkBox(player1Moves = moves, player2Moves = moves)
             crossingList.forEach {
                 CrossingLine(
                     crossing = it,
@@ -244,7 +241,7 @@ private fun GameScreen(
         TurnBox(modifier = Modifier.constrainAs(turn) {
             top.linkTo(name.top)
             end.linkTo(parent.end)
-        }, isPlayable, xTurn)
+        }, isPlayable = isPlayable, xTurn = xTurn)
         GameContainer(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
@@ -295,9 +292,8 @@ fun TurnBox(
     xTurn: Boolean = true,
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.End) {
-        val isChecked by remember { mutableStateOf(xTurn) }
         Switch(
-            checked = isChecked,
+            checked = xTurn,
             onCheckedChange = { },
             colors = SwitchDefaults.colors(
                 uncheckedIconColor = colorScheme.onSurface,
@@ -306,7 +302,7 @@ fun TurnBox(
                 uncheckedThumbColor = colorScheme.onPrimary,
             ),
             thumbContent = {
-                if (isChecked)
+                if (xTurn)
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = null,
@@ -320,22 +316,20 @@ fun TurnBox(
                     )
             },
         )
-        AnimatedVisibility(
-            visible = isPlayable,
-            modifier = modifier
-        ) {
-            Text(
-                text = "your turn",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .background(
-                        shape = RoundedCornerShape(10.dp),
-                        color = colorScheme.tertiary
-                    )
-                    .padding(bottom = 5.dp, start = 10.dp, end = 10.dp),
-                color = colorScheme.background
-            )
-        }
+        Text(
+            text = "${
+                if (isPlayable) ""
+                else "not "
+            }your turn",
+            fontSize = 15.sp,
+            modifier = Modifier
+                .background(
+                    shape = RoundedCornerShape(10.dp),
+                    color = colorScheme.tertiary
+                )
+                .padding(bottom = 5.dp, start = 10.dp, end = 10.dp),
+            color = colorScheme.background
+        )
     }
 }
 
@@ -373,7 +367,7 @@ fun GameContainer(
 
 @Composable
 fun MarkBox(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     player1Moves: List<Int>,
     player2Moves: List<Int>,
     onCellClicked: (cell: Int) -> Unit = {},
@@ -446,7 +440,7 @@ fun CrossingLine(
     crossing: Crossing,
 ) {
     Canvas(
-        modifier = modifier.size(210.dp)
+        modifier = modifier.size(200.dp)
     ) {
         drawLine(
             color = Color.Yellow.copy(alpha = 0.5f),
@@ -478,10 +472,11 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
 
 @Composable
 fun LineBox(
+    modifier: Modifier = Modifier,
     color: Color = colorScheme.primary,
     stroke: Dp = 2.dp,
 ) {
-    Box(Modifier.size(300.dp)) {
+    Box(modifier.size(300.dp)) {
         Canvas(Modifier.fillMaxSize()) {
             val line1hStart = Offset(0f, size.width / 3)
             val line1hEnd = Offset(size.width, size.width / 3)

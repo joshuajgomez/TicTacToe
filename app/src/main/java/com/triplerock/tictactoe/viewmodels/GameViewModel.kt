@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 data class Crossing(val start: Offset, val end: Offset, val positions: List<Int>)
 
-const val rectOffset = 600f
+const val rectOffset = 560f
 val rect = Rect(Offset.Zero, Size(width = rectOffset, height = rectOffset))
 val crossingList = listOf(
     Crossing(positions = listOf(0, 1, 2), start = rect.topLeft, end = rect.topRight),
@@ -88,7 +88,7 @@ class GameViewModel(
             _uiState.value = GameUiState.NextTurn(
                 player1Moves = player1Moves,
                 player2Moves = player2Moves,
-                statusText = "Turn: ${if (xTurn) it.player1Name else it.player2Name}",
+                statusText = "Turn: ${if (xTurn()) it.player1Name else it.player2Name}",
                 isMyTurn = it.nextTurn == me,
             )
         }
@@ -103,7 +103,7 @@ class GameViewModel(
         )
     }
 
-    val xTurn = playingRoom.value?.nextTurn == Player1
+    fun xTurn() = playingRoom.value?.nextTurn == Player1
 
     private fun checkGameState() {
         val nextTurn = playingRoom.value!!.nextTurn
