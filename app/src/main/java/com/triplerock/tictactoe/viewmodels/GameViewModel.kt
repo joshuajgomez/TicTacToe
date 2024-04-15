@@ -62,7 +62,7 @@ class GameViewModel(
 
     val playerName: String = gameRepository.getName()
 
-    val room: MutableStateFlow<Room?> = MutableStateFlow(null)
+    val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
 
     private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Waiting())
     val uiState: StateFlow<GameUiState> = _uiState
@@ -70,24 +70,27 @@ class GameViewModel(
     init {
         Logger.debug("roomId = [${roomId}]")
         gameRepository.listenForRoomUpdates(roomId) {
-            room.value = it
-            if (room.value == null) {
+            val isStarting = playingRoom.value == null
+            playingRoom.value = it
+            if (isStarting || it.nextTurn == player) {
+                // If nextTurn is other player, we already updated turn when cell was clicked
                 Logger.verbose("room set. starting game")
+                checkGameState()
             }
-            checkGameState()
         }
     }
 
     fun onCellClick(cell: Int) {
         Logger.debug("cell=$cell")
-        val room = room.value
+        val room = playingRoom.value
         room?.moves?.get(player)?.add(cell)
         room?.nextTurn = if (room?.nextTurn == PlayerX) PlayerO else PlayerX
+        playingRoom.value = room
         checkGameState(true)
     }
 
     private fun checkGameState(shouldUpdate: Boolean = false) {
-        val room = room.value!!
+        val room = playingRoom.value!!
         Logger.debug("nextTurn = $room")
         if (isDraw()) {
             // game draw
@@ -108,7 +111,7 @@ class GameViewModel(
     }
 
     private fun isWon(moves: List<Int>): Boolean {
-        val room = room.value!!
+        val room = playingRoom.value!!
         for (crossing in crossingList) {
             if (moves.containsAll(crossing.positions)) {
                 room.status = "$player wins!!"
@@ -123,7 +126,7 @@ class GameViewModel(
     }
 
     private fun isDraw(): Boolean {
-        val room = room.value!!
+        val room = playingRoom.value!!
         if (room.moves[PlayerX]!!.size + room.moves[PlayerO]!!.size == 9) {
             // game is draw
             room.status = "Draw :|"
@@ -135,9 +138,9 @@ class GameViewModel(
 
     fun onRestartClick() {
         _uiState.value = GameUiState.Waiting()
-        gameRepository.resetGame(room.value!!) {
+        gameRepository.resetGame(playingRoom.value!!) {
             // on reset complete
-            gameRepository.updateTurn(room.value!!)
+            gameRepository.updateTurn(playingRoom.value!!)
         }
     }
 

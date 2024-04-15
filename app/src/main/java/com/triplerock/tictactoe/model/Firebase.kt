@@ -13,6 +13,8 @@ private const val COLLECTION_MOVES = "moves"
 
 private const val keyPlayer2Name = "player2Name"
 private const val keyNextTurn = "nextTurn"
+private const val keyMoves = "moves"
+private const val keyHistory = "history"
 
 private const val keyRoomId = "roomId"
 
@@ -91,23 +93,14 @@ class Firebase {
             }
     }
 
-    fun submitMove(move: Move, onMoveUpdated: () -> Unit) {
-        Logger.debug("move = [${move}]")
-        firestore.collection(COLLECTION_MOVES)
-            .add(move)
-            .addOnSuccessListener {
-                Logger.debug("success")
-                onMoveUpdated()
-            }
-            .addOnFailureListener {
-                Logger.error(it.message.toString())
-            }
-    }
-
     fun updateTurn(room: Room) {
         Logger.debug("room = [${room}]")
         firestore.collection(COLLECTION_ROOMS).document(room.id)
-            .update(keyNextTurn, room.nextTurn)
+            .update(
+                keyNextTurn, room.nextTurn,
+                keyMoves, room.moves,
+                keyHistory, room.history,
+            )
             .addOnSuccessListener {
                 Logger.debug("success")
             }
@@ -116,22 +109,8 @@ class Firebase {
             }
     }
 
-    fun listenForMoves(roomId: String, onPlayerMoved: (moves: List<Move>) -> Unit) {
-        val roomRef = firestore.collection(COLLECTION_MOVES)
-            .whereEqualTo(keyRoomId, roomId)
-        roomRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Logger.error(e.message.toString())
-                return@addSnapshotListener
-            }
-            val moves = getMoves(snapshot!!)
-            Logger.debug("onMoveUpdate: $moves")
-            onPlayerMoved(moves)
-        }
-    }
-
     fun listenForTurns(roomId: String, onTurnUpdate: (room: Room) -> Unit) {
-        Logger.debug("roomId = [${roomId}], onTurnUpdate = [${onTurnUpdate}]")
+        Logger.debug("roomId = [${roomId}]")
         val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
         roomRef.addSnapshotListener { snapshot, e ->
             if (e != null) {

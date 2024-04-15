@@ -75,6 +75,7 @@ fun GameScreenContainer(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val gameUiState = gameViewModel.uiState.collectAsState()
+        Logger.debug("gameUiState = ${gameUiState.value}")
         val playerName = gameViewModel.playerName
         when (gameUiState.value) {
             is GameUiState.Waiting -> {
@@ -380,7 +381,7 @@ fun GameContainer(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
-            room.moves[PlayerX]!!, room.moves[PlayerX]!!, onCellClicked
+            room.moves[PlayerX]!!, room.moves[PlayerO]!!, onCellClicked
         )
         if (crossing != null) {
             CrossingLine(

@@ -23,7 +23,11 @@ data class Room(
     ),
 
     var history: History = History(),
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return false
+    }
+}
 
 data class History(
     var xWins: Int = 0,
