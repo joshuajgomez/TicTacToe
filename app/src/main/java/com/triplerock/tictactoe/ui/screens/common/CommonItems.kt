@@ -64,7 +64,7 @@ fun CustomButton(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = null,
             modifier = Modifier.size(30.dp),
-            tint = colorScheme.onPrimaryContainer
+            tint = colorScheme.onSurface
         )
     }
 }
@@ -96,7 +96,7 @@ fun CustomTextButton(
         modifier = modifier
             .background(
                 shape = RoundedCornerShape(30.dp),
-                color = colorScheme.primary
+                color = colorScheme.onBackground
             )
             .padding(horizontal = 20.dp)
             .height(50.dp)
@@ -104,7 +104,7 @@ fun CustomTextButton(
         Text(
             text = text,
             fontSize = 22.sp,
-            color = colorScheme.onPrimary
+            color = colorScheme.surface
         )
     }
 }
@@ -129,7 +129,7 @@ fun PreviewLoadingLight() {
 @Composable
 fun Loading(
     message: String = "Loading",
-    color: Color = colorScheme.secondary,
+    color: Color = colorScheme.onBackground,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp),
@@ -181,7 +181,7 @@ fun TitleBar(
         Text(
             text = title,
             fontSize = 35.sp,
-            color = colorScheme.onPrimaryContainer,
+            color = colorScheme.onSurface,
             modifier = Modifier.constrainAs(titleRef) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
@@ -326,9 +326,8 @@ fun TicSurface(content: @Composable () -> Unit) {
     TicTacToeTheme {
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(brush = gradientBrush()),
-            color = Color.Transparent,
+                .fillMaxWidth(),
+            color = colorScheme.background,
             content = content
         )
     }
@@ -338,9 +337,7 @@ fun TicSurface(content: @Composable () -> Unit) {
 fun TicBackground(content: @Composable () -> Unit) {
     TicTacToeTheme {
         Surface(
-            modifier = Modifier
-                .background(brush = gradientBrush()),
-            color = Color.Transparent,
+            color = colorScheme.background,
             content = content
         )
     }

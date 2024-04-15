@@ -122,7 +122,7 @@ fun GameScreenContainer(
 
 }
 
-@Preview(device = Devices.PIXEL_2)
+//@Preview(device = Devices.PIXEL_2)
 @Composable
 private fun PreviewGameScreenLightPixel2() {
     GameScreenForPreview()
@@ -152,7 +152,7 @@ val moves = listOf(
     0, 1, 2, 3, 4, 5, 6
 )
 
-//@Preview
+@Preview
 @Composable
 private fun PreviewGameBox() {
     TicSurface {
@@ -279,7 +279,7 @@ fun Stats(modifier: Modifier = Modifier, room: Room = getRooms().random()) {
             .padding(all = 10.dp)
             .background(
                 shape = RoundedCornerShape(10.dp),
-                color = colorScheme.secondaryContainer
+                color = colorScheme.onBackground
             ).padding(10.dp)
     ) {
         Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
@@ -295,11 +295,11 @@ fun Stat(label: String, icon: ImageVector = Icons.Default.Close) {
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(30.dp),
-            tint = colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+            tint = colorScheme.surface
         )
         Text(
             text = label, fontSize = 18.sp,
-            color = colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+            color = colorScheme.surface
         )
     }
 }
@@ -497,7 +497,7 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
             Icon(
                 imageVector = mark.icon,
                 contentDescription = null,
-                tint = colorScheme.primary,
+                tint = colorScheme.onBackground,
                 modifier = Modifier.size(100.dp)
             )
         }
@@ -507,7 +507,7 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
 @Composable
 fun LineBox(
     modifier: Modifier = Modifier,
-    color: Color = colorScheme.primary,
+    color: Color = colorScheme.onBackground,
     stroke: Dp = 2.dp,
 ) {
     Box(modifier.size(300.dp)) {
