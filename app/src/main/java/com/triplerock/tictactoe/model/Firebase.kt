@@ -5,11 +5,12 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import com.triplerock.tictactoe.data.Move
+import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.utils.Logger
 
 private const val COLLECTION_ROOMS = "rooms"
-private const val COLLECTION_MOVES = "moves"
 
 private const val keyPlayer2Name = "player2Name"
 private const val keyNextTurn = "nextTurn"
@@ -128,25 +129,16 @@ class Firebase {
     }
 
     fun clearMoves(playingRoom: Room, onResetComplete: () -> Unit) {
-        firestore.collection(COLLECTION_MOVES)
-            .whereEqualTo(keyRoomId, playingRoom.id)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    Logger.error(error.message.toString())
-                    return@addSnapshotListener
-                }
-                if (value == null) {
-                    Logger.error("value is null")
-                    return@addSnapshotListener
-                }
-                val batch = firestore.batch()
-                for (document in value) {
-                    batch.delete(document.reference)
-                }
-                batch.commit().addOnSuccessListener {
-                    Logger.debug("success")
-                    onResetComplete()
-                }
+        Logger.info("playingRoom = [${playingRoom}]")
+        val emptyMoves: HashMap<String, ArrayList<Int>> = hashMapOf(
+            PlayerX to ArrayList(),
+            PlayerO to ArrayList(),
+        )
+        firestore.collection(COLLECTION_ROOMS).document(playingRoom.id)
+            .update(keyMoves, emptyMoves)
+            .addOnSuccessListener { result ->
+                Logger.debug("success")
+                onResetComplete()
             }
     }
 }
@@ -155,17 +147,7 @@ private fun getRooms(result: QuerySnapshot): List<Room> {
     val rooms = ArrayList<Room>()
     for (document in result) {
         val room = document.toObject(Room::class.java)
-        room.id = document.id
         rooms.add(room)
     }
     return rooms
-}
-
-private fun getMoves(result: QuerySnapshot): List<Move> {
-    val moves = ArrayList<Move>()
-    for (document in result) {
-        val move = document.toObject(Move::class.java)
-        moves.add(move)
-    }
-    return moves
 }

@@ -72,7 +72,10 @@ class GameViewModel(
         gameRepository.listenForRoomUpdates(roomId) {
             val isStarting = playingRoom.value == null
             playingRoom.value = it
-            if (isStarting || it.nextTurn == player) {
+            if (isStarting
+                || it.nextTurn == player
+                || isReset(it)
+            ) {
                 // If nextTurn is other player, we already updated turn when cell was clicked
                 Logger.verbose("room set. starting game")
                 checkGameState()
@@ -80,12 +83,14 @@ class GameViewModel(
         }
     }
 
+    private fun isReset(it: Room) = (it.moves[PlayerX]!!.isEmpty()
+            && it.moves[PlayerO]!!.isEmpty())
+
     fun onCellClick(cell: Int) {
         Logger.debug("cell=$cell")
         val room = playingRoom.value
         room?.moves?.get(player)?.add(cell)
         room?.nextTurn = if (room?.nextTurn == PlayerX) PlayerO else PlayerX
-        playingRoom.value = room
         checkGameState(true)
     }
 

@@ -18,8 +18,8 @@ data class Room(
     var player2Name: String = "",
 
     val moves: HashMap<String, ArrayList<Int>> = hashMapOf(
-        Pair(PlayerX, ArrayList()),
-        Pair(PlayerO, ArrayList())
+        PlayerX to ArrayList(),
+        PlayerO to ArrayList(),
     ),
 
     var history: History = History(),
