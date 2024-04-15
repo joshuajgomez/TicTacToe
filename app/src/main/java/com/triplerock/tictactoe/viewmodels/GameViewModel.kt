@@ -1,34 +1,18 @@
 package com.triplerock.tictactoe.viewmodels
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.ui.screens.crossingList
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 data class Crossing(val start: Offset, val end: Offset, val positions: List<Int>)
-
-const val rectOffset = 560f
-val rect = Rect(Offset.Zero, Size(width = rectOffset, height = rectOffset))
-val crossingList = listOf(
-    Crossing(positions = listOf(0, 1, 2), start = rect.topLeft, end = rect.topRight),
-    Crossing(positions = listOf(3, 4, 5), start = rect.centerLeft, end = rect.centerRight),
-    Crossing(positions = listOf(6, 7, 8), start = rect.bottomLeft, end = rect.bottomRight),
-
-    Crossing(positions = listOf(0, 3, 6), start = rect.topLeft, end = rect.bottomLeft),
-    Crossing(positions = listOf(1, 4, 7), start = rect.topCenter, end = rect.bottomCenter),
-    Crossing(positions = listOf(2, 5, 8), start = rect.topRight, end = rect.bottomRight),
-
-    Crossing(positions = listOf(0, 4, 8), start = rect.topLeft, end = rect.bottomRight),
-    Crossing(positions = listOf(2, 4, 6), start = rect.topRight, end = rect.bottomLeft),
-)
 
 sealed class GameUiState {
     data class Waiting(
@@ -60,9 +44,7 @@ class GameViewModel(
     private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
     val player: String = checkNotNull(savedStateHandle[navKeyPlayer])
 
-    val playerName: String = gameRepository.getName()
-
-    val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
+    private val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
 
     private val _uiState: MutableStateFlow<GameUiState> = MutableStateFlow(GameUiState.Waiting())
     val uiState: StateFlow<GameUiState> = _uiState

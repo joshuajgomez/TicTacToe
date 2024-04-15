@@ -108,10 +108,10 @@ fun PreviewJoinRoomLightTheme() {
 }
 
 fun getRooms(): List<Room> = listOf(
-    Room(name = "Jocha", id = "skdfhgweyigbcajkndfbks", player1Name = "pico"),
-    Room(name = "Manvila", id = "skdfhgweyigbcajkndfbks", player1Name = "max"),
-    Room(name = "Visteon", id = "skdfhgweyigbcajkndfbks", player1Name = "biggie"),
-    Room(name = "Tharavadu", id = "skdfhgweyigbcajkndfbks", player1Name = "mini"),
+    Room(name = "Jocha", id = "skdfhgweyigbcajkndfbks", player1Name = "pico", player2Name = "max"),
+    Room(name = "Manvila", id = "skdfhgweyigbcajkndfbks", player1Name = "max", player2Name = "buggie"),
+    Room(name = "Visteon", id = "skdfhgweyigbcajkndfbks", player1Name = "biggie", player2Name = "max"),
+    Room(name = "Tharavadu", id = "skdfhgweyigbcajkndfbks", player1Name = "mini", player2Name = "max"),
 )
 
 @Composable

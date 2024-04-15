@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,28 +21,28 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.outlined.Balance
+import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -51,8 +53,6 @@ import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
-import com.triplerock.tictactoe.data.sampleNames
-import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
@@ -60,7 +60,6 @@ import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
-import com.triplerock.tictactoe.viewmodels.crossingList
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -73,10 +72,10 @@ fun GameScreenContainer(
             .fillMaxSize()
             .padding(top = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         val gameUiState = gameViewModel.uiState.collectAsState()
         Logger.debug("gameUiState = ${gameUiState.value}")
-        val playerName = gameViewModel.playerName
         when (gameUiState.value) {
             is GameUiState.Waiting -> {
                 val waiting = gameUiState.value as GameUiState.Waiting
@@ -93,7 +92,7 @@ fun GameScreenContainer(
                     onCellClicked = { gameViewModel.onCellClick(it) },
                     statusText = nextTurn.room.status,
                     isPlayable = nextTurn.room.nextTurn == gameViewModel.player,
-                    playerName = playerName,
+                    currentPlayer = gameViewModel.player
                 )
             }
 
@@ -105,7 +104,7 @@ fun GameScreenContainer(
                     crossing = winner.crossing,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    playerName = playerName,
+                    currentPlayer = gameViewModel.player
                 )
             }
 
@@ -115,7 +114,7 @@ fun GameScreenContainer(
                     statusText = gameOver.room.status,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    playerName = playerName,
+                    currentPlayer = gameViewModel.player
                 )
             }
         }
@@ -123,7 +122,7 @@ fun GameScreenContainer(
 
 }
 
-//@Preview(device = Devices.PIXEL_2)
+@Preview(device = Devices.PIXEL_2)
 @Composable
 private fun PreviewGameScreenLightPixel2() {
     GameScreenForPreview()
@@ -204,35 +203,35 @@ data class Mark(
 private fun GameScreen(
     room: Room = getRooms().random(),
     isPlayable: Boolean = true,
-    playerName: String = sampleNames.random(),
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
     isShowRestartButton: Boolean = false,
     onCellClicked: (cell: Int) -> Unit = {},
     onRestartButtonClick: () -> Unit = {},
+    currentPlayer: String = PlayerX,
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (status, name, turn, grid, restart, stats) = createRefs()
+        val (title, turn, grid, restart, stats) = createRefs()
         StatusBox(
             message = statusText,
-            modifier = Modifier.constrainAs(status) {
+            modifier = Modifier.constrainAs(title) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 top.linkTo(parent.top)
             })
-        IdBox(modifier = Modifier.constrainAs(name) {
-            start.linkTo(parent.start)
-            top.linkTo(status.bottom, margin = 40.dp)
-        }, playerName = playerName, roomName = room.name)
-        TurnBox(modifier = Modifier.constrainAs(turn) {
-            top.linkTo(name.top)
-            end.linkTo(parent.end)
-        }, isPlayable = isPlayable, xTurn = room.nextTurn == PlayerX)
+        TurnBox(
+            modifier = Modifier.constrainAs(turn) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(title.bottom, margin = 30.dp)
+            },
+            room = room, currentPlayer = currentPlayer
+        )
         GameContainer(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(name.bottom, margin = 60.dp)
+                top.linkTo(turn.bottom, margin = 20.dp)
                 bottom.linkTo(stats.top)
             },
             room = room,
@@ -248,7 +247,7 @@ private fun GameScreen(
             modifier = Modifier.constrainAs(stats) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(grid.bottom)
+                top.linkTo(grid.bottom, margin = 20.dp)
                 bottom.linkTo(restart.top)
             },
             room = room
@@ -266,22 +265,23 @@ private fun GameScreen(
     }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun Stats(modifier: Modifier = Modifier, room: Room = getRooms().random()) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier
             .fillMaxWidth()
-            .padding(all = 10.dp)
-            .background(
-                shape = RoundedCornerShape(10.dp),
-                color = colorScheme.onBackground
+            .padding(horizontal = 30.dp)
+            .border(
+                width = 1.dp,
+                color = colorScheme.onBackground,
+                shape = RoundedCornerShape(20.dp)
             )
-            .padding(10.dp)
+            .padding(vertical = 10.dp)
     ) {
         Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
-        Stat("${room.history.xWins} wins", Icons.Outlined.Clear)
+        Stat("${room.history.xWins} wins", Icons.Outlined.Cancel)
         Stat("${room.history.draws} draws", Icons.Outlined.Balance)
     }
 }
@@ -293,75 +293,11 @@ fun Stat(label: String, icon: ImageVector = Icons.Default.Close) {
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(30.dp),
-            tint = colorScheme.surface
+            tint = colorScheme.onBackground
         )
         Text(
             text = label, fontSize = 18.sp,
-            color = colorScheme.surface
-        )
-    }
-}
-
-//@Preview
-@Composable
-fun PreviewTurnBox() {
-    TicBackground {
-        TurnBox(isPlayable = false)
-    }
-}
-
-//@Preview
-@Composable
-fun PreviewTurnBox2() {
-    TicBackground {
-        TurnBox(xTurn = false)
-    }
-}
-
-@Composable
-fun TurnBox(
-    modifier: Modifier = Modifier,
-    isPlayable: Boolean = true,
-    xTurn: Boolean = true,
-) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.End) {
-        Switch(
-            checked = xTurn,
-            onCheckedChange = { },
-            colors = SwitchDefaults.colors(
-                uncheckedIconColor = colorScheme.onSurface,
-                uncheckedTrackColor = colorScheme.primary,
-                uncheckedBorderColor = colorScheme.primary,
-                uncheckedThumbColor = colorScheme.onPrimary,
-            ),
-            thumbContent = {
-                if (xTurn)
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = null,
-                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                    )
-                else
-                    Icon(
-                        imageVector = Icons.Outlined.Circle,
-                        contentDescription = null,
-                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                    )
-            },
-        )
-        Text(
-            text = "${
-                if (isPlayable) ""
-                else "not "
-            }your turn",
-            fontSize = 15.sp,
-            modifier = Modifier
-                .background(
-                    shape = RoundedCornerShape(10.dp),
-                    color = colorScheme.tertiary
-                )
-                .padding(bottom = 5.dp, start = 10.dp, end = 10.dp),
-            color = colorScheme.background
+            color = colorScheme.onBackground
         )
     }
 }
@@ -407,17 +343,16 @@ fun MarkBox(
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         verticalArrangement = Arrangement.spacedBy(0.dp),
-        modifier = modifier.size(300.dp)
+        modifier = modifier.size(270.dp)
     ) {
         items(count = 9) {
             val cellState = if (player1Moves.contains(it)) Mark(
-                icon = Icons.Default.Clear,
+                icon = Icons.Outlined.Cancel,
                 iconTint = colorScheme.error,
             )
             else if (player2Moves.contains(it)) Mark(
                 icon = Icons.Outlined.Circle,
                 iconTint = colorScheme.onBackground,
-                modifier = Modifier.size(65.dp)
             )
             else Mark(isEmpty = true)
             Cell(mark = cellState) {
@@ -429,34 +364,96 @@ fun MarkBox(
 
 @Preview
 @Composable
-fun PreviewIdBox() {
-    TicBackground {
-        IdBox()
+fun PreviewTurnBox3() {
+    TicSurface {
+        TurnBox()
+    }
+}
+
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewTurnBoxDark() {
+    TicSurface {
+        TurnBox()
     }
 }
 
 @Composable
-fun IdBox(
-    modifier: Modifier = Modifier, roomName: String = "big-mac",
-    playerName: String = "pico",
+fun TurnBox(
+    modifier: Modifier = Modifier,
+    room: Room = getRooms().random(),
+    currentPlayer: String = PlayerX,
 ) {
-    Column(
-        modifier = modifier
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Info("Room: ", roomName)
-        Info("Player: ", playerName)
+        TurnItem(
+            mark = Mark(
+                icon = Icons.Outlined.Cancel,
+                iconTint = colorScheme.error,
+            ),
+            playerName = room.player1Name,
+            isTurn = room.nextTurn == PlayerX,
+            isCurrentPlayer = currentPlayer == PlayerX
+        )
+        TurnItem(
+            mark = Mark(
+                icon = Icons.Outlined.Circle,
+                iconTint = colorScheme.onBackground,
+            ),
+            playerName = room.player2Name,
+            isTurn = room.nextTurn == PlayerO,
+            isCurrentPlayer = currentPlayer == PlayerO
+        )
     }
 }
 
 @Composable
-fun Info(
-    label: String,
-    info: String,
-    color: Color = colorScheme.onSurface,
+fun TurnItem(
+    mark: Mark,
+    playerName: String,
+    isTurn: Boolean,
+    isCurrentPlayer: Boolean = false,
 ) {
-    Row {
-        Text(text = label, color = color)
-        Text(text = info, fontWeight = FontWeight.Bold, color = color)
+    val modifier = Modifier
+        .padding(vertical = 10.dp)
+        .height(100.dp)
+        .width(100.dp)
+        .clip(shape = RoundedCornerShape(20.dp))
+        .border(
+            width = if (isTurn) 3.dp else 1.dp,
+            color = if (isTurn) colorScheme.primary else colorScheme.onBackground,
+            shape = RoundedCornerShape(20.dp)
+        )
+        .padding(vertical = 0.dp)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.padding(top = 5.dp),
+    ) {
+        Icon(
+            imageVector = mark.icon,
+            contentDescription = null,
+            tint = mark.iconTint,
+            modifier = mark.modifier.size(40.dp)
+        )
+        Text(
+            text = playerName, fontSize = 20.sp,
+            color = if (isTurn) colorScheme.primary else
+                colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(3.dp))
+        if (isCurrentPlayer) {
+            Text(
+                text = "you",
+                textAlign = TextAlign.Center,
+                color = colorScheme.onPrimary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .background(color = colorScheme.primary),
+            )
+        }
     }
 }
 
@@ -473,6 +470,21 @@ fun RestartButton(onRestartClick: () -> Unit = {}) {
     }
 }
 
+const val rectOffset = 500f
+val rect = Rect(Offset.Zero, Size(width = rectOffset, height = rectOffset))
+val crossingList = listOf(
+    Crossing(positions = listOf(0, 1, 2), start = rect.topLeft, end = rect.topRight),
+    Crossing(positions = listOf(3, 4, 5), start = rect.centerLeft, end = rect.centerRight),
+    Crossing(positions = listOf(6, 7, 8), start = rect.bottomLeft, end = rect.bottomRight),
+
+    Crossing(positions = listOf(0, 3, 6), start = rect.topLeft, end = rect.bottomLeft),
+    Crossing(positions = listOf(1, 4, 7), start = rect.topCenter, end = rect.bottomCenter),
+    Crossing(positions = listOf(2, 5, 8), start = rect.topRight, end = rect.bottomRight),
+
+    Crossing(positions = listOf(0, 4, 8), start = rect.topLeft, end = rect.bottomRight),
+    Crossing(positions = listOf(2, 4, 6), start = rect.topRight, end = rect.bottomLeft),
+)
+
 @Composable
 fun CrossingLine(
     modifier: Modifier = Modifier,
@@ -480,7 +492,7 @@ fun CrossingLine(
     color: Color = colorScheme.primary
 ) {
     Canvas(
-        modifier = modifier.size(200.dp)
+        modifier = modifier.size(180.dp)
     ) {
         drawLine(
             color = color.copy(alpha = 0.7f),
@@ -496,7 +508,7 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
     IconButton(
         onClick = { onCellClick() },
         modifier = Modifier
-            .size(100.dp)
+            .size(90.dp)
             .padding(all = 10.dp),
     ) {
         AnimatedVisibility(visible = !mark.isEmpty) {
@@ -516,7 +528,7 @@ fun LineBox(
     color: Color = colorScheme.onBackground,
     stroke: Dp = 2.dp,
 ) {
-    Box(modifier.size(300.dp)) {
+    Box(modifier.size(270.dp)) {
         Canvas(Modifier.fillMaxSize()) {
             val line1hStart = Offset(0f, size.width / 3)
             val line1hEnd = Offset(size.width, size.width / 3)
@@ -524,11 +536,23 @@ fun LineBox(
             val line2hStart = Offset(0f, size.width / 3 * 2)
             val line2hEnd = Offset(size.width, size.width / 3 * 2)
 
+            val line3hStart = Offset(0f, 0f)
+            val line3hEnd = Offset(size.width, 0f)
+
+            val line4hStart = Offset(0f, size.width)
+            val line4hEnd = Offset(size.width, size.width)
+
             val line1vStart = Offset(size.width / 3, 0f)
             val line1vEnd = Offset(size.width / 3, size.width)
 
             val line2vStart = Offset(size.width / 3 * 2, 0f)
             val line2vEnd = Offset(size.width / 3 * 2, size.width)
+
+            val line3vStart = Offset(0f, 0f)
+            val line3vEnd = Offset(0f, size.width)
+
+            val line4vStart = Offset(size.width, 0f)
+            val line4vEnd = Offset(size.width, size.width)
 
             drawLine(
                 color = color,
@@ -552,6 +576,33 @@ fun LineBox(
                 color = color,
                 start = line2vStart,
                 end = line2vEnd,
+                strokeWidth = stroke.toPx(),
+            )
+            drawLine(
+                color = color,
+                start = line3vStart,
+                end = line3vEnd,
+                strokeWidth = stroke.toPx(),
+            )
+            drawLine(
+                color = color,
+                start = line4vStart,
+                end = line4vEnd,
+                strokeWidth = stroke.toPx(),
+            )
+
+            drawLine(
+                color = color,
+                start = line3hStart,
+                end = line3hEnd,
+                strokeWidth = stroke.toPx(),
+            )
+
+
+            drawLine(
+                color = color,
+                start = line4hStart,
+                end = line4hEnd,
                 strokeWidth = stroke.toPx(),
             )
         }
