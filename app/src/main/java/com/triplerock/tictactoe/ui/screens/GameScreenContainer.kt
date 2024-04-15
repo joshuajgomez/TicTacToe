@@ -158,7 +158,7 @@ private fun PreviewGameBox() {
     TicSurface {
         Box(contentAlignment = Alignment.Center) {
             LineBox()
-            MarkBox(player1Moves = moves, player2Moves = moves)
+            MarkBox(player1Moves = moves.subList(0, 4), player2Moves = moves)
             crossingList.forEach {
                 CrossingLine(
                     crossing = it,
@@ -194,13 +194,9 @@ fun StatusBox(
 
 data class Mark(
     val icon: ImageVector = Icons.Default.QuestionMark,
+    val modifier: Modifier = Modifier,
+    val iconTint: Color = Color.Gray,
     val isEmpty: Boolean = false,
-)
-
-val stateList = listOf(
-    Mark(Icons.Default.Clear),
-    Mark(Icons.Outlined.Circle),
-    Mark(isEmpty = true),
 )
 
 @Composable
@@ -280,7 +276,8 @@ fun Stats(modifier: Modifier = Modifier, room: Room = getRooms().random()) {
             .background(
                 shape = RoundedCornerShape(10.dp),
                 color = colorScheme.onBackground
-            ).padding(10.dp)
+            )
+            .padding(10.dp)
     ) {
         Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
         Stat("${room.history.xWins} wins", Icons.Outlined.Clear)
@@ -412,8 +409,15 @@ fun MarkBox(
         modifier = modifier.size(300.dp)
     ) {
         items(count = 9) {
-            val cellState = if (player1Moves.contains(it)) Mark(Icons.Default.Clear)
-            else if (player2Moves.contains(it)) Mark(Icons.Outlined.Circle)
+            val cellState = if (player1Moves.contains(it)) Mark(
+                icon = Icons.Default.Clear,
+                iconTint = colorScheme.error,
+            )
+            else if (player2Moves.contains(it)) Mark(
+                icon = Icons.Outlined.Circle,
+                iconTint = colorScheme.onBackground,
+                modifier = Modifier.size(65.dp)
+            )
             else Mark(isEmpty = true)
             Cell(mark = cellState) {
                 onCellClicked(it)
@@ -472,12 +476,13 @@ fun RestartButton(onRestartClick: () -> Unit = {}) {
 fun CrossingLine(
     modifier: Modifier = Modifier,
     crossing: Crossing,
+    color: Color = colorScheme.primary
 ) {
     Canvas(
         modifier = modifier.size(200.dp)
     ) {
         drawLine(
-            color = Color.Yellow.copy(alpha = 0.5f),
+            color = color.copy(alpha = 0.7f),
             start = crossing.start,
             end = crossing.end,
             strokeWidth = 30f
@@ -497,8 +502,8 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
             Icon(
                 imageVector = mark.icon,
                 contentDescription = null,
-                tint = colorScheme.onBackground,
-                modifier = Modifier.size(100.dp)
+                tint = mark.iconTint,
+                modifier = mark.modifier.size(100.dp)
             )
         }
     }

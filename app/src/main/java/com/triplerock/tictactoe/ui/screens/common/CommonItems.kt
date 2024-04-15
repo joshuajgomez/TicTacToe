@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -225,7 +227,7 @@ fun NameTags(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(horizontal = 20.dp)
     ) {
-        Text(text = "choose another name", color = colorScheme.secondary)
+        Text(text = "choose another name", color = colorScheme.onBackground)
         Spacer(modifier = Modifier.height(10.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(items = names) {
@@ -257,7 +259,7 @@ private fun NameTag(name: String, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         colors = SuggestionChipDefaults.suggestionChipColors(
-            containerColor = colorScheme.primary.copy(alpha = 0.3f),
+            containerColor = Color.Transparent,
             labelColor = colorScheme.onSurface,
         ),
         label = {
@@ -302,9 +304,10 @@ fun CustomTextField(
     BasicTextField(
         modifier = modifier
             .background(
-                color = colorScheme.tertiary.copy(alpha = 0.3f),
+                color = colorScheme.background,
                 shape = MaterialTheme.shapes.extraLarge,
             )
+            .border(2.dp, color = colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
             .padding(horizontal = 10.dp, vertical = 10.dp)
             .fillMaxWidth(),
         value = text,
@@ -313,7 +316,7 @@ fun CustomTextField(
         },
         cursorBrush = SolidColor(colorScheme.primary),
         textStyle = LocalTextStyle.current.copy(
-            color = colorScheme.primary,
+            color = colorScheme.onBackground,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -349,6 +352,19 @@ fun gradientBrush(): Brush {
         listOf(
             colorScheme.primaryContainer,
             colorScheme.surface,
+        )
+    )
+}
+
+@Composable
+fun rainbowBrush(): Brush {
+    return Brush.verticalGradient(
+        listOf(
+            Color.Red,
+            Color.Red,
+            Color.Yellow,
+            Color.Green,
+            Color.Blue,
         )
     )
 }

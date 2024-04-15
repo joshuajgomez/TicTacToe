@@ -114,7 +114,7 @@ fun RoomName(
         var name by remember { mutableStateOf(defaultName) }
         Text(
             text = "Choose a name for the room",
-            color = colorScheme.secondary
+            color = colorScheme.onBackground
         )
         CustomTextField(
             text = name,

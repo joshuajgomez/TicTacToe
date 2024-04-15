@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -13,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Attractions
 import androidx.compose.material3.Divider
@@ -161,13 +165,13 @@ private fun WaitingForPlayers(onCreateRoomClick: () -> Unit = {}) {
         )
         Text(
             text = "No games yet",
-            color = colorScheme.secondary,
+            color = colorScheme.onBackground,
             fontSize = 30.sp
         )
 
         Text(
             text = "Would you like to host a game?",
-            color = colorScheme.secondary.copy(alpha = 0.8f),
+            color = colorScheme.onBackground.copy(alpha = 0.8f),
             fontSize = 22.sp
         )
         CustomTextButton(text = textHostGame) {
@@ -184,7 +188,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         val (roomName, roomId, timeCreated, button, line, player) = createRefs()
         Text(
             text = room.name,
-            color = colorScheme.primary,
+            color = colorScheme.onBackground,
             fontSize = 25.sp,
             modifier = Modifier.constrainAs(roomName) {
                 start.linkTo(parent.start)
@@ -206,11 +210,11 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
                 start.linkTo(roomName.start)
                 top.linkTo(roomName.bottom, margin = 3.dp)
             },
-            color = colorScheme.secondary
+            color = colorScheme.onBackground
         )
         Text(
             text = getRelativeTime(room.timeCreated),
-            color = colorScheme.secondary.copy(alpha = 0.8f),
+            color = colorScheme.onBackground.copy(alpha = 0.8f),
             fontSize = 15.sp,
             maxLines = 1,
             modifier = Modifier
@@ -221,7 +225,7 @@ private fun RoomItem(room: Room, onJoinClick: () -> Unit) {
         )
         Text(
             text = " | ${room.id}",
-            color = colorScheme.primary.copy(alpha = 0.6f),
+            color = colorScheme.onBackground.copy(alpha = 0.6f),
             fontSize = 15.sp,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -257,17 +261,19 @@ fun JoinButton(
         modifier = modifier
             .background(
                 shape = RoundedCornerShape(30.dp),
-                color = colorScheme.primary
+                color = colorScheme.onBackground
             )
+            .height(40.dp)
     ) {
         Text(
             text = "Join",
-            color = colorScheme.onPrimary
+            color = colorScheme.surface
         )
+        Spacer(modifier = Modifier.width(5.dp))
         Icon(
-            imageVector = Icons.Default.ChevronRight,
+            imageVector = Icons.Default.ArrowForward,
             contentDescription = null,
-            tint = colorScheme.onPrimary
+            tint = colorScheme.surface
         )
     }
 }
