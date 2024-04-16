@@ -1,6 +1,5 @@
 package com.triplerock.tictactoe.model
 
-import com.triplerock.tictactoe.data.Move
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room

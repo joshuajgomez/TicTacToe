@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.triplerock.tictactoe.ui.screens.CreateRoomContainer
 import com.triplerock.tictactoe.ui.screens.CreditsContainer
-import com.triplerock.tictactoe.ui.screens.GameScreenContainer
+import com.triplerock.tictactoe.ui.screens.game.GameScreenContainer
 import com.triplerock.tictactoe.ui.screens.JoinRoomContainer
 import com.triplerock.tictactoe.ui.screens.MenuContainer
 import com.triplerock.tictactoe.viewmodels.navKeyPlayer

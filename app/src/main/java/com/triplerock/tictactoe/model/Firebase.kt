@@ -4,7 +4,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
-import com.triplerock.tictactoe.data.Move
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room

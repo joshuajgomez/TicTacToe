@@ -18,8 +18,8 @@ data class Room(
     var player2Name: String = "",
 
     val moves: HashMap<String, ArrayList<Int>> = hashMapOf(
-        PlayerX to ArrayList(),
-        PlayerO to ArrayList(),
+        PlayerX to arrayListOf(),
+        PlayerO to arrayListOf(),
     ),
 
     var history: History = History(),
@@ -27,20 +27,25 @@ data class Room(
     override fun equals(other: Any?): Boolean {
         return false
     }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + timeCreated.hashCode()
+        result = 31 * result + status.hashCode()
+        result = 31 * result + nextTurn.hashCode()
+        result = 31 * result + player1Name.hashCode()
+        result = 31 * result + player2Name.hashCode()
+        result = 31 * result + moves.hashCode()
+        result = 31 * result + history.hashCode()
+        return result
+    }
 }
 
 data class History(
     var xWins: Int = 0,
     var oWins: Int = 0,
     var draws: Int = 0,
-)
-
-data class Move(
-    var id: String = "",
-    var roomId: String = "",
-    var playerName: String = "",
-    var player: String = "",
-    var cell: Int = 0,
 )
 
 val sampleNames = listOf(

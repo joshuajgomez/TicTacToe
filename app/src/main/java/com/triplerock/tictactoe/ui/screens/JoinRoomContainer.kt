@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.triplerock.tictactoe.data.History
 import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.navHostGame
 import com.triplerock.tictactoe.ui.navGame
@@ -107,11 +109,41 @@ fun PreviewJoinRoomLightTheme() {
     }
 }
 
+val movesSample = hashMapOf(
+    PlayerX to arrayListOf(0, 1, 2, 6),
+    PlayerO to arrayListOf(3, 4, 5, 8),
+)
+
 fun getRooms(): List<Room> = listOf(
-    Room(name = "Jocha", id = "skdfhgweyigbcajkndfbks", player1Name = "pico", player2Name = "max"),
-    Room(name = "Manvila", id = "skdfhgweyigbcajkndfbks", player1Name = "max", player2Name = "buggie"),
-    Room(name = "Visteon", id = "skdfhgweyigbcajkndfbks", player1Name = "biggie", player2Name = "max"),
-    Room(name = "Tharavadu", id = "skdfhgweyigbcajkndfbks", player1Name = "mini", player2Name = "max"),
+    Room(
+        name = "Jocha",
+        id = "skdfhgweyigbcajkndfbks",
+        player1Name = "pico",
+        player2Name = "max",
+        moves = movesSample,
+        history = History(3, 5, 6)
+    ),
+    Room(
+        name = "Manvila",
+        id = "skdfhgweyigbcajkndfbks",
+        player1Name = "max",
+        player2Name = "buggie",
+        moves = movesSample
+    ),
+    Room(
+        name = "Visteon",
+        id = "skdfhgweyigbcajkndfbks",
+        player1Name = "biggie",
+        player2Name = "max",
+        moves = movesSample
+    ),
+    Room(
+        name = "Tharavadu",
+        id = "skdfhgweyigbcajkndfbks",
+        player1Name = "mini",
+        player2Name = "max",
+        moves = movesSample
+    ),
 )
 
 @Composable

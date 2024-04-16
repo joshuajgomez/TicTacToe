@@ -7,7 +7,7 @@ import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
-import com.triplerock.tictactoe.ui.screens.crossingList
+import com.triplerock.tictactoe.ui.screens.game.crossingList
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
