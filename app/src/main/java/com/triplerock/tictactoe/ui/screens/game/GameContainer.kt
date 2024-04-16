@@ -4,21 +4,14 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -39,12 +32,9 @@ import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.ui.theme.Red10
-import com.triplerock.tictactoe.viewmodels.Crossing
 
 data class Mark(
-    val icon: ImageVector = Icons.Default.QuestionMark,
-    val modifier: Modifier = Modifier,
-    val iconTint: Color = Color.Gray,
+    val icon: @Composable () -> Unit = { IconX() },
     val isEmpty: Boolean = false,
 )
 
@@ -134,20 +124,25 @@ fun MarkBox(
     ) {
         items(count = 9) {
             val cellState = if (player1Moves.contains(it)) Mark(
-                icon = Icons.Outlined.Cancel,
-                iconTint = Red10,
+                icon = { IconX() }
             )
             else if (player2Moves.contains(it)) Mark(
-                icon = Icons.Outlined.Circle,
-                iconTint = colorScheme.onBackground,
+                icon = { IconO() }
             )
             else Mark(isEmpty = true)
+
             Cell(mark = cellState) {
                 onCellClicked(it)
             }
         }
     }
 }
+
+data class Crossing(
+    val start: Offset,
+    val end: Offset,
+    val positions: List<Int>,
+)
 
 const val rectOffset = 610f
 val rect = Rect(Offset.Zero, Size(width = rectOffset, height = rectOffset))
@@ -168,7 +163,7 @@ val crossingList = listOf(
 fun CrossingLine(
     modifier: Modifier = Modifier,
     crossing: Crossing,
-    color: Color = MaterialTheme.colorScheme.primary
+    color: Color = colorScheme.primary
 ) {
     Canvas(
         modifier = modifier.size(220.dp)
@@ -182,22 +177,63 @@ fun CrossingLine(
     }
 }
 
+@Preview
 @Composable
-fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
-    IconButton(
-        onClick = { onCellClick() },
+fun Cell(mark: Mark = Mark().copy(icon = { IconX() }), onCellClick: () -> Unit = {}) {
+    AnimatedVisibility(
+        visible = !mark.isEmpty,
         modifier = Modifier
             .size(gameBoxSize / 3)
-            .padding(all = 10.dp),
+            .padding(all = 10.dp)
+            .clickable { onCellClick() },
+        content = { mark.icon() }
+    )
+}
+
+@Preview
+@Composable
+fun IconX(
+    iconSize: Dp = 100.dp,
+    color: Color = Red10,
+    stroke: Float = iconSize / 5.dp,
+) {
+    Canvas(
+        modifier = Modifier
+            .size(iconSize)
+            .padding(iconSize / 6)
     ) {
-        AnimatedVisibility(visible = !mark.isEmpty) {
-            Icon(
-                imageVector = mark.icon,
-                contentDescription = null,
-                tint = mark.iconTint,
-                modifier = mark.modifier.size(100.dp)
-            )
-        }
+        drawLine(
+            color = color,
+            start = Offset(0f, 0f),
+            end = Offset(size.width, size.width),
+            strokeWidth = stroke
+        )
+        drawLine(
+            color = color,
+            start = Offset(size.width, 0f),
+            end = Offset(0f, size.width),
+            strokeWidth = stroke
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun IconO(
+    iconSize: Dp = 100.dp,
+    color: Color = colorScheme.onBackground,
+    stroke: Float = (iconSize / 5.dp),
+) {
+    Canvas(
+        modifier = Modifier
+            .size(iconSize)
+            .padding(iconSize / 6)
+    ) {
+        drawCircle(
+            color = color,
+            radius = (size.width / 5).dp.toPx(),
+            style = Stroke(width = stroke)
+        )
     }
 }
 
@@ -217,15 +253,40 @@ fun BorderLines(
                 val color: Color = innerColor,
             )
 
+            val mildColor = innerColor.copy(alpha = 0.2f)
             val lines = listOf(
                 Line(0f, 0f, size.width, 0f),
-                Line(0f, size.width / 3, size.width, size.width / 3, color = innerColor.copy(alpha = 0.2f)),
-                Line(0f, size.width / 3 * 2, size.width, size.width / 3 * 2, color = innerColor.copy(alpha = 0.2f)),
+                Line(
+                    0f,
+                    size.width / 3,
+                    size.width,
+                    size.width / 3,
+                    mildColor
+                ),
+                Line(
+                    0f,
+                    size.width / 3 * 2,
+                    size.width,
+                    size.width / 3 * 2,
+                    mildColor
+                ),
                 Line(0f, size.width, size.width, size.width),
 
                 Line(0f, 0f, 0f, size.width),
-                Line(size.width / 3, 0f, size.width / 3, size.width, color = innerColor.copy(alpha = 0.2f)),
-                Line(size.width / 3 * 2, 0f, size.width / 3 * 2, size.width, color = innerColor.copy(alpha = 0.2f)),
+                Line(
+                    size.width / 3,
+                    0f,
+                    size.width / 3,
+                    size.width,
+                    mildColor
+                ),
+                Line(
+                    size.width / 3 * 2,
+                    0f,
+                    size.width / 3 * 2,
+                    size.width,
+                    mildColor
+                ),
                 Line(size.width, 0f, size.width, size.width),
             )
 

@@ -10,14 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +26,6 @@ import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.getRooms
-import com.triplerock.tictactoe.ui.theme.Red10
 
 @Preview
 @Composable
@@ -62,8 +55,7 @@ fun TurnBox(
     ) {
         TurnItem(
             mark = Mark(
-                icon = Icons.Outlined.Cancel,
-                iconTint = Red10,
+                icon = { IconX(iconSize = 30.dp, stroke = 10f) },
             ),
             playerName = room.player1Name,
             isTurn = room.nextTurn == PlayerX,
@@ -71,8 +63,7 @@ fun TurnBox(
         )
         TurnItem(
             mark = Mark(
-                icon = Icons.Outlined.Circle,
-                iconTint = colorScheme.onBackground,
+                icon = { IconO(iconSize = 30.dp, stroke = 10f) },
             ),
             playerName = room.player2Name,
             isTurn = room.nextTurn == PlayerO,
@@ -83,7 +74,7 @@ fun TurnBox(
 
 @Composable
 fun TurnItem(
-    mark: Mark = Mark(icon = Icons.Default.Clear, iconTint = colorScheme.onBackground),
+    mark: Mark = Mark(icon = { IconX() }),
     playerName: String = "yoo",
     isTurn: Boolean = true,
     isCurrentPlayer: Boolean = false,
@@ -111,12 +102,7 @@ fun TurnItem(
                 .padding(horizontal = 20.dp, vertical = 10.dp)
                 .width(120.dp)
         ) {
-            Icon(
-                imageVector = mark.icon,
-                contentDescription = null,
-                tint = mark.iconTint,
-                modifier = mark.modifier.size(30.dp)
-            )
+            mark.icon()
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = playerName, fontSize = 25.sp,

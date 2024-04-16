@@ -56,7 +56,7 @@ fun PreviewStatsDark() {
 @Composable
 fun Stats(
     modifier: Modifier = Modifier,
-    room: Room = getRooms().first()
+    room: Room = getRooms().first(),
 ) {
     Box(
         modifier
@@ -69,29 +69,25 @@ fun Stats(
                 .clip(RoundedCornerShape(10.dp))
                 .background(colorScheme.background)
         ) {
-            Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
-            Stat(
-                "${room.history.xWins} wins", Icons.Outlined.Cancel,
-                iconTint = colorScheme.error
-            )
-            Stat("${room.history.draws} draws", Icons.Outlined.Balance)
+            Stat("${room.history.oWins} wins") { IconO(iconSize = 40.dp) }
+            Stat("${room.history.draws} draws") {
+                Icon(
+                    Icons.Outlined.Balance, null,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Stat("${room.history.xWins} wins") { IconX(iconSize = 40.dp) }
         }
     }
 }
 
 @Composable
 fun Stat(
-    label: String,
-    icon: ImageVector = Icons.Default.Close,
-    iconTint: Color = colorScheme.onBackground,
+    label: String = "3 Wins",
+    icon: @Composable () -> Unit = {},
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(30.dp),
-            tint = iconTint
-        )
+        icon()
         Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = label, fontSize = 18.sp,

@@ -1,18 +1,16 @@
 package com.triplerock.tictactoe.viewmodels
 
-import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.ui.screens.game.Crossing
 import com.triplerock.tictactoe.ui.screens.game.crossingList
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-
-data class Crossing(val start: Offset, val end: Offset, val positions: List<Int>)
 
 sealed class GameUiState {
     data class Waiting(

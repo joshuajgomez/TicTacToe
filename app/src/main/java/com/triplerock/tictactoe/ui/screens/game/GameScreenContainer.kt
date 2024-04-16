@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,15 +13,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +37,6 @@ import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.utils.Logger
-import com.triplerock.tictactoe.viewmodels.Crossing
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -163,7 +158,7 @@ private fun GameScreen(
     isPlayable: Boolean = true,
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
-    isShowRestartButton: Boolean = false,
+    isShowRestartButton: Boolean = true,
     currentPlayer: String = PlayerX,
     onRestartButtonClick: () -> Unit = {},
     onCellClicked: (cell: Int) -> Unit = {},
