@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
@@ -49,7 +50,7 @@ fun PreviewTurnBox() {
 @Composable
 fun PreviewTurnBoxDark() {
     TicSurface {
-        TurnBox()
+        TurnBox(currentPlayer = PlayerO)
     }
 }
 
@@ -99,44 +100,45 @@ fun TurnItem(
         .fillMaxHeight()
         .clip(shape = RoundedCornerShape(20.dp))
         .border(
-            width = if (isTurn) 3.dp else 1.dp,
-            color = if (isTurn) colorScheme.primary else colorScheme.onBackground,
+            width = 2.dp,
+            color = colorScheme.onBackground,
             shape = RoundedCornerShape(20.dp)
         )
-    Box(
-        Modifier
-            .solidShadow(offset = if (isCurrentPlayer) 6.dp else 3.dp, radius = 50f)
-    )
-    {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.background(colorScheme.background),
-        ) {
-            Spacer(modifier = Modifier.height(10.dp))
-            Icon(
-                imageVector = mark.icon,
-                contentDescription = null,
-                tint = mark.iconTint,
-                modifier = mark.modifier.size(60.dp)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .background(colorScheme.background),
+    ) {
+        Spacer(modifier = Modifier.height(10.dp))
+        Icon(
+            imageVector = mark.icon,
+            contentDescription = null,
+            tint = mark.iconTint,
+            modifier = mark.modifier
+                .size(60.dp)
+                .solidShadow(offset = if (isTurn) 5.dp else 0.dp, radius = 100f)
+                .clip(CircleShape)
+                .border(1.dp, colorScheme.onBackground, CircleShape)
+                .background(colorScheme.background)
+                .padding(5.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = playerName, fontSize = 25.sp,
+            color = colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        if (isCurrentPlayer) {
             Text(
-                text = playerName, fontSize = 25.sp,
-                color = if (isTurn) colorScheme.primary else
-                    colorScheme.onBackground
+                text = "you",
+                textAlign = TextAlign.Center,
+                color = colorScheme.background,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .background(color = colorScheme.onBackground),
             )
-            Spacer(modifier = Modifier.height(15.dp))
-            if (isCurrentPlayer) {
-                Text(
-                    text = "you",
-                    textAlign = TextAlign.Center,
-                    color = colorScheme.onPrimary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(30.dp)
-                        .background(color = colorScheme.primary),
-                )
-            }
         }
     }
+
 }
