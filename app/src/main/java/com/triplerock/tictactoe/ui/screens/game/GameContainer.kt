@@ -203,7 +203,7 @@ fun Cell(mark: Mark, onCellClick: () -> Unit = {}) {
 @Composable
 fun BorderLines(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    innerColor: Color = colorScheme.onBackground,
     stroke: Dp = 2.dp,
 ) {
     Box(modifier.size(gameBoxSize)) {
@@ -213,23 +213,24 @@ fun BorderLines(
                 val yStart: Float,
                 val xEnd: Float,
                 val yEnd: Float,
+                val color: Color = innerColor,
             )
 
             val lines = listOf(
                 Line(0f, 0f, size.width, 0f),
-                Line(0f, size.width / 3, size.width, size.width / 3),
-                Line(0f, size.width / 3 * 2, size.width, size.width / 3 * 2),
+                Line(0f, size.width / 3, size.width, size.width / 3, color = innerColor.copy(alpha = 0.2f)),
+                Line(0f, size.width / 3 * 2, size.width, size.width / 3 * 2, color = innerColor.copy(alpha = 0.2f)),
                 Line(0f, size.width, size.width, size.width),
 
                 Line(0f, 0f, 0f, size.width),
-                Line(size.width / 3, 0f, size.width / 3, size.width),
-                Line(size.width / 3 * 2, 0f, size.width / 3 * 2, size.width),
+                Line(size.width / 3, 0f, size.width / 3, size.width, color = innerColor.copy(alpha = 0.2f)),
+                Line(size.width / 3 * 2, 0f, size.width / 3 * 2, size.width, color = innerColor.copy(alpha = 0.2f)),
                 Line(size.width, 0f, size.width, size.width),
             )
 
             lines.forEach { line ->
                 drawLine(
-                    color = color,
+                    color = line.color,
                     start = Offset(line.xStart, line.yStart),
                     end = Offset(line.xEnd, line.yEnd),
                     strokeWidth = stroke.toPx(),

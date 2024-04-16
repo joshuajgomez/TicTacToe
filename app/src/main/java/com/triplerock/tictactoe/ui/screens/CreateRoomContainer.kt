@@ -37,6 +37,7 @@ import com.triplerock.tictactoe.ui.screens.common.CustomTextField
 import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.textHostGame
 import com.triplerock.tictactoe.utils.getPrettyTime
@@ -120,6 +121,7 @@ fun RoomName(
             text = name,
             onTextChanged = { name = it },
             modifier = Modifier.padding(horizontal = 50.dp)
+                .solidShadow()
         )
         RoomNameTags(names = sampleRoomNames) {
             name = it

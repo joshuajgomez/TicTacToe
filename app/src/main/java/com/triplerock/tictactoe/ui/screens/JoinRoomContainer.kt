@@ -2,6 +2,7 @@ package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +51,7 @@ import com.triplerock.tictactoe.ui.screens.common.CustomTextButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.theme.textHostGame
 import com.triplerock.tictactoe.ui.theme.textJoinGame
 import com.triplerock.tictactoe.utils.getRelativeTime
@@ -291,21 +294,25 @@ fun JoinButton(
     TextButton(
         onClick = { onJoinClick() },
         modifier = modifier
-            .background(
-                shape = RoundedCornerShape(30.dp),
-                color = colorScheme.onBackground
-            )
+            .solidShadow(offset = 3.dp)
+            .border(width = 1.dp,
+                color = colorScheme.onBackground,
+                shape = RoundedCornerShape(30.dp))
+            .clip(RoundedCornerShape(30.dp))
             .height(40.dp)
+            .background(
+                color = colorScheme.background
+            )
     ) {
         Text(
             text = "Join",
-            color = colorScheme.surface
+            color = colorScheme.onBackground
         )
         Spacer(modifier = Modifier.width(5.dp))
         Icon(
             imageVector = Icons.Default.ArrowForward,
             contentDescription = null,
-            tint = colorScheme.surface
+            tint = colorScheme.onBackground
         )
     }
 }

@@ -3,6 +3,7 @@ package com.triplerock.tictactoe.ui.screens
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,10 +36,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +58,9 @@ import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.gradientBrush
+import com.triplerock.tictactoe.ui.screens.common.imageBrush
 import com.triplerock.tictactoe.ui.screens.common.rainbowBrush
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.theme.textAppTitle
 import com.triplerock.tictactoe.ui.theme.textCredits
 import com.triplerock.tictactoe.ui.theme.textHostGame
@@ -117,13 +126,7 @@ fun Menu(
     ) {
         XoMarqueeContainer()
         Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = textAppTitle,
-            fontSize = 60.sp,
-            style = TextStyle.Default.copy(
-                brush = rainbowBrush()
-            )
-        )
+        TitleLogo()
         Spacer(modifier = Modifier.height(10.dp))
 
         NameBox(name)
@@ -148,7 +151,8 @@ fun Menu(
             onClick = {
                 onMenuClick(navCredits)
             },
-            color = colorScheme.secondary
+            color = colorScheme.onBackground,
+            backgroundColor = colorScheme.surfaceVariant
         )
 
         AnimatedVisibility(visible = errorStatus.isNotEmpty()) {
@@ -162,10 +166,30 @@ fun Menu(
 }
 
 @Composable
+fun TitleLogo() {
+    Text(
+        text = textAppTitle,
+        fontSize = 60.sp,
+        color = colorScheme.onBackground
+    )
+}
+
+@Composable
 fun NameBox(name: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp)
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = Modifier
+            .border(
+                width = 2.dp, color = colorScheme.onBackground,
+                shape = RoundedCornerShape(30.dp)
+            )
+            .solidShadow(offset = 5.dp)
+            .background(
+                color = colorScheme.surface,
+                shape = RoundedCornerShape(30.dp)
+            )
+            .padding(horizontal = 30.dp)
     ) {
         Text(
             text = name,
@@ -175,7 +199,7 @@ fun NameBox(name: String) {
         Icon(
             imageVector = Icons.Default.Edit,
             contentDescription = null,
-            tint = colorScheme.onSurface.copy(alpha = 0.5f)
+            tint = colorScheme.onSurface.copy(alpha = 0.7f)
         )
     }
 }
@@ -186,27 +210,31 @@ fun MenuItem(
     text: String,
     onClick: () -> Unit,
     color: Color = colorScheme.onBackground,
+    backgroundColor: Color = colorScheme.background,
 ) {
     TextButton(
         onClick = onClick,
         modifier = Modifier
-            .background(
-                shape = RoundedCornerShape(10.dp),
-                color = color
-            )
+            .solidShadow(offset = 5.dp, radius = 20f)
+            .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
             .height(60.dp)
-            .width(250.dp),
+            .width(250.dp)
+            .border(
+                width = 2.dp, color = color,
+                shape = RoundedCornerShape(10.dp)
+            ),
     ) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 10.dp)
+                .background(backgroundColor)
         ) {
             val (iconRef, textRef) = createRefs()
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = colorScheme.onPrimary,
+                tint = color,
                 modifier = Modifier
                     .size(30.dp)
                     .constrainAs(iconRef) {
@@ -217,7 +245,7 @@ fun MenuItem(
             )
             Text(
                 text = text,
-                color = colorScheme.onPrimary,
+                color = color,
                 textAlign = TextAlign.Center,
                 fontSize = 25.sp,
                 modifier = Modifier.constrainAs(textRef) {

@@ -46,11 +46,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.triplerock.tictactoe.R
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
@@ -244,7 +249,9 @@ fun TitleBar(
 @Composable
 fun PreviewNameTagsDark(onNameSelect: (name: String) -> Unit = {}) {
     TicSurface {
-        NameTags()
+        Box(modifier = Modifier.padding(20.dp)) {
+            NameTags()
+        }
     }
 }
 
@@ -252,7 +259,9 @@ fun PreviewNameTagsDark(onNameSelect: (name: String) -> Unit = {}) {
 @Composable
 fun PreviewNameTagsLight(onNameSelect: (name: String) -> Unit = {}) {
     TicSurface {
-        NameTags()
+        Box(modifier = Modifier.padding(20.dp)) {
+            NameTags()
+        }
     }
 }
 
@@ -305,8 +314,8 @@ private fun NameTag(name: String, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         colors = SuggestionChipDefaults.suggestionChipColors(
-            containerColor = Color.Transparent,
-            labelColor = colorScheme.onSurface,
+            containerColor = colorScheme.onBackground,
+            labelColor = colorScheme.background,
         ),
         label = {
             Text(
@@ -401,6 +410,10 @@ fun gradientBrush(): Brush {
         )
     )
 }
+
+@Composable
+fun imageBrush() =
+    ShaderBrush(ImageShader(ImageBitmap.imageResource(id = R.drawable.rainbow_bg)))
 
 @Composable
 fun rainbowBrush(): Brush {
