@@ -412,10 +412,6 @@ fun gradientBrush(): Brush {
 }
 
 @Composable
-fun imageBrush() =
-    ShaderBrush(ImageShader(ImageBitmap.imageResource(id = R.drawable.rainbow_bg)))
-
-@Composable
 fun rainbowBrush(): Brush {
     return Brush.verticalGradient(
         listOf(
