@@ -3,8 +3,10 @@ package com.triplerock.tictactoe.ui.screens.game
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +36,7 @@ import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.viewmodels.Crossing
 
@@ -82,26 +86,33 @@ fun GameContainer(
     room: Room = getRooms().first(),
     onCellClicked: (cell: Int) -> Unit = {},
 ) {
-    ConstraintLayout(modifier) {
-        val (grid, crossingContainer) = createRefs()
-        BorderLines()
-        MarkBox(
-            modifier = Modifier.constrainAs(grid) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            room.moves[PlayerX]!!, room.moves[PlayerO]!!, onCellClicked
+    Box(
+        modifier.solidShadow(
+            color = colorScheme.onBackground,
+            radius = 0f, offset = 7.dp
         )
-        if (crossing != null) {
-            CrossingLine(
-                modifier = Modifier.constrainAs(crossingContainer) {
-                    start.linkTo(grid.start)
-                    end.linkTo(grid.end)
-                    top.linkTo(grid.top)
-                    bottom.linkTo(grid.bottom)
+    ) {
+        ConstraintLayout(Modifier.background(color = colorScheme.background)) {
+            val (grid, crossingContainer) = createRefs()
+            BorderLines()
+            MarkBox(
+                modifier = Modifier.constrainAs(grid) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 },
-                crossing = crossing
+                room.moves[PlayerX]!!, room.moves[PlayerO]!!, onCellClicked
             )
+            if (crossing != null) {
+                CrossingLine(
+                    modifier = Modifier.constrainAs(crossingContainer) {
+                        start.linkTo(grid.start)
+                        end.linkTo(grid.end)
+                        top.linkTo(grid.top)
+                        bottom.linkTo(grid.bottom)
+                    },
+                    crossing = crossing
+                )
+            }
         }
     }
 }

@@ -1,12 +1,14 @@
 package com.triplerock.tictactoe.ui.screens.common
 
 import android.content.res.Configuration
+import android.graphics.BlurMaskFilter
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -37,14 +40,21 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -93,24 +103,60 @@ fun CustomTextButton(
     text: String = "Click me",
     onClick: () -> Unit = {},
 ) {
-    TextButton(
-        onClick = onClick,
-        modifier = modifier
-            .background(
-                shape = RoundedCornerShape(30.dp),
-                color = colorScheme.onBackground
-            )
-            .padding(horizontal = 20.dp)
-            .height(50.dp)
+    Box(
+        modifier = Modifier
+
     ) {
-        Text(
-            text = text,
-            fontSize = 22.sp,
-            color = colorScheme.surface
-        )
+        TextButton(
+            onClick = onClick,
+            modifier = modifier
+                .padding(horizontal = 20.dp)
+                .solidShadow(colorScheme.onBackground)
+                .height(50.dp)
+                .border(2.dp, colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
+                .clip(RoundedCornerShape(30.dp))
+                .background(colorScheme.background)
+        ) {
+            Text(
+                text = text,
+                fontSize = 22.sp,
+                color = colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
     }
 }
 
+@Composable
+fun Modifier.solidShadow(
+    color: Color = colorScheme.onBackground,
+    offset: Dp = 2.dp,
+    radius: Float = 75f
+) = then(
+    drawBehind {
+        drawIntoCanvas { canvas ->
+            val paint = Paint()
+            val frameworkPaint = paint.asFrameworkPaint()
+
+            frameworkPaint.color = color.toArgb()
+
+            val leftPixel = (-offset).toPx()
+            val topPixel = offset.toPx()
+            val rightPixel = size.width + leftPixel
+            val bottomPixel = size.height + topPixel
+
+            canvas.drawRoundRect(
+                left = leftPixel,
+                top = topPixel,
+                right = rightPixel,
+                bottom = bottomPixel,
+                paint = paint,
+                radiusX = radius,
+                radiusY = radius
+            )
+        }
+    }
+)
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -419,4 +465,39 @@ fun XoIcon(icon: ImageVector = Icons.Default.Close) {
         contentDescription = null,
         modifier = Modifier.size(40.dp),
     )
+}
+
+
+fun Modifier.advancedShadow(
+    color: Color = Color.Red,
+    alpha: Float = 1f,
+    cornersRadius: Dp = 0.dp,
+    shadowBlurRadius: Dp = 1.dp,
+    offsetY: Dp = 0.dp,
+    offsetX: Dp = 0.dp
+) = drawBehind {
+
+    val shadowColor = color.copy().toArgb()
+    val transparentColor = color.copy(alpha = 0f).toArgb()
+
+    drawIntoCanvas {
+        val paint = Paint()
+        val frameworkPaint = paint.asFrameworkPaint()
+        frameworkPaint.color = transparentColor
+        frameworkPaint.setShadowLayer(
+            shadowBlurRadius.toPx(),
+            offsetX.toPx(),
+            offsetY.toPx(),
+            shadowColor
+        )
+        it.drawRoundRect(
+            0f,
+            0f,
+            this.size.width,
+            this.size.height,
+            cornersRadius.toPx(),
+            cornersRadius.toPx(),
+            paint
+        )
+    }
 }

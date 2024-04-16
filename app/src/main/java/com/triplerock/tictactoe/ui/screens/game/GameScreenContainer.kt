@@ -96,9 +96,15 @@ fun GameScreenContainer(
 
 }
 
-@Preview(device = Devices.PIXEL_2)
+//@Preview(device = Devices.PIXEL_2)
 @Composable
 private fun PreviewGameScreenLightPixel2() {
+    GameScreenForPreview()
+}
+
+@Preview
+@Composable
+private fun PreviewGameScreenLight() {
     GameScreenForPreview()
 }
 
@@ -170,7 +176,7 @@ private fun GameScreen(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(turn.bottom, margin = 20.dp)
+                top.linkTo(turn.bottom, margin = 40.dp)
                 bottom.linkTo(stats.top)
             },
             room = room,

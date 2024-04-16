@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
 
 @Preview
@@ -60,7 +62,8 @@ fun TurnBox(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(150.dp),
+            .height(170.dp)
+            .padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         TurnItem(
@@ -92,7 +95,6 @@ fun TurnItem(
     isCurrentPlayer: Boolean = false,
 ) {
     val modifier = Modifier
-        .padding(vertical = 10.dp)
         .width(130.dp)
         .fillMaxHeight()
         .clip(shape = RoundedCornerShape(20.dp))
@@ -101,34 +103,40 @@ fun TurnItem(
             color = if (isTurn) colorScheme.primary else colorScheme.onBackground,
             shape = RoundedCornerShape(20.dp)
         )
-        .padding(vertical = 0.dp)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(top = 10.dp),
-    ) {
-        Icon(
-            imageVector = mark.icon,
-            contentDescription = null,
-            tint = mark.iconTint,
-            modifier = mark.modifier.size(40.dp)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = playerName, fontSize = 25.sp,
-            color = if (isTurn) colorScheme.primary else
-                colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-        if (isCurrentPlayer) {
-            Text(
-                text = "you",
-                textAlign = TextAlign.Center,
-                color = colorScheme.onPrimary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp)
-                    .background(color = colorScheme.primary),
+    Box(
+        Modifier
+            .solidShadow(offset = if (isCurrentPlayer) 6.dp else 3.dp, radius = 50f)
+    )
+    {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.background(colorScheme.background),
+        ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Icon(
+                imageVector = mark.icon,
+                contentDescription = null,
+                tint = mark.iconTint,
+                modifier = mark.modifier.size(60.dp)
             )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = playerName, fontSize = 25.sp,
+                color = if (isTurn) colorScheme.primary else
+                    colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            if (isCurrentPlayer) {
+                Text(
+                    text = "you",
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.onPrimary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp)
+                        .background(color = colorScheme.primary),
+                )
+            }
         }
     }
 }
