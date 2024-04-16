@@ -57,9 +57,6 @@ import com.triplerock.tictactoe.ui.navJoinGame
 import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
-import com.triplerock.tictactoe.ui.screens.common.gradientBrush
-import com.triplerock.tictactoe.ui.screens.common.imageBrush
-import com.triplerock.tictactoe.ui.screens.common.rainbowBrush
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.theme.textAppTitle
 import com.triplerock.tictactoe.ui.theme.textCredits
