@@ -71,6 +71,7 @@ import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 @Composable
 fun CustomButton(
     modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Default.ArrowBack,
     onClick: () -> Unit = {},
 ) {
     IconButton(
@@ -78,7 +79,7 @@ fun CustomButton(
         modifier = modifier.padding(all = 5.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(30.dp),
             tint = colorScheme.onSurface

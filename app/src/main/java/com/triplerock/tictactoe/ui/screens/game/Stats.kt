@@ -63,7 +63,6 @@ fun Stats(
     Box(
         modifier
             .padding(horizontal = 20.dp)
-            .solidShadow(radius = 30f, offset = 5.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -71,11 +70,6 @@ fun Stats(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .background(colorScheme.background)
-                .border(
-                    width = 1.dp,
-                    color = colorScheme.onBackground,
-                    shape = RoundedCornerShape(10.dp)
-                )
                 .padding(vertical = 15.dp)
         ) {
             Stat("${room.history.oWins} wins", Icons.Outlined.Circle)

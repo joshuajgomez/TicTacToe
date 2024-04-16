@@ -38,6 +38,7 @@ import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
+import com.triplerock.tictactoe.ui.theme.Red10
 import com.triplerock.tictactoe.viewmodels.Crossing
 
 data class Mark(
@@ -89,7 +90,7 @@ fun GameContainer(
     Box(
         modifier.solidShadow(
             color = colorScheme.onBackground,
-            radius = 0f, offset = 7.dp
+            radius = 0f, offset = 5.dp
         )
     ) {
         ConstraintLayout(Modifier.background(color = colorScheme.background)) {
@@ -134,11 +135,11 @@ fun MarkBox(
         items(count = 9) {
             val cellState = if (player1Moves.contains(it)) Mark(
                 icon = Icons.Outlined.Cancel,
-                iconTint = MaterialTheme.colorScheme.error,
+                iconTint = Red10,
             )
             else if (player2Moves.contains(it)) Mark(
                 icon = Icons.Outlined.Circle,
-                iconTint = MaterialTheme.colorScheme.onBackground,
+                iconTint = colorScheme.onBackground,
             )
             else Mark(isEmpty = true)
             Cell(mark = cellState) {

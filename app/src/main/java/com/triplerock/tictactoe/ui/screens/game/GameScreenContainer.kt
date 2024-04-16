@@ -2,22 +2,29 @@ package com.triplerock.tictactoe.ui.screens.game
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,8 +34,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.screens.common.CustomButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
+import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.Crossing
@@ -42,9 +51,7 @@ fun GameScreenContainer(
     navController: NavController,
 ) {
     Column(
-        Modifier
-            .fillMaxSize()
-            .padding(top = 30.dp),
+        Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -85,6 +92,7 @@ fun GameScreenContainer(
             is GameUiState.Draw -> {
                 val gameOver = gameUiState.value as GameUiState.Draw
                 GameScreen(
+                    room = gameOver.room,
                     statusText = gameOver.room.status,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
@@ -112,9 +120,7 @@ private fun PreviewGameScreenLight() {
 fun GameScreenForPreview() {
     TicBackground {
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 30.dp),
+            Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             GameScreen(isPlayable = true, isShowRestartButton = true)
@@ -139,7 +145,7 @@ fun StatusBox(
         text = message,
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
-        color = colorScheme.primary,
+        color = colorScheme.onBackground,
         modifier = modifier
     )
 }
@@ -151,24 +157,31 @@ private fun GameScreen(
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
     isShowRestartButton: Boolean = false,
-    onCellClicked: (cell: Int) -> Unit = {},
-    onRestartButtonClick: () -> Unit = {},
     currentPlayer: String = PlayerX,
+    onRestartButtonClick: () -> Unit = {},
+    onCellClicked: (cell: Int) -> Unit = {},
+    onCloseClicked: () -> Unit = {},
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (title, turn, grid, restart, stats) = createRefs()
+        val (close, title, turn, turnText, grid, restart, stats) = createRefs()
+        CustomButton(modifier = Modifier.constrainAs(close) {
+            start.linkTo(parent.start, 20.dp)
+            top.linkTo(parent.top, 17.dp)
+        }, icon = Icons.Default.Clear) {
+            onCloseClicked()
+        }
         StatusBox(
             message = statusText,
             modifier = Modifier.constrainAs(title) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(parent.top)
+                top.linkTo(parent.top, 30.dp)
             })
         TurnBox(
             modifier = Modifier.constrainAs(turn) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(title.bottom, margin = 30.dp)
+                top.linkTo(title.bottom)
             },
             room = room, currentPlayer = currentPlayer
         )
@@ -176,8 +189,7 @@ private fun GameScreen(
             modifier = Modifier.constrainAs(grid) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(turn.bottom, margin = 40.dp)
-                bottom.linkTo(stats.top)
+                top.linkTo(turn.bottom, margin = 30.dp)
             },
             room = room,
             crossing = crossing
@@ -186,6 +198,19 @@ private fun GameScreen(
             if (isPlayable) {
                 onCellClicked(it)
             }
+        }
+
+        AnimatedVisibility(
+            visible = room.nextTurn == currentPlayer,
+            modifier = Modifier.constrainAs(turnText) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(grid.bottom, 20.dp)
+            }) {
+            Text(
+                text = "your turn",
+                fontSize = 25.sp,
+            )
         }
 
         Stats(
@@ -212,14 +237,25 @@ private fun GameScreen(
 
 @Composable
 fun RestartButton(onRestartClick: () -> Unit = {}) {
-    Button(
+    TextButton(
         onClick = { onRestartClick() },
+        modifier = Modifier
+            .solidShadow()
+            .clip(RoundedCornerShape(30.dp))
+            .background(colorScheme.background)
+            .border(2.dp, colorScheme.onBackground, RoundedCornerShape(30.dp))
+            .padding(horizontal = 10.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.Autorenew, contentDescription = null
+            imageVector = Icons.Default.Autorenew,
+            contentDescription = null,
+            tint = colorScheme.onBackground
         )
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = "New game", fontSize = 20.sp)
+        Text(
+            text = "New Game", fontSize = 25.sp,
+            color = colorScheme.onBackground
+        )
     }
 }
 
