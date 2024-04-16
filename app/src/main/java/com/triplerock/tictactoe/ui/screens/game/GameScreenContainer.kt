@@ -34,6 +34,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.navMenu
 import com.triplerock.tictactoe.ui.screens.common.CustomButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
@@ -73,7 +74,10 @@ fun GameScreenContainer(
                     onCellClicked = { gameViewModel.onCellClick(it) },
                     statusText = nextTurn.room.status,
                     isPlayable = nextTurn.room.nextTurn == gameViewModel.player,
-                    currentPlayer = gameViewModel.player
+                    currentPlayer = gameViewModel.player,
+                    onCloseClicked = {
+                        navController.navigate(navMenu)
+                    }
                 )
             }
 
@@ -85,7 +89,10 @@ fun GameScreenContainer(
                     crossing = winner.crossing,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    currentPlayer = gameViewModel.player
+                    currentPlayer = gameViewModel.player,
+                    onCloseClicked = {
+                        navController.navigate(navMenu)
+                    }
                 )
             }
 
@@ -96,7 +103,10 @@ fun GameScreenContainer(
                     statusText = gameOver.room.status,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
-                    currentPlayer = gameViewModel.player
+                    currentPlayer = gameViewModel.player,
+                    onCloseClicked = {
+                        navController.navigate(navMenu)
+                    }
                 )
             }
         }
@@ -121,7 +131,6 @@ fun GameScreenForPreview() {
     TicBackground {
         Column(
             Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             GameScreen(isPlayable = true, isShowRestartButton = true)
         }
