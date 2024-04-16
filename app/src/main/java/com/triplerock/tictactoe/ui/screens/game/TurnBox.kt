@@ -57,9 +57,7 @@ fun TurnBox(
     currentPlayer: String = PlayerX,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         TurnItem(
@@ -93,14 +91,14 @@ fun TurnItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.height(120.dp)
+        modifier = Modifier.height(80.dp)
     ) {
         if (isCurrentPlayer) {
             Text(
-                text = "You", fontSize = 25.sp,
+                text = "You", fontSize = 20.sp,
             )
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         Row(
             modifier = Modifier
                 .border(

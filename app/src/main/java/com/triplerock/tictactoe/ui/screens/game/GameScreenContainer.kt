@@ -53,8 +53,6 @@ fun GameScreenContainer(
 ) {
     Column(
         Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         val gameUiState = gameViewModel.uiState.collectAsState()
         Logger.debug("gameUiState = ${gameUiState.value}")
@@ -114,7 +112,7 @@ fun GameScreenContainer(
 
 }
 
-//@Preview(device = Devices.PIXEL_2)
+@Preview(device = Devices.PIXEL_2)
 @Composable
 private fun PreviewGameScreenLightPixel2() {
     GameScreenForPreview()
@@ -132,7 +130,7 @@ fun GameScreenForPreview() {
         Column(
             Modifier.fillMaxSize(),
         ) {
-            GameScreen(isPlayable = true, isShowRestartButton = true)
+            GameScreen(isPlayable = true, isShowRestartButton = false)
         }
     }
 }
@@ -174,8 +172,8 @@ private fun GameScreen(
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (close, title, turn, turnText, grid, restart, stats) = createRefs()
         CustomButton(modifier = Modifier.constrainAs(close) {
-            start.linkTo(parent.start, 20.dp)
-            top.linkTo(parent.top, 17.dp)
+            start.linkTo(parent.start, 6.dp)
+            top.linkTo(parent.top, 6.dp)
         }, icon = Icons.Default.Clear) {
             onCloseClicked()
         }
@@ -184,13 +182,13 @@ private fun GameScreen(
             modifier = Modifier.constrainAs(title) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(parent.top, 30.dp)
+                top.linkTo(parent.top, 20.dp)
             })
         TurnBox(
             modifier = Modifier.constrainAs(turn) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(title.bottom)
+                top.linkTo(title.bottom, margin = 10.dp)
             },
             room = room, currentPlayer = currentPlayer
         )
@@ -226,8 +224,7 @@ private fun GameScreen(
             modifier = Modifier.constrainAs(stats) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                top.linkTo(grid.bottom, margin = 20.dp)
-                bottom.linkTo(restart.top)
+                top.linkTo(grid.bottom, margin = 80.dp)
             },
             room = room
         )

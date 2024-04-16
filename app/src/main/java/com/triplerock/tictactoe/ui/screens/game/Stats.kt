@@ -39,7 +39,7 @@ import com.triplerock.tictactoe.ui.screens.getRooms
 @Composable
 fun PreviewStats() {
     TicSurface {
-        Box(modifier = Modifier.padding(20.dp)) {
+        Box {
             Stats()
         }
     }
@@ -49,9 +49,7 @@ fun PreviewStats() {
 @Composable
 fun PreviewStatsDark() {
     TicSurface {
-        Box(modifier = Modifier.padding(20.dp)) {
-            Stats()
-        }
+        Stats()
     }
 }
 
@@ -62,7 +60,7 @@ fun Stats(
 ) {
     Box(
         modifier
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 10.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -70,7 +68,6 @@ fun Stats(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .background(colorScheme.background)
-                .padding(vertical = 15.dp)
         ) {
             Stat("${room.history.oWins} wins", Icons.Outlined.Circle)
             Stat(
