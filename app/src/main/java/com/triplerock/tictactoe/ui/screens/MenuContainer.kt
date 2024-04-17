@@ -174,10 +174,9 @@ fun Menu(
 fun TitleLogo() {
     Surface(
         modifier = Modifier
-            .solidShadow2(offset = 5.dp, radius = 90f)
-            .clip(RoundedCornerShape(30.dp))
+            .solidShadow2(offset = 5.dp, radius = 0f, strokeWidth = 5f)
             .background(color = colorScheme.onBackground)
-            .padding(15.dp)
+            .padding(vertical = 5.dp, horizontal = 10.dp)
         ,
         color = colorScheme.onBackground
     ) {

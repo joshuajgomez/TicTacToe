@@ -189,27 +189,44 @@ fun Modifier.solidShadow2(
             val rightPixel = size.width + leftPixel
             val bottomPixel = size.height + topPixel
 
+            if (radius == 0f) {
+                // draw square
+                canvas.drawRect(
+                    paint = paint2,
+                    left = leftPixel - strokeWidth,
+                    top = topPixel - strokeWidth,
+                    right = rightPixel + strokeWidth,
+                    bottom = bottomPixel + strokeWidth,
+                )
+                canvas.drawRect(
+                    paint = paint,
+                    left = leftPixel,
+                    top = topPixel,
+                    right = rightPixel,
+                    bottom = bottomPixel,
+                )
+            } else {
+                // draw round rect
+                canvas.drawRoundRect(
+                    left = leftPixel - strokeWidth,
+                    top = topPixel - strokeWidth,
+                    right = rightPixel + strokeWidth,
+                    bottom = bottomPixel + strokeWidth,
+                    paint = paint2,
+                    radiusX = radius,
+                    radiusY = radius
+                )
 
-
-            canvas.drawRoundRect(
-                left = leftPixel - strokeWidth,
-                top = topPixel - strokeWidth,
-                right = rightPixel + strokeWidth,
-                bottom = bottomPixel + strokeWidth,
-                paint = paint2,
-                radiusX = radius,
-                radiusY = radius
-            )
-
-            canvas.drawRoundRect(
-                left = leftPixel,
-                top = topPixel,
-                right = rightPixel,
-                bottom = bottomPixel,
-                paint = paint,
-                radiusX = radius,
-                radiusY = radius
-            )
+                canvas.drawRoundRect(
+                    left = leftPixel,
+                    top = topPixel,
+                    right = rightPixel,
+                    bottom = bottomPixel,
+                    paint = paint,
+                    radiusX = radius,
+                    radiusY = radius
+                )
+            }
         }
     }
 )
