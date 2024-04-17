@@ -1,16 +1,16 @@
 package com.triplerock.tictactoe.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.model.RoomRepository
 
 class MenuViewModel(
-    private val gameRepository: GameRepository,
+    private val roomRepository: RoomRepository,
 ) : ViewModel() {
 
-    var name = gameRepository.getName()
+    var name = roomRepository.getName()
 
     fun setName(name: String): Boolean {
-        gameRepository.setName(name)
+        roomRepository.setName(name)
         return true
     }
 }

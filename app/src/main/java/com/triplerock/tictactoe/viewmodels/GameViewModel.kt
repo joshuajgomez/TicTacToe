@@ -5,12 +5,16 @@ import androidx.lifecycle.ViewModel
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
-import com.triplerock.tictactoe.model.GameRepository
+import com.triplerock.tictactoe.model.gamemanager.GameManager
+import com.triplerock.tictactoe.model.gamemanager.LocalMultiPlayerGame
+import com.triplerock.tictactoe.model.gamemanager.OnlineGame
+import com.triplerock.tictactoe.model.gamemanager.SinglePlayerGame
 import com.triplerock.tictactoe.ui.screens.game.Crossing
 import com.triplerock.tictactoe.ui.screens.game.crossingList
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.koin.java.KoinJavaComponent.get
 
 sealed class GameUiState {
     data class Waiting(
@@ -18,11 +22,11 @@ sealed class GameUiState {
     ) : GameUiState()
 
     data class NextTurn(
-        val room: Room
+        val room: Room,
     ) : GameUiState()
 
     data class Draw(
-        val room: Room
+        val room: Room,
     ) : GameUiState()
 
     data class Winner(
@@ -33,14 +37,21 @@ sealed class GameUiState {
 
 const val navKeyRoomId = "roomId"
 const val navKeyPlayer = "player"
+const val navKeyMode = "mode"
+
+const val modeSingle = "single_player"
+const val modeMultiOnline = "multiplayer_online"
+const val modeMultiLocal = "multiplayer_local"
 
 class GameViewModel(
     savedStateHandle: SavedStateHandle,
-    private val gameRepository: GameRepository,
-) : ViewModel() {
+) : ViewModel(), GameManager.Callback {
 
-    private val roomId: String = checkNotNull(savedStateHandle[navKeyRoomId])
-    val player: String = checkNotNull(savedStateHandle[navKeyPlayer])
+    private val mode: String = checkNotNull(savedStateHandle[navKeyMode])
+    private var roomId: String = ""
+    var player: String = ""
+
+    private lateinit var gameManager: GameManager
 
     private val playingRoom: MutableStateFlow<Room?> = MutableStateFlow(null)
 
@@ -48,19 +59,23 @@ class GameViewModel(
     val uiState: StateFlow<GameUiState> = _uiState
 
     init {
-        Logger.debug("roomId = [${roomId}]")
-        gameRepository.listenForRoomUpdates(roomId) {
-            val isStarting = playingRoom.value == null
-            playingRoom.value = it
-            if (isStarting
-                || it.nextTurn == player
-                || isReset(it)
-            ) {
-                // If nextTurn is other player, we already updated turn when cell was clicked
-                Logger.verbose("room set. starting game")
-                checkGameState()
+        when (mode) {
+            modeMultiOnline -> {
+                gameManager = get(OnlineGame::class.java)
+                roomId = checkNotNull(savedStateHandle[navKeyRoomId])
+                player = checkNotNull(savedStateHandle[navKeyPlayer])
+            }
+
+            modeSingle -> {
+                gameManager = get(SinglePlayerGame::class.java)
+            }
+
+            modeMultiLocal -> {
+                gameManager = get(LocalMultiPlayerGame::class.java)
             }
         }
+        Logger.debug("roomId = [${roomId}]")
+        gameManager.listenUpdates(roomId, this)
     }
 
     private fun isReset(it: Room) = (it.moves[PlayerX]!!.isEmpty()
@@ -92,7 +107,7 @@ class GameViewModel(
             room.status = "Turn: ${room.nextTurn}"
             _uiState.value = GameUiState.NextTurn(room)
         }
-        if (shouldUpdate) gameRepository.updateTurn(room)
+        if (shouldUpdate) gameManager.onMove(room)
     }
 
     private fun isWon(moves: List<Int>): Boolean {
@@ -121,12 +136,26 @@ class GameViewModel(
         return false
     }
 
+    override fun onRoomUpdate(room: Room) {
+        val isStarting = playingRoom.value == null
+        playingRoom.value = room
+        if (isStarting
+            || room.nextTurn == player
+            || isReset(room)
+        ) {
+            // If nextTurn is other player, we already updated turn when cell was clicked
+            Logger.verbose("room set. starting game")
+            checkGameState()
+        }
+    }
+
     fun onRestartClick() {
         _uiState.value = GameUiState.Waiting()
-        gameRepository.resetGame(playingRoom.value!!) {
-            // on reset complete
-            gameRepository.updateTurn(playingRoom.value!!)
-        }
+        gameManager.clearMoves(playingRoom.value!!)
+    }
+
+    override fun onRoomCleared() {
+        gameManager.onMove(playingRoom.value!!)
     }
 
 }

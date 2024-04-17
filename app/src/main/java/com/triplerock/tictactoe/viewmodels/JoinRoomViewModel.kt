@@ -1,8 +1,8 @@
 package com.triplerock.tictactoe.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.triplerock.tictactoe.model.GameRepository
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.model.RoomRepository
 import com.triplerock.tictactoe.utils.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ sealed class JoinRoomUiState {
     data class Joined(val roomId: String) : JoinRoomUiState()
 }
 
-class JoinRoomViewModel(private val gameRepository: GameRepository) : ViewModel() {
+class JoinRoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
 
     private val _uiState: MutableStateFlow<JoinRoomUiState> =
         MutableStateFlow(JoinRoomUiState.EmptyRoom(""))
@@ -22,7 +22,7 @@ class JoinRoomViewModel(private val gameRepository: GameRepository) : ViewModel(
 
     init {
         Logger.entry()
-        gameRepository.findRooms {
+        roomRepository.findRooms {
             // on room found
             _uiState.value = JoinRoomUiState.RoomFound(it)
         }
@@ -31,7 +31,7 @@ class JoinRoomViewModel(private val gameRepository: GameRepository) : ViewModel(
     fun onJoinRoomClick(room: Room) {
         val message = "Joining room ${room.name}"
         _uiState.value = JoinRoomUiState.Joining(message)
-        gameRepository.joinRoom(room) {
+        roomRepository.joinRoom(room) {
             // on room joined
             _uiState.value = JoinRoomUiState.Joined(room.id)
         }

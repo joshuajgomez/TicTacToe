@@ -163,7 +163,7 @@ val crossingList = listOf(
 fun CrossingLine(
     modifier: Modifier = Modifier,
     crossing: Crossing,
-    color: Color = colorScheme.primary
+    color: Color = colorScheme.primary,
 ) {
     Canvas(
         modifier = modifier.size(220.dp)
@@ -185,7 +185,7 @@ fun Cell(mark: Mark = Mark().copy(icon = { IconX() }), onCellClick: () -> Unit =
         modifier = Modifier
             .size(gameBoxSize / 3)
             .padding(all = 10.dp)
-            .clickable { onCellClick() },
+            .clickable(enabled = mark.isEmpty) { onCellClick() },
         content = { mark.icon() }
     )
 }

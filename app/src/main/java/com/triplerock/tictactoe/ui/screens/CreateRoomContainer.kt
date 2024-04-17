@@ -45,6 +45,7 @@ import com.triplerock.tictactoe.ui.theme.textHostGame
 import com.triplerock.tictactoe.utils.getPrettyTime
 import com.triplerock.tictactoe.viewmodels.CreateRoomUiState
 import com.triplerock.tictactoe.viewmodels.CreateRoomViewModel
+import com.triplerock.tictactoe.viewmodels.modeMultiOnline
 import org.koin.androidx.compose.koinViewModel
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -95,7 +96,7 @@ fun CreateRoomContainer(
                 val starting = uiState.value as CreateRoomUiState.Starting
                 val room = starting.room
                 WaitingForPlayers(room = room, status = "Starting game")
-                navController.navigate("$navGame/${room.id}/$PlayerX")
+                navController.navigate("$navGame/$modeMultiOnline/${room.id}/$PlayerX")
             }
         }
     }
@@ -178,7 +179,7 @@ private fun PreviewEmptyRoomLight() {
 @Composable
 private fun WaitingForPlayers(
     room: Room = getRooms().random(),
-    status: String = "Waiting for players"
+    status: String = "Waiting for players",
 ) {
     TicTacToeTheme {
         Column(

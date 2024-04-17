@@ -9,6 +9,7 @@ import com.triplerock.tictactoe.ui.screens.CreditsContainer
 import com.triplerock.tictactoe.ui.screens.game.GameScreenContainer
 import com.triplerock.tictactoe.ui.screens.JoinRoomContainer
 import com.triplerock.tictactoe.ui.screens.MenuContainer
+import com.triplerock.tictactoe.viewmodels.navKeyMode
 import com.triplerock.tictactoe.viewmodels.navKeyPlayer
 import com.triplerock.tictactoe.viewmodels.navKeyRoomId
 
@@ -38,7 +39,7 @@ fun TicAppContainer(
             JoinRoomContainer(navController = navController)
         }
 
-        composable("$navGame/{$navKeyRoomId}/{$navKeyPlayer}") {
+        composable("$navGame/{$navKeyMode}/{$navKeyRoomId}/{$navKeyPlayer}") {
             GameScreenContainer(navController = navController)
         }
 

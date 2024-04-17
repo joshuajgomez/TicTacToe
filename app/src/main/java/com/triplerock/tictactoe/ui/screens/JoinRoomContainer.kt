@@ -57,6 +57,7 @@ import com.triplerock.tictactoe.ui.theme.textJoinGame
 import com.triplerock.tictactoe.utils.getRelativeTime
 import com.triplerock.tictactoe.viewmodels.JoinRoomUiState
 import com.triplerock.tictactoe.viewmodels.JoinRoomViewModel
+import com.triplerock.tictactoe.viewmodels.modeMultiOnline
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -84,7 +85,7 @@ fun JoinRoomContainer(
 
             is JoinRoomUiState.Joined -> {
                 val roomId = (uiState.value as JoinRoomUiState.Joined).roomId
-                navController.navigate("$navGame/$roomId/$PlayerO")
+                navController.navigate("$navGame/$modeMultiOnline/$roomId/$PlayerO")
             }
         }
     }
@@ -295,9 +296,11 @@ fun JoinButton(
         onClick = { onJoinClick() },
         modifier = modifier
             .solidShadow(offset = 3.dp)
-            .border(width = 1.dp,
+            .border(
+                width = 1.dp,
                 color = colorScheme.onBackground,
-                shape = RoundedCornerShape(30.dp))
+                shape = RoundedCornerShape(30.dp)
+            )
             .clip(RoundedCornerShape(30.dp))
             .height(40.dp)
             .background(

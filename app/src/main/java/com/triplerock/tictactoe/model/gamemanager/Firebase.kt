@@ -1,8 +1,7 @@
-package com.triplerock.tictactoe.model
+package com.triplerock.tictactoe.model.gamemanager
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.firestore
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
@@ -16,9 +15,11 @@ private const val keyNextTurn = "nextTurn"
 private const val keyMoves = "moves"
 private const val keyHistory = "history"
 
-private const val keyRoomId = "roomId"
+class Firebase : GameManager {
 
-class Firebase {
+    private val callback: GameManager.Callback? = null
+
+    private lateinit var roomsListener: ListenerRegistration
 
     private val firestore = Firebase.firestore
 
@@ -62,19 +63,21 @@ class Firebase {
         }
     }
 
-    private lateinit var roomsListener: ListenerRegistration
-
     fun findRooms(onRoomsFound: (rooms: List<Room>) -> Unit) {
         val roomRef = firestore.collection(COLLECTION_ROOMS)
             .whereEqualTo(keyPlayer2Name, "")
         roomsListener = roomRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Logger.error(e.message.toString())
+            if (e != null || snapshot == null) {
+                Logger.error(e?.message.toString())
                 return@addSnapshotListener
             }
-            val rooms = getRooms(snapshot!!)
+            val rooms = arrayListOf<Room>()
+            for (document in snapshot) {
+                val room = document.toObject(Room::class.java)
+                rooms.add(room)
+            }
+            Logger.debug("rooms found = ${rooms.size}")
             if (rooms.isNotEmpty()) {
-                Logger.debug("rooms found = ${rooms.size}")
                 onRoomsFound(rooms)
             }
         }
@@ -93,7 +96,25 @@ class Firebase {
             }
     }
 
-    fun updateTurn(room: Room) {
+    override fun listenUpdates(roomId: String, callback: GameManager.Callback) {
+        Logger.debug("roomId = [${roomId}]")
+        val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
+        roomRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Logger.error(e.message.toString())
+                return@addSnapshotListener
+            }
+            if (snapshot == null || snapshot.data == null) {
+                Logger.warn("snapshot is null")
+                return@addSnapshotListener
+            }
+            val roomUpdate = snapshot.toObject(Room::class.java)!!
+            Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
+            callback.onRoomUpdate(roomUpdate)
+        }
+    }
+
+    override fun onMove(room: Room) {
         Logger.debug("room = [${room}]")
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(
@@ -109,44 +130,18 @@ class Firebase {
             }
     }
 
-    fun listenForTurns(roomId: String, onTurnUpdate: (room: Room) -> Unit) {
-        Logger.debug("roomId = [${roomId}]")
-        val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
-        roomRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Logger.error(e.message.toString())
-                return@addSnapshotListener
-            }
-            if (snapshot == null || snapshot.data == null) {
-                Logger.warn("snapshot is null")
-                return@addSnapshotListener
-            }
-            val roomUpdate = snapshot.toObject(Room::class.java)
-            Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
-            onTurnUpdate(roomUpdate!!)
-        }
-    }
-
-    fun clearMoves(playingRoom: Room, onResetComplete: () -> Unit) {
-        Logger.info("playingRoom = [${playingRoom}]")
+    override fun clearMoves(room: Room) {
+        Logger.info("room = [${room}]")
         val emptyMoves: HashMap<String, ArrayList<Int>> = hashMapOf(
             PlayerX to ArrayList(),
             PlayerO to ArrayList(),
         )
-        firestore.collection(COLLECTION_ROOMS).document(playingRoom.id)
+        firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(keyMoves, emptyMoves)
             .addOnSuccessListener { result ->
                 Logger.debug("success")
-                onResetComplete()
+                callback?.onRoomCleared()
             }
     }
 }
 
-private fun getRooms(result: QuerySnapshot): List<Room> {
-    val rooms = ArrayList<Room>()
-    for (document in result) {
-        val room = document.toObject(Room::class.java)
-        rooms.add(room)
-    }
-    return rooms
-}
