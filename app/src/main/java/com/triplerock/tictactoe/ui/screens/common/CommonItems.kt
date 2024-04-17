@@ -65,6 +65,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.triplerock.tictactoe.R
 import com.triplerock.tictactoe.data.sampleNames
 import com.triplerock.tictactoe.data.sampleRoomNames
+import com.triplerock.tictactoe.ui.theme.Red10
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 
 
@@ -99,7 +100,9 @@ fun PreviewCustomTextButtonDark() {
 @Composable
 fun PreviewCustomTextButtonLight() {
     TicBackground {
+        Row(modifier = Modifier.background(Red10)) {
         CustomTextButton(modifier = Modifier.padding(20.dp))
+        }
     }
 }
 
@@ -117,16 +120,16 @@ fun CustomTextButton(
             onClick = onClick,
             modifier = modifier
                 .padding(horizontal = 20.dp)
-                .solidShadow(colorScheme.onBackground)
+                .solidShadow2(offset = 2.dp, color = colorScheme.background)
                 .height(50.dp)
                 .border(2.dp, colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
                 .clip(RoundedCornerShape(30.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.onBackground)
         ) {
             Text(
                 text = text,
                 fontSize = 22.sp,
-                color = colorScheme.onBackground,
+                color = colorScheme.background,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }
@@ -136,13 +139,17 @@ fun CustomTextButton(
 @Composable
 fun Modifier.solidShadow(
     color: Color = colorScheme.onBackground,
+    strokeColor: Color = colorScheme.background,
     offset: Dp = 2.dp,
-    radius: Float = 75f
+    radius: Float = 75f,
 ) = then(
     drawBehind {
         drawIntoCanvas { canvas ->
             val paint = Paint()
             val frameworkPaint = paint.asFrameworkPaint()
+            val paint2 = Paint()
+            val frameworkPaint2 = paint2.asFrameworkPaint()
+            frameworkPaint2.color = strokeColor.toArgb()
 
             frameworkPaint.color = color.toArgb()
 
@@ -150,6 +157,63 @@ fun Modifier.solidShadow(
             val topPixel = offset.toPx()
             val rightPixel = size.width + leftPixel
             val bottomPixel = size.height + topPixel
+
+            canvas.drawRoundRect(
+                left = leftPixel,
+                top = topPixel,
+                right = rightPixel,
+                bottom = bottomPixel,
+                paint = paint,
+                radiusX = radius,
+                radiusY = radius
+            )
+            canvas.drawRoundRect(
+                left = leftPixel - 1,
+                top = topPixel - 1,
+                right = rightPixel + 1,
+                bottom = bottomPixel + 1,
+                paint = paint2,
+                radiusX = radius,
+                radiusY = radius
+            )
+        }
+    }
+)
+
+@Composable
+fun Modifier.solidShadow2(
+    color: Color = colorScheme.background,
+    strokeWidth: Float = 2f,
+    strokeColor: Color = colorScheme.onBackground,
+    offset: Dp = 2.dp,
+    radius: Float = 75f,
+) = then(
+    drawBehind {
+        drawIntoCanvas { canvas ->
+            val paint = Paint()
+            val frameworkPaint = paint.asFrameworkPaint()
+            frameworkPaint.color = color.toArgb()
+
+            val paint2 = Paint()
+            val frameworkPaint2 = paint2.asFrameworkPaint()
+            frameworkPaint2.color = strokeColor.toArgb()
+
+            val leftPixel = (-offset).toPx()
+            val topPixel = offset.toPx()
+            val rightPixel = size.width + leftPixel
+            val bottomPixel = size.height + topPixel
+
+
+
+            canvas.drawRoundRect(
+                left = leftPixel - strokeWidth,
+                top = topPixel - strokeWidth,
+                right = rightPixel + strokeWidth,
+                bottom = bottomPixel + strokeWidth,
+                paint = paint2,
+                radiusX = radius,
+                radiusY = radius
+            )
 
             canvas.drawRoundRect(
                 left = leftPixel,
@@ -363,7 +427,7 @@ fun CustomTextField(
                 color = colorScheme.background,
                 shape = MaterialTheme.shapes.extraLarge,
             )
-            .border(2.dp, color = colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
+            .border(1.dp, color = colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
             .padding(horizontal = 10.dp, vertical = 10.dp)
             .fillMaxWidth(),
         value = text,
@@ -484,7 +548,7 @@ fun Modifier.advancedShadow(
     cornersRadius: Dp = 0.dp,
     shadowBlurRadius: Dp = 1.dp,
     offsetY: Dp = 0.dp,
-    offsetX: Dp = 0.dp
+    offsetX: Dp = 0.dp,
 ) = drawBehind {
 
     val shadowColor = color.copy().toArgb()

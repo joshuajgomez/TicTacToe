@@ -121,7 +121,6 @@ fun RoomName(
             text = name,
             onTextChanged = { name = it },
             modifier = Modifier.padding(horizontal = 50.dp)
-                .solidShadow()
         )
         RoomNameTags(names = sampleRoomNames) {
             name = it
