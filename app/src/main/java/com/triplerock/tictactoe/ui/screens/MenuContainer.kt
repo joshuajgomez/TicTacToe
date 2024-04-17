@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +28,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -58,6 +61,7 @@ import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.NameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
+import com.triplerock.tictactoe.ui.screens.common.solidShadow2
 import com.triplerock.tictactoe.ui.theme.textAppTitle
 import com.triplerock.tictactoe.ui.theme.textCredits
 import com.triplerock.tictactoe.ui.theme.textHostGame
@@ -121,9 +125,13 @@ fun Menu(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        XoMarqueeContainer()
-        Spacer(modifier = Modifier.height(10.dp))
-        TitleLogo()
+        Box(contentAlignment = Alignment.Center) {
+            Column {
+                XoMarqueeContainer()
+                XoMarqueeContainer()
+            }
+            TitleLogo()
+        }
         Spacer(modifier = Modifier.height(10.dp))
 
         NameBox(name)
@@ -164,11 +172,21 @@ fun Menu(
 
 @Composable
 fun TitleLogo() {
-    Text(
-        text = textAppTitle,
-        fontSize = 60.sp,
+    Surface(
+        modifier = Modifier
+            .solidShadow2(offset = 5.dp, radius = 90f)
+            .clip(RoundedCornerShape(30.dp))
+            .background(color = colorScheme.onBackground)
+            .padding(15.dp)
+        ,
         color = colorScheme.onBackground
-    )
+    ) {
+        Text(
+            text = textAppTitle,
+            fontSize = 50.sp,
+            color = colorScheme.background
+        )
+    }
 }
 
 @Composable

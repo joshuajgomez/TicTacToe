@@ -1,17 +1,17 @@
 package com.triplerock.tictactoe.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.RamenDining
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
@@ -37,6 +38,7 @@ import com.triplerock.tictactoe.ui.screens.common.CustomTextField
 import com.triplerock.tictactoe.ui.screens.common.RoomNameTags
 import com.triplerock.tictactoe.ui.screens.common.TicSurface
 import com.triplerock.tictactoe.ui.screens.common.TitleBar
+import com.triplerock.tictactoe.ui.screens.common.XoMarqueeContainer
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
 import com.triplerock.tictactoe.ui.theme.TicTacToeTheme
 import com.triplerock.tictactoe.ui.theme.textHostGame
@@ -105,28 +107,52 @@ fun RoomName(
     defaultName: String = sampleRoomNames.random(),
     onCreateRoomClick: (roomName: String) -> Unit = {},
 ) {
-    Column(
+    ConstraintLayout(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .fillMaxSize()
+            .padding(horizontal = 10.dp),
     ) {
+        val (message, textInput, tags, button) = createRefs()
         var name by remember { mutableStateOf(defaultName) }
         Text(
             text = "Choose a name for the room",
-            color = colorScheme.onBackground
+            color = colorScheme.onBackground,
+            modifier = Modifier.constrainAs(message) {
+                top.linkTo(parent.top, 40.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
         )
         CustomTextField(
             text = name,
             onTextChanged = { name = it },
-            modifier = Modifier.padding(horizontal = 50.dp)
+            modifier = Modifier
+                .solidShadow()
+                .constrainAs(textInput) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(message.bottom, 10.dp)
+                }
         )
-        RoomNameTags(names = sampleRoomNames) {
+        RoomNameTags(
+            names = sampleRoomNames,
+            modifier = Modifier.constrainAs(tags) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(textInput.bottom, 30.dp)
+            }
+        ) {
             name = it
         }
         CustomTextButton(
             text = textHostGame,
+            modifier = Modifier
+                .constrainAs(button) {
+                    end.linkTo(parent.end)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom, 20.dp)
+                }
+                .fillMaxWidth()
         ) {
             onCreateRoomClick(name)
         }
@@ -162,33 +188,45 @@ private fun WaitingForPlayers(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = room.name,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.primary
-            )
-            Text(
-                text = room.id,
-                color = colorScheme.primary.copy(alpha = 0.8f)
-            )
-            Text(
-                text = "created at ${getPrettyTime(room.timeCreated)}",
-                color = colorScheme.secondary.copy(alpha = 0.8f)
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Column {
+                    XoMarqueeContainer()
+                    XoMarqueeContainer()
+                }
+                RoomInfo(room)
+            }
             Spacer(modifier = Modifier.height(30.dp))
-            Icon(
-                imageVector = Icons.Outlined.RamenDining,
-                contentDescription = null,
-                modifier = Modifier.size(200.dp),
-                tint = colorScheme.onBackground.copy(alpha = 0.8f)
-            )
             Text(
                 text = status,
                 fontSize = 30.sp,
-                color = colorScheme.secondary
             )
         }
+    }
+}
+
+@Composable
+fun RoomInfo(room: Room) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .solidShadow(offset = 5.dp, radius = 90f)
+            .height(150.dp)
+            .clip(RoundedCornerShape(30.dp))
+            .background(colorScheme.background)
+            .border(1.dp, colorScheme.onBackground, RoundedCornerShape(30.dp))
+            .padding(20.dp)
+    ) {
+        Text(
+            text = room.name,
+            fontSize = 30.sp,
+        )
+        Text(
+            text = room.id,
+        )
+        Text(
+            text = "created at ${getPrettyTime(room.timeCreated)}",
+        )
     }
 }
 

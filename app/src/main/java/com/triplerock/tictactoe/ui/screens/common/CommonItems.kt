@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -88,7 +93,7 @@ fun CustomButton(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewCustomTextButtonDark() {
     TicBackground {
@@ -96,12 +101,12 @@ fun PreviewCustomTextButtonDark() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewCustomTextButtonLight() {
     TicBackground {
         Row(modifier = Modifier.background(Red10)) {
-        CustomTextButton(modifier = Modifier.padding(20.dp))
+            CustomTextButton(modifier = Modifier.padding(20.dp))
         }
     }
 }
@@ -112,34 +117,27 @@ fun CustomTextButton(
     text: String = "Click me",
     onClick: () -> Unit = {},
 ) {
-    Box(
-        modifier = Modifier
-
+    TextButton(
+        onClick = onClick,
+        modifier = modifier
+            .solidShadow2(offset = 2.dp, color = colorScheme.background)
+            .height(50.dp)
+            .border(2.dp, colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
+            .clip(RoundedCornerShape(30.dp))
+            .background(colorScheme.onBackground)
     ) {
-        TextButton(
-            onClick = onClick,
-            modifier = modifier
-                .padding(horizontal = 20.dp)
-                .solidShadow2(offset = 2.dp, color = colorScheme.background)
-                .height(50.dp)
-                .border(2.dp, colorScheme.onBackground, shape = RoundedCornerShape(30.dp))
-                .clip(RoundedCornerShape(30.dp))
-                .background(colorScheme.onBackground)
-        ) {
-            Text(
-                text = text,
-                fontSize = 22.sp,
-                color = colorScheme.background,
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
-        }
+        Text(
+            text = text,
+            fontSize = 22.sp,
+            color = colorScheme.background,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
     }
 }
 
 @Composable
 fun Modifier.solidShadow(
     color: Color = colorScheme.onBackground,
-    strokeColor: Color = colorScheme.background,
     offset: Dp = 2.dp,
     radius: Float = 75f,
 ) = then(
@@ -147,9 +145,6 @@ fun Modifier.solidShadow(
         drawIntoCanvas { canvas ->
             val paint = Paint()
             val frameworkPaint = paint.asFrameworkPaint()
-            val paint2 = Paint()
-            val frameworkPaint2 = paint2.asFrameworkPaint()
-            frameworkPaint2.color = strokeColor.toArgb()
 
             frameworkPaint.color = color.toArgb()
 
@@ -164,15 +159,6 @@ fun Modifier.solidShadow(
                 right = rightPixel,
                 bottom = bottomPixel,
                 paint = paint,
-                radiusX = radius,
-                radiusY = radius
-            )
-            canvas.drawRoundRect(
-                left = leftPixel - 1,
-                top = topPixel - 1,
-                right = rightPixel + 1,
-                bottom = bottomPixel + 1,
-                paint = paint2,
                 radiusX = radius,
                 radiusY = radius
             )
@@ -228,7 +214,7 @@ fun Modifier.solidShadow2(
     }
 )
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewLoadingDark() {
     TicBackground {
@@ -236,7 +222,7 @@ fun PreviewLoadingDark() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewLoadingLight() {
     TicBackground {
@@ -261,7 +247,7 @@ fun Loading(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewTitleBarDark() {
     TicSurface {
@@ -269,7 +255,7 @@ fun PreviewTitleBarDark() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewTitleBarLight() {
     TicSurface {
@@ -310,7 +296,7 @@ fun TitleBar(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewNameTagsDark(onNameSelect: (name: String) -> Unit = {}) {
     TicSurface {
@@ -320,21 +306,13 @@ fun PreviewNameTagsDark(onNameSelect: (name: String) -> Unit = {}) {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewNameTagsLight(onNameSelect: (name: String) -> Unit = {}) {
     TicSurface {
         Box(modifier = Modifier.padding(20.dp)) {
             NameTags()
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewRoomNameTags(onNameSelect: (name: String) -> Unit = {}) {
-    TicSurface {
-        RoomNameTags()
     }
 }
 
@@ -359,40 +337,27 @@ fun NameTags(
     }
 }
 
+@Preview
 @Composable
-fun RoomNameTags(
-    names: List<String> = sampleRoomNames,
-    onNameSelect: (name: String) -> Unit = {},
-) {
-    LazyColumn {
-        items(items = names) {
-            NameTag(name = it) {
-                onNameSelect(it)
-            }
-        }
-    }
-}
-
-@Composable
-private fun NameTag(name: String, onClick: () -> Unit) {
+private fun NameTag(name: String = sampleNames.random(), onClick: () -> Unit = {}) {
     SuggestionChip(
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         colors = SuggestionChipDefaults.suggestionChipColors(
-            containerColor = colorScheme.onBackground,
-            labelColor = colorScheme.background,
+            containerColor = colorScheme.background,
+            labelColor = colorScheme.onBackground,
         ),
         label = {
             Text(
                 text = name,
                 fontSize = 20.sp,
             )
-        }
+        },
     )
 }
 
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewCustomTextFieldDark() {
     TicTacToeTheme {
@@ -405,7 +370,7 @@ fun PreviewCustomTextFieldDark() {
     }
 }
 
-@Preview()
+//@Preview()
 @Composable
 fun PreviewCustomTextFieldLight() {
     TicTacToeTheme {
@@ -489,7 +454,7 @@ fun rainbowBrush(): Brush {
     )
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+//@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewAppLogoContainerDark() {
     TicSurface {
@@ -497,7 +462,7 @@ fun PreviewAppLogoContainerDark() {
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun PreviewAppLogoContainerLight() {
     TicSurface {
@@ -541,37 +506,33 @@ fun XoIcon(icon: ImageVector = Icons.Default.Close) {
     )
 }
 
-
-fun Modifier.advancedShadow(
-    color: Color = Color.Red,
-    alpha: Float = 1f,
-    cornersRadius: Dp = 0.dp,
-    shadowBlurRadius: Dp = 1.dp,
-    offsetY: Dp = 0.dp,
-    offsetX: Dp = 0.dp,
-) = drawBehind {
-
-    val shadowColor = color.copy().toArgb()
-    val transparentColor = color.copy(alpha = 0f).toArgb()
-
-    drawIntoCanvas {
-        val paint = Paint()
-        val frameworkPaint = paint.asFrameworkPaint()
-        frameworkPaint.color = transparentColor
-        frameworkPaint.setShadowLayer(
-            shadowBlurRadius.toPx(),
-            offsetX.toPx(),
-            offsetY.toPx(),
-            shadowColor
-        )
-        it.drawRoundRect(
-            0f,
-            0f,
-            this.size.width,
-            this.size.height,
-            cornersRadius.toPx(),
-            cornersRadius.toPx(),
-            paint
-        )
+@Preview
+@Composable
+private fun PreviewRoomTags() {
+    TicSurface {
+        RoomNameTags()
     }
+}
+
+@Composable
+fun RoomNameTags(
+    modifier: Modifier = Modifier,
+    names: List<String> = sampleRoomNames,
+    onNameSelect: (name: String) -> Unit = {},
+) {
+    LazyHorizontalStaggeredGrid(
+        rows = StaggeredGridCells.Adaptive(35.dp),
+        horizontalItemSpacing = 5.dp,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        content = {
+            items(items = names) {
+                NameTag(name = it) {
+                    onNameSelect(it)
+                }
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(160.dp)
+    )
 }
