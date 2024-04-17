@@ -7,13 +7,18 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,6 +40,7 @@ import com.triplerock.tictactoe.ui.screens.common.CustomButton
 import com.triplerock.tictactoe.ui.screens.common.Loading
 import com.triplerock.tictactoe.ui.screens.common.TicBackground
 import com.triplerock.tictactoe.ui.screens.common.solidShadow
+import com.triplerock.tictactoe.ui.screens.common.solidShadow2
 import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.GameUiState
@@ -125,7 +131,7 @@ fun GameScreenForPreview() {
         Column(
             Modifier.fillMaxSize(),
         ) {
-            GameScreen(isPlayable = true, isShowRestartButton = false)
+            GameScreen(isPlayable = true, isShowRestartButton = true)
         }
     }
 }
@@ -227,8 +233,7 @@ private fun GameScreen(
         AnimatedVisibility(
             visible = isShowRestartButton,
             modifier = Modifier.constrainAs(restart) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
+                end.linkTo(parent.end, 20.dp)
                 bottom.linkTo(parent.bottom, 20.dp)
             }) {
             RestartButton { onRestartButtonClick() }
@@ -238,24 +243,20 @@ private fun GameScreen(
 
 @Composable
 fun RestartButton(onRestartClick: () -> Unit = {}) {
-    TextButton(
-        onClick = { onRestartClick() },
+    IconButton(
+        onClick = onRestartClick,
         modifier = Modifier
-            .solidShadow()
-            .clip(RoundedCornerShape(30.dp))
-            .background(colorScheme.background)
-            .border(2.dp, colorScheme.onBackground, RoundedCornerShape(30.dp))
-            .padding(horizontal = 10.dp)
+            .solidShadow2(radius = 200f, offset = 5.dp)
+            .background(
+                colorScheme.onBackground, CircleShape
+            )
+            .size(80.dp),
     ) {
         Icon(
-            imageVector = Icons.Default.Autorenew,
+            imageVector = Icons.Default.RestartAlt,
             contentDescription = null,
-            tint = colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.width(5.dp))
-        Text(
-            text = "New Game", fontSize = 25.sp,
-            color = colorScheme.onBackground
+            tint = colorScheme.background,
+            modifier = Modifier.size(60.dp)
         )
     }
 }
