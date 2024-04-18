@@ -55,7 +55,7 @@ class SinglePlayerGameTest {
     }
 
     @Test
-    fun `onMove PlayerO empty, PlayerX empty`() {
+    fun `onMove O empty, X empty`() {
         printMoves()
 
         // method call
@@ -67,7 +67,7 @@ class SinglePlayerGameTest {
     }
 
     @Test
-    fun `onMove PlayerO empty, PlayerX notEmpty`() {
+    fun `onMove O empty, X notEmpty`() {
         // all cells filled except 4
         room.moves[PlayerX] = arrayListOf(0, 1, 2, 3, 5, 6, 7, 8)
         printMoves()
@@ -81,7 +81,7 @@ class SinglePlayerGameTest {
     }
 
     @Test
-    fun `onMove PlayerO notEmpty, PlayerX empty`() {
+    fun `onMove O nearWin notEmpty, X empty`() {
         room.moves[PlayerO] = arrayListOf(0, 4)
         printMoves()
 
@@ -94,7 +94,7 @@ class SinglePlayerGameTest {
     }
 
     @Test
-    fun `onMove PlayerO notEmpty, PlayerX notEmpty`() {
+    fun `onMove O notNearWin, X notEmpty`() {
         room.moves[PlayerO] = arrayListOf(0, 4, 8)
         room.moves[PlayerX] = arrayListOf(1, 2)
         printMoves()
@@ -108,7 +108,7 @@ class SinglePlayerGameTest {
     }
 
     @Test
-    fun `onMove PlayerO notEmpty, PlayerX notEmpty2`() {
+    fun `onMove O nearWin`() {
         room.moves[PlayerO] = arrayListOf(1, 2)
         room.moves[PlayerX] = arrayListOf(3, 8, 7, 4)
         printMoves()
@@ -119,5 +119,19 @@ class SinglePlayerGameTest {
         // verify O's winning move 8
         verify { callback.onRoomUpdate(room) }
         assert(room.moves[PlayerO]!!.contains(0))
+    }
+
+    @Test
+    fun `onMove X nearWin`() {
+        room.moves[PlayerO] = arrayListOf(2, 7)
+        room.moves[PlayerX] = arrayListOf(4, 0, 1)
+        printMoves()
+
+        // method call
+        game.onMove(room)
+
+        // verify O's winning move 8
+        verify { callback.onRoomUpdate(room) }
+        assert(room.moves[PlayerO]!!.contains(8))
     }
 }
