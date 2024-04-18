@@ -1,6 +1,8 @@
 package com.triplerock.tictactoe.model.gamemanager
 
+import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.screens.game.crossingList
 import com.triplerock.tictactoe.viewmodels.GameViewModel
 
 class SinglePlayerGame : GameManager {
@@ -12,7 +14,15 @@ class SinglePlayerGame : GameManager {
     }
 
     override fun onMove(room: Room) {
-        TODO("Not yet implemented")
+        val moves = room.moves[PlayerO]!!
+        crossingList.forEach { crossing ->
+            var matchingCount = 0
+            crossing.positions.forEach {
+                if (moves.contains(it)) matchingCount++
+            }
+        }
+        moves.add(0)
+        callback.onRoomUpdate(room)
     }
 
     override fun clearMoves(room: Room) {
