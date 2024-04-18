@@ -96,7 +96,7 @@ fun CreateRoomContainer(
                 val starting = uiState.value as CreateRoomUiState.Starting
                 val room = starting.room
                 WaitingForPlayers(room = room, status = "Starting game")
-                navController.navigate("$navGame/$modeMultiOnline/${room.id}/$PlayerX")
+                navController.navigate("$navGame/$modeMultiOnline/$PlayerX/${room.id}")
             }
         }
     }

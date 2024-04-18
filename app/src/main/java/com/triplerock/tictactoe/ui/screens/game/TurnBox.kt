@@ -31,7 +31,12 @@ import com.triplerock.tictactoe.ui.screens.getRooms
 @Composable
 fun PreviewTurnBox() {
     TicSurface {
-        TurnBox()
+        Column {
+            TurnBox()
+            TurnBox(
+                room = getRooms().random().copy(nextTurn = PlayerO),
+            )
+        }
     }
 }
 
@@ -39,31 +44,44 @@ fun PreviewTurnBox() {
 @Composable
 fun PreviewTurnBoxDark() {
     TicSurface {
-        TurnBox(currentPlayer = PlayerO)
+        Column {
+            TurnBox(currentPlayer = PlayerO)
+            TurnBox(
+                currentPlayer = PlayerO,
+                room = getRooms().random().copy(nextTurn = PlayerO),
+            )
+        }
     }
 }
 
 @Composable
 fun TurnBox(
     modifier: Modifier = Modifier,
-    room: Room = getRooms().random(),
+    room: Room = getRooms().random().copy(nextTurn = PlayerX),
     currentPlayer: String = PlayerX,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+        val isTurn = room.nextTurn == PlayerX
         TurnItem(
             mark = Mark(
                 icon = { IconX(iconSize = 30.dp, stroke = 10f) },
             ),
             playerName = room.player1Name,
-            isTurn = room.nextTurn == PlayerX,
+            isTurn = isTurn,
             isCurrentPlayer = currentPlayer == PlayerX
         )
         TurnItem(
             mark = Mark(
-                icon = { IconO(iconSize = 30.dp, stroke = 10f) },
+                icon = {
+                    IconO(
+                        iconSize = 30.dp, stroke = 10f,
+                        color = if (isTurn) colorScheme.onBackground
+                        else colorScheme.background
+                    )
+                },
             ),
             playerName = room.player2Name,
             isTurn = room.nextTurn == PlayerO,
@@ -98,7 +116,10 @@ fun TurnItem(
                     RoundedCornerShape(30.dp)
                 )
                 .clip(RoundedCornerShape(30.dp))
-                .background(if (isTurn) colorScheme.onBackground else colorScheme.background)
+                .background(
+                    if (isTurn) colorScheme.onBackground
+                    else colorScheme.background
+                )
                 .padding(horizontal = 20.dp, vertical = 10.dp)
                 .width(120.dp)
         ) {
@@ -106,7 +127,8 @@ fun TurnItem(
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = playerName, fontSize = 25.sp,
-                color = if (isTurn) colorScheme.onPrimary else colorScheme.onBackground,
+                color = if (isTurn) colorScheme.onPrimary
+                else colorScheme.onBackground,
             )
         }
     }

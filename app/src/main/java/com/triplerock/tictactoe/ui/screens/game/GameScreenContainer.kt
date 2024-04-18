@@ -71,7 +71,6 @@ fun GameScreenContainer(
                 GameScreen(
                     room = nextTurn.room,
                     onCellClicked = { gameViewModel.onCellClick(it) },
-                    statusText = nextTurn.room.status,
                     isPlayable = nextTurn.room.nextTurn == gameViewModel.player,
                     currentPlayer = gameViewModel.player,
                     onCloseClicked = {
@@ -84,7 +83,6 @@ fun GameScreenContainer(
                 val winner = gameUiState.value as GameUiState.Winner
                 GameScreen(
                     room = winner.room,
-                    statusText = winner.room.status,
                     crossing = winner.crossing,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
@@ -99,7 +97,6 @@ fun GameScreenContainer(
                 val gameOver = gameUiState.value as GameUiState.Draw
                 GameScreen(
                     room = gameOver.room,
-                    statusText = gameOver.room.status,
                     isShowRestartButton = gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     currentPlayer = gameViewModel.player,
@@ -163,7 +160,6 @@ private fun GameScreen(
     room: Room = getRooms().random(),
     isPlayable: Boolean = true,
     crossing: Crossing? = null,
-    statusText: String = statusTurnPlayer1,
     isShowRestartButton: Boolean = false,
     currentPlayer: String = PlayerX,
     onRestartButtonClick: () -> Unit = {},
@@ -179,7 +175,7 @@ private fun GameScreen(
             onCloseClicked()
         }
         StatusBox(
-            message = statusText,
+            message = room.status,
             modifier = Modifier.constrainAs(title) {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)

@@ -1,15 +1,16 @@
 package com.triplerock.tictactoe.model.gamemanager
 
-import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.viewmodels.GameUiState
 
 interface GameManager {
-    fun listenUpdates(roomId: String, callback: GameManager.Callback)
-    fun onMove(room: Room)
-    fun clearMoves(room: Room)
+
+    fun setPlayer(player: String)
+    fun listenUpdates(roomId: String, callback: Callback)
+    fun onMove(cell: Int)
+    fun clearMoves()
 
     interface Callback {
-        fun onRoomUpdate(room: Room)
-        fun onRoomCleared()
+        fun onGameUiStateChange(uiState: GameUiState)
     }
 }
 

@@ -63,6 +63,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.ui.navHostGame
 import com.triplerock.tictactoe.ui.navCredits
 import com.triplerock.tictactoe.ui.navGame
@@ -185,7 +186,7 @@ fun MenuBox(
                 MenuItem(
                     text = "Single Player",
                     icon = Icons.Rounded.Person,
-                    onClick = { onMenuClick("$navGame/$modeSingle/na/na") }
+                    onClick = { onMenuClick("$navGame/$modeSingle/$PlayerX/..") }
                 )
                 MenuItem(
                     text = "Multiplayer",
@@ -212,7 +213,7 @@ fun MenuBox(
                 MenuItem(
                     text = "Local",
                     icon = Icons.Rounded.House,
-                    onClick = { onMenuClick("$navGame/$modeMultiLocal/na/na") }
+                    onClick = { onMenuClick("$navGame/$modeMultiLocal/$PlayerX/..") }
                 )
                 MenuItem(
                     text = "Go Back",

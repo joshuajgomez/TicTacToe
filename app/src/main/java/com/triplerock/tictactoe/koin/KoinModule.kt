@@ -3,6 +3,7 @@ package com.triplerock.tictactoe.koin
 import androidx.lifecycle.SavedStateHandle
 import com.triplerock.tictactoe.model.RoomRepository
 import com.triplerock.tictactoe.model.gamemanager.Firebase
+import com.triplerock.tictactoe.model.gamemanager.GameEngine
 import com.triplerock.tictactoe.model.gamemanager.LocalMultiPlayerGame
 import com.triplerock.tictactoe.model.gamemanager.OnlineGame
 import com.triplerock.tictactoe.model.gamemanager.SinglePlayerGame
@@ -19,16 +20,19 @@ val koinModule = module {
         Firebase()
     }
     single {
-        SinglePlayerGame()
+        SharedPrefUtil(get())
+    }
+    single {
+        GameEngine()
+    }
+    single {
+        SinglePlayerGame(get(), get())
     }
     single {
         LocalMultiPlayerGame()
     }
     single {
-        OnlineGame(get<Firebase>())
-    }
-    single {
-        SharedPrefUtil(get())
+        OnlineGame(get(), get())
     }
     single {
         RoomRepository(get(), get())

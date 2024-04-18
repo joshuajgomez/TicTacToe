@@ -85,7 +85,7 @@ fun JoinRoomContainer(
 
             is JoinRoomUiState.Joined -> {
                 val roomId = (uiState.value as JoinRoomUiState.Joined).roomId
-                navController.navigate("$navGame/$modeMultiOnline/$roomId/$PlayerO")
+                navController.navigate("$navGame/$modeMultiOnline/$PlayerO/$roomId")
             }
         }
     }

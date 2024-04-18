@@ -1,19 +1,44 @@
 package com.triplerock.tictactoe.model.gamemanager
 
+import android.os.Handler
+import android.os.Looper
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.data.emptyMoves
+import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.screens.game.Crossing
-import com.triplerock.tictactoe.ui.screens.game.crossingList
+import com.triplerock.tictactoe.utils.SharedPrefUtil
 
 const val invalid = -1
 
-class SinglePlayerGame : GameManager {
+class SinglePlayerGame(
+    private val gameEngine: GameEngine,
+    private val sharedPrefUtil: SharedPrefUtil,
+) : GameManager {
 
     private lateinit var callback: GameManager.Callback
 
+    private lateinit var room: Room
+    private lateinit var player: String
+
+    override fun setPlayer(player: String) {
+        this.player = player
+    }
+
     override fun listenUpdates(roomId: String, callback: GameManager.Callback) {
         this.callback = callback
+
+        room = Room(
+            name = sampleRoomNames.random(),
+            player1Name = sharedPrefUtil.getName(),
+            player2Name = "bot",
+            nextTurn = PlayerX,
+        )
+
+        callback.onGameUiStateChange(
+            gameEngine.nextState(room)
+        )
     }
 
     data class CrossMatch(
@@ -25,65 +50,36 @@ class SinglePlayerGame : GameManager {
         }
     }
 
-    override fun onMove(room: Room) {
-        val xMoves = room.moves[PlayerX]!!
-        val oMoves = room.moves[PlayerO]!!
-        val availableMoves = availableMoves(xMoves, oMoves)
+    override fun onMove(cell: Int) {
+        room.moves[PlayerX]?.add(cell)
 
-        val nextMove: Int = if (oMoves.isEmpty()) {
-            availableMoves.random()
-        } else {
-            nextMove(xMoves, oMoves, availableMoves)
-        }
+        callback.onGameUiStateChange(
+            gameEngine.nextState(room)
+        )
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            makeNextMove()
+        }, 1000)
+    }
+
+    private fun makeNextMove() {
+        val nextMove = gameEngine.nextMove(room)
         println("nextMove = $nextMove")
-        oMoves.add(nextMove)
-        callback.onRoomUpdate(room)
-    }
-
-    private fun nextMove(
-        xMoves: List<Int>,
-        oMoves: List<Int>,
-        availableMoves: List<Int>,
-    ): Int {
-        // check if X is about to win
-        var move = winningMove(xMoves, availableMoves)
-        if (move == invalid) move = winningMove(oMoves, availableMoves)
-        return if (move == invalid) availableMoves.random() else move
-    }
-
-    private fun winningMove(xMoves: List<Int>, availableMoves: List<Int>): Int {
-        val crossMatches = arrayListOf<CrossMatch>()
-        crossingList.forEach { crossing ->
-            var matches = 0
-            crossing.positions.forEach {
-                if (xMoves.contains(it)) matches++
-            }
-            if (matches == 2)
-                crossMatches.add(CrossMatch(crossing, matches))
-        }
-        crossMatches.sortByDescending { crossMatch ->
-            crossMatch.matches
-        }
-        crossMatches.forEach { crossMatch ->
-            availableMoves.forEach { move ->
-                if (crossMatch.crossing.positions.contains(move)) {
-                    return move
-                }
-            }
-        }
-        return invalid
-    }
-
-    private fun availableMoves(xMoves: List<Int>, oMoves: List<Int>): List<Int> {
-        val exclude = arrayListOf<Int>()
-        exclude.addAll(xMoves)
-        exclude.addAll(oMoves)
-        return (0..8).filter {
-            !exclude.contains(it)
+        if (nextMove != invalid) {
+            room.moves[PlayerO]?.add(nextMove)
+            callback.onGameUiStateChange(
+                gameEngine.nextState(room)
+            )
         }
     }
 
-    override fun clearMoves(room: Room) {
-        TODO("Not yet implemented")
+
+    override fun clearMoves() {
+        room.moves[PlayerX]?.clear()
+        room.moves[PlayerO]?.clear()
+        callback.onGameUiStateChange(
+            gameEngine.nextState(room)
+        )
     }
+
 }

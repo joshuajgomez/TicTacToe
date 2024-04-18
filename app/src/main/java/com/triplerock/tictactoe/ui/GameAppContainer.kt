@@ -39,7 +39,7 @@ fun TicAppContainer(
             JoinRoomContainer(navController = navController)
         }
 
-        composable("$navGame/{$navKeyMode}/{$navKeyRoomId}/{$navKeyPlayer}") {
+        composable("$navGame/{$navKeyMode}/{$navKeyPlayer}/{$navKeyRoomId}") {
             GameScreenContainer(navController = navController)
         }
 

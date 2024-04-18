@@ -3,9 +3,8 @@ package com.triplerock.tictactoe.model.gamemanager
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
-import com.triplerock.tictactoe.data.PlayerO
-import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.data.emptyMoves
 import com.triplerock.tictactoe.utils.Logger
 
 private const val COLLECTION_ROOMS = "rooms"
@@ -15,7 +14,7 @@ private const val keyNextTurn = "nextTurn"
 private const val keyMoves = "moves"
 private const val keyHistory = "history"
 
-class Firebase : GameManager {
+class Firebase {
 
     private val callback: GameManager.Callback? = null
 
@@ -96,7 +95,7 @@ class Firebase : GameManager {
             }
     }
 
-    override fun listenUpdates(roomId: String, callback: GameManager.Callback) {
+    fun listenUpdates(roomId: String, onRoomUpdate: (room: Room) -> Unit) {
         Logger.debug("roomId = [${roomId}]")
         val roomRef = firestore.collection(COLLECTION_ROOMS).document(roomId)
         roomRef.addSnapshotListener { snapshot, e ->
@@ -110,11 +109,11 @@ class Firebase : GameManager {
             }
             val roomUpdate = snapshot.toObject(Room::class.java)!!
             Logger.debug("snapshot:onTurnUpdate: $roomUpdate")
-            callback.onRoomUpdate(roomUpdate)
+            onRoomUpdate(roomUpdate)
         }
     }
 
-    override fun onMove(room: Room) {
+    fun onMove(room: Room) {
         Logger.debug("room = [${room}]")
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(
@@ -130,17 +129,12 @@ class Firebase : GameManager {
             }
     }
 
-    override fun clearMoves(room: Room) {
+    fun clearMoves(room: Room) {
         Logger.info("room = [${room}]")
-        val emptyMoves: HashMap<String, ArrayList<Int>> = hashMapOf(
-            PlayerX to ArrayList(),
-            PlayerO to ArrayList(),
-        )
         firestore.collection(COLLECTION_ROOMS).document(room.id)
             .update(keyMoves, emptyMoves)
             .addOnSuccessListener { result ->
                 Logger.debug("success")
-                callback?.onRoomCleared()
             }
     }
 }
