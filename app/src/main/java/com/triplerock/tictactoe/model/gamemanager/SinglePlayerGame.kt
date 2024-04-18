@@ -1,9 +1,10 @@
 package com.triplerock.tictactoe.model.gamemanager
 
 import com.triplerock.tictactoe.data.PlayerO
+import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.ui.screens.game.Crossing
 import com.triplerock.tictactoe.ui.screens.game.crossingList
-import com.triplerock.tictactoe.viewmodels.GameViewModel
 
 class SinglePlayerGame : GameManager {
 
@@ -13,16 +14,62 @@ class SinglePlayerGame : GameManager {
         this.callback = callback
     }
 
+    data class CrossMatch(
+        val crossing: Crossing,
+        val matches: Int
+    ) {
+        override fun toString(): String {
+            return "CrossMatch(crossing=${crossing.positions}, matches=$matches)"
+        }
+    }
+
     override fun onMove(room: Room) {
-        val moves = room.moves[PlayerO]!!
+        val oMoves = room.moves[PlayerO]!!
+        val xMoves = room.moves[PlayerX]!!
+        val availableMoves = availableMoves(oMoves, xMoves)
+
+        val nextMove: Int = if (oMoves.isEmpty()) {
+            availableMoves.random()
+        } else {
+            nextMove(oMoves, availableMoves)
+        }
+        println("nextMove = $nextMove")
+        oMoves.add(nextMove)
+        callback.onRoomUpdate(room)
+    }
+
+    private fun nextMove(
+        moves: List<Int>,
+        availableMoves: List<Int>
+    ): Int {
+        val crossMatches = arrayListOf<CrossMatch>()
         crossingList.forEach { crossing ->
-            var matchingCount = 0
+            var matches = 0
             crossing.positions.forEach {
-                if (moves.contains(it)) matchingCount++
+                if (moves.contains(it)) matches++
+            }
+            crossMatches.add(CrossMatch(crossing, matches))
+        }
+        crossMatches.sortByDescending { crossMatch ->
+            crossMatch.matches
+        }
+        crossMatches.forEach { crossMatch ->
+            availableMoves.forEach { move ->
+                if (crossMatch.crossing.positions.contains(move)) {
+                    return move
+                }
             }
         }
-        moves.add(0)
-        callback.onRoomUpdate(room)
+        return availableMoves.first()
+    }
+
+    private fun availableMoves(xMoves: List<Int>, oMoves: List<Int>): List<Int> {
+        val exclude = arrayListOf<Int>()
+        exclude.addAll(xMoves)
+        exclude.addAll(oMoves)
+        return (0..8).filter {
+            !exclude.contains(it)
+        }
     }
 
     override fun clearMoves(room: Room) {
