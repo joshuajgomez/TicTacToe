@@ -164,7 +164,7 @@ private fun GameScreen(
     isPlayable: Boolean = true,
     crossing: Crossing? = null,
     statusText: String = statusTurnPlayer1,
-    isShowRestartButton: Boolean = true,
+    isShowRestartButton: Boolean = false,
     currentPlayer: String = PlayerX,
     onRestartButtonClick: () -> Unit = {},
     onCellClicked: (cell: Int) -> Unit = {},

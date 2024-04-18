@@ -34,7 +34,7 @@ import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.ui.theme.Red10
 
 data class Mark(
-    val icon: @Composable () -> Unit = { IconX() },
+    val icon: @Composable () -> Unit = {},
     val isEmpty: Boolean = false,
 )
 
@@ -181,7 +181,7 @@ fun CrossingLine(
 @Composable
 fun Cell(mark: Mark = Mark().copy(icon = { IconX() }), onCellClick: () -> Unit = {}) {
     AnimatedVisibility(
-        visible = !mark.isEmpty,
+        visible = true,
         modifier = Modifier
             .size(gameBoxSize / 3)
             .padding(all = 10.dp)

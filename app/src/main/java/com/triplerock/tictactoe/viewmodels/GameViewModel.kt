@@ -48,7 +48,6 @@ class GameViewModel(
 ) : ViewModel(), GameManager.Callback {
 
     private val mode: String = checkNotNull(savedStateHandle[navKeyMode])
-    private var roomId: String = ""
     var player: String = ""
 
     private lateinit var gameManager: GameManager
@@ -59,6 +58,7 @@ class GameViewModel(
     val uiState: StateFlow<GameUiState> = _uiState
 
     init {
+        var roomId = ""
         when (mode) {
             modeMultiOnline -> {
                 gameManager = get(OnlineGame::class.java)
