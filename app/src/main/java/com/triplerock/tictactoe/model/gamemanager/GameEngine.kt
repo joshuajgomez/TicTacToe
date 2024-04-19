@@ -64,43 +64,50 @@ class GameEngine {
         }
     }
 
-    fun nextState(room: Room): GameUiState {
+    fun nextState(
+        room: Room,
+        shouldChangeTurn: Boolean = true,
+        onRoomUpdate: (room: Room) -> Unit = {}
+    ): GameUiState {
         Logger.debug("nextTurn = $room")
+        var uiState: GameUiState
+        val crossingX = isWon(room.moves[PlayerX]!!)
+        val crossingO = isWon(room.moves[PlayerO]!!)
         if (isDraw(room)) {
             // game draw
             room.history.draws++
             room.status = "Draw :|"
-            return GameUiState.Draw(room)
-        }
-        var crossing = isWon(room.moves[PlayerX]!!)
-        if (crossing != null) {
+            uiState = GameUiState.Draw(room)
+        } else if (crossingX != null) {
             // game won by playerX
             room.history.xWins++
-            room.status = "$PlayerX wins!!"
-            return GameUiState.Winner(
+            room.status = "$PlayerX won"
+            uiState = GameUiState.Winner(
                 room = room,
-                crossing = crossing
+                crossing = crossingX
             )
-        }
-        crossing = isWon(room.moves[PlayerO]!!)
-        if (crossing != null) {
+        } else if (crossingO != null) {
             // game won by playerO
             room.history.oWins++
-            room.status = "$PlayerO wins!!"
-            return GameUiState.Winner(
+            room.status = "$PlayerO won"
+            uiState = GameUiState.Winner(
                 room = room,
-                crossing = crossing
+                crossing = crossingO
             )
-        }
-        if (!room.isEmptyMoves()) {
-            // change turn
-            room.changeTurn()
         } else {
-            room.nextTurn = PlayerX
+            // change turn
+            if (!room.isEmptyMoves()) {
+                if (shouldChangeTurn) room.changeTurn()
+            } else {
+                // game reset. reset turn
+                room.nextTurn = PlayerX
+            }
+            room.status = "Turn: ${room.nextTurn}"
+            Logger.info("turn changed = $room")
+            uiState = GameUiState.NextTurn(room)
         }
-        room.status = "Turn: ${room.nextTurn}"
-        Logger.info("changing turn = $room")
-        return GameUiState.NextTurn(room)
+        onRoomUpdate(room)
+        return uiState
     }
 
     private fun isWon(moves: List<Int>): Crossing? {

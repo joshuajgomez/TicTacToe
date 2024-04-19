@@ -3,6 +3,7 @@ package com.triplerock.tictactoe.model.gamemanager
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.model.Firebase
 import com.triplerock.tictactoe.utils.Logger
+import com.triplerock.tictactoe.viewmodels.GameUiState
 
 class OnlineGame(
     private val firebase: Firebase,
@@ -22,9 +23,9 @@ class OnlineGame(
         this.callback = callback
         firebase.listenUpdates(roomId) {
             room = it
-            if (player == it.nextTurn) {
+            if (player == it.nextTurn || room.isEmptyMoves()) {
                 callback.onGameUiStateChange(
-                    gameEngine.nextState(room)
+                    gameEngine.nextState(room, false)
                 )
             }
         }
@@ -35,10 +36,10 @@ class OnlineGame(
 
         room.moves[player]?.add(cell)
 
-        firebase.onMove(room)
-
         callback.onGameUiStateChange(
-            gameEngine.nextState(room)
+            gameEngine.nextState(room) {
+                firebase.onMove(room)
+            }
         )
     }
 
