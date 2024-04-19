@@ -8,6 +8,8 @@ import com.triplerock.tictactoe.ui.screens.game.crossingList
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.GameUiState
 
+const val invalid = -1
+
 class GameEngine {
 
     fun nextMove(room: Room): Int {

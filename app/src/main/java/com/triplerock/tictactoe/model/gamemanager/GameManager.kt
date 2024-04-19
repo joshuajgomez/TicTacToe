@@ -11,6 +11,7 @@ interface GameManager {
 
     interface Callback {
         fun onGameUiStateChange(uiState: GameUiState)
+        fun updatePlayer(player: String)
     }
 }
 

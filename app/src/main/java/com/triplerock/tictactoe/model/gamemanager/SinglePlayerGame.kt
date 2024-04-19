@@ -5,12 +5,9 @@ import android.os.Looper
 import com.triplerock.tictactoe.data.PlayerO
 import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
-import com.triplerock.tictactoe.data.emptyMoves
 import com.triplerock.tictactoe.data.sampleRoomNames
 import com.triplerock.tictactoe.ui.screens.game.Crossing
 import com.triplerock.tictactoe.utils.SharedPrefUtil
-
-const val invalid = -1
 
 class SinglePlayerGame(
     private val gameEngine: GameEngine,

@@ -1,7 +1,7 @@
 package com.triplerock.tictactoe.model.gamemanager
 
-import com.triplerock.tictactoe.data.PlayerX
 import com.triplerock.tictactoe.data.Room
+import com.triplerock.tictactoe.model.Firebase
 import com.triplerock.tictactoe.utils.Logger
 
 class OnlineGame(

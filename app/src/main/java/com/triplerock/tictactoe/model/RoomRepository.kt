@@ -2,7 +2,6 @@ package com.triplerock.tictactoe.model
 
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.sampleNames
-import com.triplerock.tictactoe.model.gamemanager.Firebase
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.utils.SharedPrefUtil
 

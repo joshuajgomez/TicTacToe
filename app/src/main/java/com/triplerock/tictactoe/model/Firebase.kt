@@ -1,10 +1,11 @@
-package com.triplerock.tictactoe.model.gamemanager
+package com.triplerock.tictactoe.model
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
 import com.triplerock.tictactoe.data.Room
 import com.triplerock.tictactoe.data.emptyMoves
+import com.triplerock.tictactoe.model.gamemanager.GameManager
 import com.triplerock.tictactoe.utils.Logger
 
 private const val COLLECTION_ROOMS = "rooms"
@@ -138,4 +139,3 @@ class Firebase {
             }
     }
 }
-

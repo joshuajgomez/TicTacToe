@@ -74,6 +74,10 @@ class GameViewModel(
         _uiState.value = uiState
     }
 
+    override fun updatePlayer(player: String) {
+        this.player = player
+    }
+
     fun onRestartClick() {
         _uiState.value = GameUiState.Waiting()
         gameManager.clearMoves()
