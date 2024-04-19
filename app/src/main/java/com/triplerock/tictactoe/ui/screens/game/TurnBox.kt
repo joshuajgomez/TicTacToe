@@ -121,12 +121,13 @@ fun TurnItem(
                     else colorScheme.background
                 )
                 .padding(horizontal = 20.dp, vertical = 10.dp)
-                .width(120.dp)
+                .width(120.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             mark.icon()
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = playerName, fontSize = 25.sp,
+                text = playerName, fontSize = 20.sp,
                 color = if (isTurn) colorScheme.onPrimary
                 else colorScheme.onBackground,
             )

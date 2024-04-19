@@ -45,6 +45,7 @@ import com.triplerock.tictactoe.ui.screens.getRooms
 import com.triplerock.tictactoe.utils.Logger
 import com.triplerock.tictactoe.viewmodels.GameUiState
 import com.triplerock.tictactoe.viewmodels.GameViewModel
+import com.triplerock.tictactoe.viewmodels.modeMultiLocal
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -84,7 +85,9 @@ fun GameScreenContainer(
                 GameScreen(
                     room = winner.room,
                     crossing = winner.crossing,
-                    isShowRestartButton = gameViewModel.player == PlayerX,
+                    isShowRestartButton =
+                    if (gameViewModel.mode == modeMultiLocal) true
+                    else gameViewModel.player == PlayerX,
                     onRestartButtonClick = { gameViewModel.onRestartClick() },
                     currentPlayer = gameViewModel.player,
                     onCloseClicked = {

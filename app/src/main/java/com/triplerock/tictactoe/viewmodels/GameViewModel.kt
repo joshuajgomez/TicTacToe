@@ -44,7 +44,7 @@ class GameViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GameManager.Callback {
 
-    private val mode: String = checkNotNull(savedStateHandle[navKeyMode])
+    val mode: String = checkNotNull(savedStateHandle[navKeyMode])
     var player: String = checkNotNull(savedStateHandle[navKeyPlayer])
 
     private var gameManager: GameManager

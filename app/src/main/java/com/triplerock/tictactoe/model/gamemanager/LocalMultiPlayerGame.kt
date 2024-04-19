@@ -37,8 +37,9 @@ class LocalMultiPlayerGame(
 
     override fun onMove(cell: Int) {
         Logger.debug("cell = [${cell}]")
-        room.moves[PlayerX]?.add(cell)
-        callback.updatePlayer(if (player == PlayerX) PlayerO else PlayerX)
+        room.moves[player]?.add(cell)
+        player = if (player == PlayerX) PlayerO else PlayerX
+        callback.updatePlayer(player)
         callback.onGameUiStateChange(
             gameEngine.nextState(room)
         )
@@ -48,6 +49,8 @@ class LocalMultiPlayerGame(
         Logger.entry()
         room.moves[PlayerX]?.clear()
         room.moves[PlayerO]?.clear()
+        player = PlayerX
+        callback.updatePlayer(player)
         callback.onGameUiStateChange(
             gameEngine.nextState(room)
         )
